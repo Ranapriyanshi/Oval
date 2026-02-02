@@ -1,0 +1,2 @@
+# Seeders directory
+# Use: sequelize-cli seed:generate --name <seeder-name>

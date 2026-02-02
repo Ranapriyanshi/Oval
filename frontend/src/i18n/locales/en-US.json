@@ -1,0 +1,52 @@
+{
+  "common": {
+    "welcome": "Welcome to Oval",
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "retry": "Retry",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "save": "Save",
+    "edit": "Edit",
+    "delete": "Delete",
+    "search": "Search",
+    "filter": "Filter",
+    "sort": "Sort"
+  },
+  "auth": {
+    "login": "Login",
+    "register": "Register",
+    "logout": "Logout",
+    "email": "Email",
+    "password": "Password",
+    "forgotPassword": "Forgot Password?",
+    "signIn": "Sign In",
+    "signUp": "Sign Up",
+    "createAccount": "Create Account",
+    "alreadyHaveAccount": "Already have an account?",
+    "dontHaveAccount": "Don't have an account?"
+  },
+  "profile": {
+    "title": "Profile",
+    "editProfile": "Edit Profile",
+    "sportsPreferences": "Sports Preferences",
+    "location": "Location",
+    "timezone": "Timezone"
+  },
+  "venue": {
+    "title": "Venues",
+    "bookVenue": "Book Venue",
+    "amenities": "Amenities",
+    "price": "Price",
+    "distance": "Distance",
+    "miles": "miles"
+  },
+  "currency": {
+    "usd": "USD",
+    "symbol": "$"
+  },
+  "date": {
+    "format": "MM/DD/YYYY",
+    "timeFormat": "hh:mm A"
+  }
+}
