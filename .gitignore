@@ -35,3 +35,4 @@ web-build/
 # Misc
 coverage/
 .nyc_output/
+frontend/src/assets/xmas-icons.zip
