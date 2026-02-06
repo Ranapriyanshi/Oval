@@ -19,7 +19,7 @@
 </td>
 <td width="50%" align="center">
 
-<img src="https://www.nytimes.com/2020/10/06/learning/what-ideas-do-you-have-to-improve-your-favorite-sport.html" alt="Sports Community" width="280">
+<img src="https://static01.nyt.com/images/2020/07/21/autossell/sports-reboot-promo-still/sports-reboot-promo-still-videoLarge.jpg" alt="Sports Community" width="280">
 
 </td>
 </tr>
