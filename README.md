@@ -1,56 +1,147 @@
+<div align="center">
+  
+# ⚽ Oval - Community Sports App
 
-# Oval - Community Sports App
-<img src="https://www.nytimes.com/2020/10/06/learning/what-ideas-do-you-have-to-improve-your-favorite-sport.html" alt="" align="right" width="370">
+<img src="https://www.nytimes.com/2020/10/06/learning/what-ideas-do-you-have-to-improve-your-favorite-sport.html" alt="Sports Community" width="300">
 
-A comprehensive community-driven sports technology app for discovering, booking, and engaging in sports activities.
+**A comprehensive community-driven sports technology app for discovering, booking, and engaging in sports activities.**
 
-## Features
+[![Node.js](https://img.shields.io/badge/Node.js-18%2B-green?logo=node.js)](https://nodejs.org/)
+[![React Native](https://img.shields.io/badge/React%20Native-Expo-blue?logo=react)](https://expo.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?logo=typescript)](https://www.typescriptlang.org/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-14%2B-blue?logo=postgresql)](https://www.postgresql.org/)
+[![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
 
-- **Venue Booking**: Browse and book sports venues in real-time
-- **Find Playpals**: Connect with local players (Tinder-style matching)
-- **Gametime Activities**: Pre-organized curated game sessions
-- **Coaching & Training**: Find verified coaches and academies
-- **Skill Tracking**: Rate players, earn karma points, track fitness journey
-- **Chat & Messaging**: Real-time messaging with Socket.io
-- **Events & Tournaments**: Create and join events and tournaments
-- **Achievements & Badges**: Unlock achievements and collect badges
-- **Stats & Analytics**: Personal performance metrics and analytics
-- **Weather Integration**: Weather-based game recommendations
+</div>
 
-## Tech Stack
+---
 
-### Frontend
-- React Native (Expo)
-- TypeScript
-- React Navigation
-- react-i18next (Internationalization)
-- Expo GL (3D assets)
+## 📋 Table of Contents
 
-### Backend
-- Node.js
-- Express.js
-- TypeScript
-- PostgreSQL
-- Socket.io
-- JWT Authentication
+- [✨ Features](#-features)
+- [🛠️ Tech Stack](#-tech-stack)
+- [📁 Project Structure](#-project-structure)
+- [🚀 Getting Started](#-getting-started)
+- [🌍 Multi-Country Support](#-multi-country-support)
+- [🎨 Design System](#-design-system)
+- [📝 License](#-license)
 
-## Project Structure
+---
+
+## ✨ Features
+
+<table>
+<tr>
+<td>
+
+🏟️ **Venue Booking**  
+Browse and book sports venues in real-time
+
+🤝 **Find Playpals**  
+Connect with local players (Tinder-style matching)
+
+🎮 **Gametime Activities**  
+Pre-organized curated game sessions
+
+</td>
+<td>
+
+🏆 **Coaching & Training**  
+Find verified coaches and academies
+
+📊 **Skill Tracking**  
+Rate players, earn karma points, track fitness journey
+
+💬 **Chat & Messaging**  
+Real-time messaging with Socket.io
+
+</td>
+<td>
+
+🎪 **Events & Tournaments**  
+Create and join events and tournaments
+
+🏅 **Achievements & Badges**  
+Unlock achievements and collect badges
+
+📈 **Stats & Analytics**  
+Personal performance metrics and analytics
+
+</td>
+</tr>
+</table>
+
+🌦️ **Weather Integration** - Weather-based game recommendations
+
+---
+
+## 🛠️ Tech Stack
+
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+
+### 📱 Frontend
+- **Framework**: React Native (Expo)
+- **Language**: TypeScript
+- **Navigation**: React Navigation
+- **Internationalization**: react-i18next
+- **3D Graphics**: Expo GL
+
+### 🔌 Backend
+- **Runtime**: Node.js
+- **Framework**: Express.js
+- **Language**: TypeScript
+- **Database**: PostgreSQL
+- **Real-time**: Socket.io
+- **Authentication**: JWT
+
+</div>
+
+---
+
+## 📁 Project Structure
 
 ```
 Oval/
-├── frontend/          # React Native Expo app
-├── backend/           # Node.js Express API
-└── assets/            # 3D assets and images
+├── 📱 frontend/               # React Native Expo app
+│   ├── src/
+│   │   ├── components/        # Reusable UI components
+│   │   ├── screens/           # App screens
+│   │   ├── services/          # API & business logic
+│   │   ├── context/           # React Context
+│   │   ├── navigation/        # Navigation setup
+│   │   ├── i18n/              # Internationalization
+│   │   └── types/             # TypeScript types
+│   └── package.json
+│
+├── 🔌 backend/                # Node.js Express API
+│   ├── src/
+│   │   ├── server.ts          # Express server entry
+│   │   ├── config/            # Configuration & DB
+│   │   ├── models/            # Database models
+│   │   ├── routes/            # API routes
+│   │   ├── middleware/        # Express middleware
+│   │   ├── migrations/        # DB migrations
+│   │   └── seeders/           # DB seeders
+│   └── package.json
+│
+└── 📚 docs/                   # Documentation
 ```
 
-## Getting Started
+---
 
-### Prerequisites
-- Node.js 18+
-- PostgreSQL 14+
-- Expo CLI
+## 🚀 Getting Started
 
-### Frontend Setup
+## 🚀 Getting Started
+
+### 📋 Prerequisites
+
+| Requirement | Version |
+|-------------|---------|
+| Node.js | 18+ |
+| PostgreSQL | 14+ |
+| Expo CLI | Latest |
+
+### 📱 Frontend Setup
 
 ```bash
 cd frontend
@@ -58,7 +149,7 @@ npm install
 npm start
 ```
 
-### Backend Setup
+### 🔌 Backend Setup
 
 ```bash
 cd backend
@@ -69,22 +160,49 @@ npm run migrate
 npm run dev
 ```
 
-## Multi-Country Support
+### ✅ Verification
 
-The app supports multiple countries with:
-- Country-specific sports (AFL, Cricket for Australia)
-- Multi-currency support (AUD, USD)
-- Localized date/time formats
-- Region-aware features
+Once running:
+- **Frontend**: Available at Expo app
+- **Backend**: API running at `http://localhost:5000`
+- **Database**: PostgreSQL migrations applied
 
-## Design System
+---
 
-The app uses a 3D illustration-driven visual system with:
-- Minimal, neutral UI as canvas
-- Expressive 3D visuals
-- Modular, reusable 3D assets
-- Playful, friendly brand personality
+## 🌍 Multi-Country Support
 
-## License
+The app adapts to multiple countries with region-specific features:
 
-MIT
+| Feature | Details |
+|---------|---------|
+| 🏟️ **Sports** | Country-specific sports (AFL, Cricket for Australia) |
+| 💰 **Currency** | Multi-currency support (AUD, USD) |
+| 📅 **Localization** | Localized date/time formats |
+| 🎯 **Regional Features** | Region-aware features and content |
+
+---
+
+## 🎨 Design System
+
+The app features a **3D illustration-driven visual system**:
+
+✨ **Minimal, neutral UI** as canvas  
+🎭 **Expressive 3D visuals** for engagement  
+🧩 **Modular, reusable 3D assets** for consistency  
+😄 **Playful, friendly brand personality** 
+
+---
+
+## 📝 License
+
+This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
+
+---
+
+<div align="center">
+
+**Made with ❤️ for the sports community**
+
+[⬆ Back to top](#-oval---community-sports-app)
+
+</div>
