@@ -2,7 +2,11 @@
   
 # ⚽ Oval - Community Sports App
 
-<img src="https://static01.nyt.com/images/2020/07/21/autossell/sports-reboot-promo-still/sports-reboot-promo-still-videoLarge.jpg" alt="Sports Community" width="300">
+</div>
+
+<table>
+<tr>
+<td width="50%" align="left">
 
 **A comprehensive community-driven sports technology app for discovering, booking, and engaging in sports activities.**
 
@@ -12,11 +16,18 @@
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-14%2B-blue?logo=postgresql)](https://www.postgresql.org/)
 [![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
 
-</div>
+</td>
+<td width="50%" align="center">
+
+<img src="https://www.nytimes.com/2020/10/06/learning/what-ideas-do-you-have-to-improve-your-favorite-sport.html" alt="Sports Community" width="280">
+
+</td>
+</tr>
+</table>
 
 ---
 
-## 📋 Table of Contents
+##  Table of Contents
 
 - [✨ Features](#-features)
 - [🛠️ Tech Stack](#-tech-stack)
