@@ -1,6 +1,6 @@
-<img src="https://www.nytimes.com/2020/10/06/learning/what-ideas-do-you-have-to-improve-your-favorite-sport.html" alt="" align="right" width="370">
 
 # Oval - Community Sports App
+<img src="https://www.nytimes.com/2020/10/06/learning/what-ideas-do-you-have-to-improve-your-favorite-sport.html" alt="" align="right" width="370">
 
 A comprehensive community-driven sports technology app for discovering, booking, and engaging in sports activities.
 
