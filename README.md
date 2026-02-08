@@ -204,12 +204,6 @@ The app features a **3D illustration-driven visual system**:
 
 ---
 
-## 📝 License
-
-This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
-
----
-
 <div align="center">
 
 **Made with ❤️ for the sports community**
