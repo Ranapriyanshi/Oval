@@ -4,8 +4,13 @@ import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import config from './config/config';
 import sequelize from './config/sequelize';
+import './models'; // Load models and register associations before routes
+import apiLogger from './middleware/apiLogger';
 import authRoutes from './routes/auth';
 import userRoutes from './routes/users';
+import venueRoutes from './routes/venues';
+import bookingRoutes from './routes/bookings';
+import playpalRoutes from './routes/playpals';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 
@@ -27,6 +32,7 @@ app.use(cors({
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(apiLogger); // Add API logging middleware
 
 // Rate limiting
 const limiter = rateLimit({
@@ -38,6 +44,9 @@ app.use('/api/', limiter);
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/venues', venueRoutes);
+app.use('/api/bookings', bookingRoutes);
+app.use('/api/playpals', playpalRoutes);
 
 // Health check
 app.get('/health', (req, res) => {

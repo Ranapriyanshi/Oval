@@ -19,8 +19,22 @@ This will create a new migration file in the format: `YYYYMMDDHHMMSS-<migration-
 
 ## Running Migrations
 
+**Always run from the `backend` directory:** `cd backend` then `npm run migrate`.
+
+### Check which migrations have run:
+```bash
+npm run migrate:status
+```
+
 ### Run all pending migrations:
 ```bash
+npm run migrate
+```
+
+If you see "No migrations were executed, database schema was already up to date", it means every migration in `src/migrations/` has already been applied (recorded in the `SequelizeMeta` table). To re-run from scratch you must undo first, then migrate again:
+
+```bash
+npm run migrate:undo:all
 npm run migrate
 ```
 

@@ -12,6 +12,10 @@ interface UserAttributes {
   currency: string;
   sports_preferences?: string[];
   karma_points: number;
+  latitude?: string | null;
+  longitude?: string | null;
+  city?: string | null;
+  bio?: string | null;
   created_at: Date;
   updated_at: Date;
 }
@@ -30,6 +34,10 @@ class User extends Model<UserAttributes, UserCreationAttributes> implements User
   public currency!: string;
   public sports_preferences?: string[];
   public karma_points!: number;
+  public latitude!: string | null;
+  public longitude!: string | null;
+  public city!: string | null;
+  public bio!: string | null;
   public created_at!: Date;
   public updated_at!: Date;
 
@@ -89,6 +97,30 @@ User.init(
     karma_points: {
       type: DataTypes.INTEGER,
       defaultValue: 0,
+    },
+    latitude: {
+      type: DataTypes.DECIMAL(10, 8),
+      allowNull: true,
+      get() {
+        const value = this.getDataValue('latitude');
+        return value != null ? String(value) : null;
+      },
+    },
+    longitude: {
+      type: DataTypes.DECIMAL(11, 8),
+      allowNull: true,
+      get() {
+        const value = this.getDataValue('longitude');
+        return value != null ? String(value) : null;
+      },
+    },
+    city: {
+      type: DataTypes.STRING(100),
+      allowNull: true,
+    },
+    bio: {
+      type: DataTypes.TEXT,
+      allowNull: true,
     },
     created_at: {
       type: DataTypes.DATE,

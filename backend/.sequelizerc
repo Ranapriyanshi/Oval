@@ -1,8 +1,12 @@
 const path = require('path');
 
+// Resolve paths relative to this config file so migrations run correctly
+// whether you run `npm run migrate` from backend/ or from project root
+const backendRoot = path.resolve(__dirname);
+
 module.exports = {
-  'config': path.resolve('src', 'config', 'database.js'),
-  'models-path': path.resolve('src', 'models'),
-  'seeders-path': path.resolve('src', 'seeders'),
-  'migrations-path': path.resolve('src', 'migrations')
+  'config': path.join(backendRoot, 'src', 'config', 'database.js'),
+  'models-path': path.join(backendRoot, 'src', 'models'),
+  'seeders-path': path.join(backendRoot, 'src', 'seeders'),
+  'migrations-path': path.join(backendRoot, 'src', 'migrations')
 };
