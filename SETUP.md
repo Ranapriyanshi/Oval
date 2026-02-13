@@ -176,9 +176,15 @@ Oval/
 - ThreeDScene component setup
 - Integration with Expo GL
 
-## Next Steps (Phase 2)
+## Phase 2: Venue & Booking System ✅
 
-- Venue booking system
+- **Backend**: Venues, venue_sports, venue_images, venue_schedules, bookings, venue_ratings (migrations + models)
+- **API**: `GET/POST /api/venues`, `GET /api/venues/:id`, `GET /api/venues/:id/availability`, `POST /api/venues/:id/rate`, `GET/POST /api/bookings`, `PUT /api/bookings/:id/cancel`
+- **Frontend**: Venues tab (list, filters), Venue detail (availability, book slot), My Bookings tab
+- **Demo data**: Run `npm run seed` in backend to add sample venues
+
+## Next Steps (Phase 3+)
+
 - Playpal discovery and matching
 - Game creation and joining
 - Basic chat functionality
