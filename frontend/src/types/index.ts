@@ -45,6 +45,32 @@ export interface Booking {
   createdAt: string;
 }
 
+export interface PlaypalMatch {
+  match_id: string;
+  matched_at: string;
+  user: {
+    id: string;
+    name: string;
+    email: string;
+    city?: string;
+    bio?: string;
+    country: string;
+  };
+}
+
+export interface SportsSkill {
+  id: string;
+  sport_name: string;
+  skill_level: 'beginner' | 'intermediate' | 'advanced' | 'professional';
+}
+
+export interface Availability {
+  id: string;
+  day_of_week: number;
+  start_time: string;
+  end_time: string;
+}
+
 export interface Game {
   id: string;
   creatorId: string;
