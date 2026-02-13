@@ -11,6 +11,7 @@ import userRoutes from './routes/users';
 import venueRoutes from './routes/venues';
 import bookingRoutes from './routes/bookings';
 import playpalRoutes from './routes/playpals';
+import gametimeRoutes from './routes/gametime';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 
@@ -47,6 +48,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/venues', venueRoutes);
 app.use('/api/bookings', bookingRoutes);
 app.use('/api/playpals', playpalRoutes);
+app.use('/api/gametime', gametimeRoutes);
 
 // Health check
 app.get('/health', (req, res) => {

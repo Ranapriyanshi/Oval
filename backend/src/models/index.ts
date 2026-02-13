@@ -11,6 +11,8 @@ import UserAvailability from './UserAvailability';
 import UserProfilePhoto from './UserProfilePhoto';
 import UserSwipe from './UserSwipe';
 import UserMatch from './UserMatch';
+import Gametime from './Gametime';
+import GametimeParticipant from './GametimeParticipant';
 
 // Venue associations
 Venue.hasMany(VenueSport, { foreignKey: 'venue_id' });
@@ -55,6 +57,16 @@ User.hasMany(UserMatch, { foreignKey: 'user2_id', as: 'MatchesAsUser2' });
 UserMatch.belongsTo(User, { foreignKey: 'user1_id', as: 'User1' });
 UserMatch.belongsTo(User, { foreignKey: 'user2_id', as: 'User2' });
 
+// Gametime associations
+User.hasMany(Gametime, { foreignKey: 'creator_id', as: 'CreatedGametimes' });
+Gametime.belongsTo(User, { foreignKey: 'creator_id', as: 'Creator' });
+
+Gametime.hasMany(GametimeParticipant, { foreignKey: 'gametime_id', as: 'GametimeParticipants' });
+GametimeParticipant.belongsTo(Gametime, { foreignKey: 'gametime_id', as: 'Gametime' });
+
+User.hasMany(GametimeParticipant, { foreignKey: 'user_id', as: 'GametimeJoined' });
+GametimeParticipant.belongsTo(User, { foreignKey: 'user_id', as: 'User' });
+
 const models = {
   User,
   Venue,
@@ -68,6 +80,8 @@ const models = {
   UserProfilePhoto,
   UserSwipe,
   UserMatch,
+  Gametime,
+  GametimeParticipant,
   sequelize,
 };
 
@@ -85,4 +99,6 @@ export {
   UserProfilePhoto,
   UserSwipe,
   UserMatch,
+  Gametime,
+  GametimeParticipant,
 };
