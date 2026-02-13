@@ -1,27 +1,117 @@
 import React from 'react';
+import { View, Text, StyleSheet } from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useAuth } from '../context/AuthContext';
+import { colors, fontSize, fontWeight } from '../theme';
 import LoginScreen from '../screens/Auth/LoginScreen';
 import RegisterScreen from '../screens/Auth/RegisterScreen';
 import HomeScreen from '../screens/Home/HomeScreen';
 import ProfileScreen from '../screens/Profile/ProfileScreen';
+import VenuesScreen from '../screens/Venues/VenuesScreen';
+import VenueDetailScreen from '../screens/Venues/VenueDetailScreen';
+import BookingsScreen from '../screens/Bookings/BookingsScreen';
+import DiscoveryScreen from '../screens/Playpals/DiscoveryScreen';
+import MatchesScreen from '../screens/Playpals/MatchesScreen';
+import PlaypalProfileScreen from '../screens/Playpals/PlaypalProfileScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
+// Simple text-based tab icon (no external icon library needed)
+const TabIcon = ({ label, focused }: { label: string; focused: boolean }) => {
+  const iconMap: Record<string, string> = {
+    Home: '⚽',
+    Discover: '🔍',
+    Matches: '🤝',
+    Venues: '🏟️',
+    Bookings: '📋',
+    Profile: '👤',
+  };
+  return (
+    <View style={tabIconStyles.container}>
+      <Text style={[tabIconStyles.icon, focused && tabIconStyles.iconFocused]}>
+        {iconMap[label] || '●'}
+      </Text>
+    </View>
+  );
+};
+
+const tabIconStyles = StyleSheet.create({
+  container: { alignItems: 'center', justifyContent: 'center' },
+  icon: { fontSize: 20, opacity: 0.5 },
+  iconFocused: { opacity: 1 },
+});
+
 const MainTabs = () => {
   return (
-    <Tab.Navigator>
-      <Tab.Screen 
-        name="Home" 
+    <Tab.Navigator
+      screenOptions={{
+        headerShown: false,
+        tabBarStyle: {
+          backgroundColor: colors.background,
+          borderTopColor: colors.borderLight,
+          borderTopWidth: 1,
+          height: 60,
+          paddingBottom: 8,
+          paddingTop: 8,
+        },
+        tabBarActiveTintColor: colors.tabActive,
+        tabBarInactiveTintColor: colors.tabInactive,
+        tabBarLabelStyle: {
+          fontSize: fontSize.xs,
+          fontWeight: fontWeight.medium,
+          marginTop: 2,
+        },
+      }}
+    >
+      <Tab.Screen
+        name="Home"
         component={HomeScreen}
-        options={{ headerShown: false }}
+        options={{
+          tabBarLabel: 'Home',
+          tabBarIcon: ({ focused }) => <TabIcon label="Home" focused={focused} />,
+        }}
       />
-      <Tab.Screen 
-        name="Profile" 
+      <Tab.Screen
+        name="Discover"
+        component={DiscoveryScreen}
+        options={{
+          tabBarLabel: 'Discover',
+          tabBarIcon: ({ focused }) => <TabIcon label="Discover" focused={focused} />,
+        }}
+      />
+      <Tab.Screen
+        name="Matches"
+        component={MatchesScreen}
+        options={{
+          tabBarLabel: 'Matches',
+          tabBarIcon: ({ focused }) => <TabIcon label="Matches" focused={focused} />,
+        }}
+      />
+      <Tab.Screen
+        name="Venues"
+        component={VenuesScreen}
+        options={{
+          tabBarLabel: 'Venues',
+          tabBarIcon: ({ focused }) => <TabIcon label="Venues" focused={focused} />,
+        }}
+      />
+      <Tab.Screen
+        name="Bookings"
+        component={BookingsScreen}
+        options={{
+          tabBarLabel: 'Bookings',
+          tabBarIcon: ({ focused }) => <TabIcon label="Bookings" focused={focused} />,
+        }}
+      />
+      <Tab.Screen
+        name="Profile"
         component={ProfileScreen}
-        options={{ headerShown: false }}
+        options={{
+          tabBarLabel: 'Profile',
+          tabBarIcon: ({ focused }) => <TabIcon label="Profile" focused={focused} />,
+        }}
       />
     </Tab.Navigator>
   );
@@ -31,13 +121,17 @@ const AppNavigator = () => {
   const { user, loading } = useAuth();
 
   if (loading) {
-    return null; // Or a loading screen
+    return null;
   }
 
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       {user ? (
-        <Stack.Screen name="Main" component={MainTabs} />
+        <>
+          <Stack.Screen name="Main" component={MainTabs} />
+          <Stack.Screen name="VenueDetail" component={VenueDetailScreen} />
+          <Stack.Screen name="PlaypalProfile" component={PlaypalProfileScreen} />
+        </>
       ) : (
         <>
           <Stack.Screen name="Login" component={LoginScreen} />
