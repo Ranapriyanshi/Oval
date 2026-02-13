@@ -14,6 +14,9 @@ import BookingsScreen from '../screens/Bookings/BookingsScreen';
 import DiscoveryScreen from '../screens/Playpals/DiscoveryScreen';
 import MatchesScreen from '../screens/Playpals/MatchesScreen';
 import PlaypalProfileScreen from '../screens/Playpals/PlaypalProfileScreen';
+import GametimeScreen from '../screens/Gametime/GametimeScreen';
+import GametimeDetailScreen from '../screens/Gametime/GametimeDetailScreen';
+import GametimeCreateScreen from '../screens/Gametime/GametimeCreateScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -24,6 +27,7 @@ const TabIcon = ({ label, focused }: { label: string; focused: boolean }) => {
     Home: '⚽',
     Discover: '🔍',
     Matches: '🤝',
+    Gametime: '🎮',
     Venues: '🏟️',
     Bookings: '📋',
     Profile: '👤',
@@ -90,19 +94,19 @@ const MainTabs = () => {
         }}
       />
       <Tab.Screen
+        name="Gametime"
+        component={GametimeScreen}
+        options={{
+          tabBarLabel: 'Gametime',
+          tabBarIcon: ({ focused }) => <TabIcon label="Gametime" focused={focused} />,
+        }}
+      />
+      <Tab.Screen
         name="Venues"
         component={VenuesScreen}
         options={{
           tabBarLabel: 'Venues',
           tabBarIcon: ({ focused }) => <TabIcon label="Venues" focused={focused} />,
-        }}
-      />
-      <Tab.Screen
-        name="Bookings"
-        component={BookingsScreen}
-        options={{
-          tabBarLabel: 'Bookings',
-          tabBarIcon: ({ focused }) => <TabIcon label="Bookings" focused={focused} />,
         }}
       />
       <Tab.Screen
@@ -131,6 +135,10 @@ const AppNavigator = () => {
           <Stack.Screen name="Main" component={MainTabs} />
           <Stack.Screen name="VenueDetail" component={VenueDetailScreen} />
           <Stack.Screen name="PlaypalProfile" component={PlaypalProfileScreen} />
+          <Stack.Screen name="GametimeDetail" component={GametimeDetailScreen} />
+          <Stack.Screen name="GametimeCreate" component={GametimeCreateScreen} />
+          <Stack.Screen name="Bookings" component={BookingsScreen} />
+          <Stack.Screen name="MatchesList" component={MatchesScreen} />
         </>
       ) : (
         <>
