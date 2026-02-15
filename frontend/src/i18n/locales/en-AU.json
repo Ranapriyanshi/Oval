@@ -149,5 +149,18 @@
     "myEvents": "My Events",
     "eventsCreated": "Events I Created",
     "eventsJoined": "Events I Joined"
+  },
+  "chat": {
+    "title": "Messages",
+    "chat": "Chat",
+    "emptyTitle": "No conversations yet",
+    "emptySubtitle": "Match with playpals to start chatting!",
+    "noMessages": "No messages yet",
+    "yesterday": "Yesterday",
+    "today": "Today",
+    "typeMessage": "Type a message...",
+    "startConversation": "Say hello!",
+    "isTyping": "is typing...",
+    "sendMessage": "Send Message"
   }
 }

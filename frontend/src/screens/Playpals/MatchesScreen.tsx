@@ -13,6 +13,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigation } from '@react-navigation/native';
 import { colors, spacing, borderRadius, fontSize, fontWeight, shadow } from '../../theme';
 import { playpalsApi, MatchItem } from '../../services/playpals';
+import chatApi from '../../services/chat';
 
 const SPORT_EMOJIS: Record<string, string> = {
   tennis: '🎾',
@@ -137,13 +138,32 @@ const MatchesScreen = () => {
           </View>
 
           {/* Actions */}
-          <TouchableOpacity
-            style={styles.unmatchButton}
-            onPress={() => handleUnmatch(item)}
-            hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-          >
-            <Text style={styles.unmatchIcon}>•••</Text>
-          </TouchableOpacity>
+          <View style={styles.matchActions}>
+            <TouchableOpacity
+              style={styles.messageButton}
+              onPress={async () => {
+                try {
+                  const conv = await chatApi.startConversation(user.id);
+                  navigation.navigate('ChatConversation', {
+                    conversationId: conv.id,
+                    otherUser: { id: user.id, name: user.name, city: user.city },
+                  });
+                } catch (error) {
+                  console.error('Start conversation failed:', error);
+                }
+              }}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.messageButtonText}>💬</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.unmatchButton}
+              onPress={() => handleUnmatch(item)}
+              hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+            >
+              <Text style={styles.unmatchIcon}>•••</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </TouchableOpacity>
     );
@@ -317,6 +337,21 @@ const styles = StyleSheet.create({
     fontSize: fontSize.xs,
     color: colors.textTertiary,
     marginTop: spacing.sm,
+  },
+  matchActions: {
+    alignItems: 'center',
+    gap: spacing.sm,
+  },
+  messageButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: colors.primaryLight,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  messageButtonText: {
+    fontSize: 18,
   },
   unmatchButton: {
     padding: spacing.sm,

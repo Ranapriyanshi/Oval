@@ -17,6 +17,8 @@ import PlaypalProfileScreen from '../screens/Playpals/PlaypalProfileScreen';
 import GametimeScreen from '../screens/Gametime/GametimeScreen';
 import GametimeDetailScreen from '../screens/Gametime/GametimeDetailScreen';
 import GametimeCreateScreen from '../screens/Gametime/GametimeCreateScreen';
+import ConversationsScreen from '../screens/Chat/ConversationsScreen';
+import ChatScreen from '../screens/Chat/ChatScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -26,10 +28,9 @@ const TabIcon = ({ label, focused }: { label: string; focused: boolean }) => {
   const iconMap: Record<string, string> = {
     Home: '⚽',
     Discover: '🔍',
-    Matches: '🤝',
+    Chat: '💬',
     Gametime: '🎮',
     Venues: '🏟️',
-    Bookings: '📋',
     Profile: '👤',
   };
   return (
@@ -86,11 +87,11 @@ const MainTabs = () => {
         }}
       />
       <Tab.Screen
-        name="Matches"
-        component={MatchesScreen}
+        name="Chat"
+        component={ConversationsScreen}
         options={{
-          tabBarLabel: 'Matches',
-          tabBarIcon: ({ focused }) => <TabIcon label="Matches" focused={focused} />,
+          tabBarLabel: 'Chat',
+          tabBarIcon: ({ focused }) => <TabIcon label="Chat" focused={focused} />,
         }}
       />
       <Tab.Screen
@@ -137,6 +138,11 @@ const AppNavigator = () => {
           <Stack.Screen name="PlaypalProfile" component={PlaypalProfileScreen} />
           <Stack.Screen name="GametimeDetail" component={GametimeDetailScreen} />
           <Stack.Screen name="GametimeCreate" component={GametimeCreateScreen} />
+          <Stack.Screen
+            name="ChatConversation"
+            component={ChatScreen}
+            options={{ headerShown: true, headerTitle: 'Chat' }}
+          />
           <Stack.Screen name="Bookings" component={BookingsScreen} />
           <Stack.Screen name="MatchesList" component={MatchesScreen} />
         </>
