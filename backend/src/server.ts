@@ -16,6 +16,10 @@ import chatRoutes from './routes/chat';
 import coachingRoutes from './routes/coaching';
 import statsRoutes from './routes/stats';
 import leaderboardsRoutes from './routes/leaderboards';
+import eventsRoutes from './routes/events';
+import achievementsRoutes from './routes/achievements';
+import weatherRoutes from './routes/weather';
+import adminRoutes from './routes/admin';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 import { setupChatSocket } from './socket/chatHandler';
@@ -58,6 +62,10 @@ app.use('/api/chat', chatRoutes);
 app.use('/api/coaching', coachingRoutes);
 app.use('/api/stats', statsRoutes);
 app.use('/api/leaderboards', leaderboardsRoutes);
+app.use('/api/events', eventsRoutes);
+app.use('/api/achievements', achievementsRoutes);
+app.use('/api/weather', weatherRoutes);
+app.use('/api/admin', adminRoutes);
 
 // Health check
 app.get('/health', (req, res) => {

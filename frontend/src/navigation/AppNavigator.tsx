@@ -26,6 +26,9 @@ import MySessionsScreen from '../screens/Coaching/MySessionsScreen';
 import StatsScreen from '../screens/Stats/StatsScreen';
 import LeaderboardsScreen from '../screens/Stats/LeaderboardsScreen';
 import GameRatingScreen from '../screens/Stats/GameRatingScreen';
+import EventsScreen from '../screens/Events/EventsScreen';
+import EventDetailScreen from '../screens/Events/EventDetailScreen';
+import MyEventsScreen from '../screens/Events/MyEventsScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -190,6 +193,21 @@ const AppNavigator = () => {
             name="GameRating"
             component={GameRatingScreen}
             options={{ headerShown: true, headerTitle: 'Rate players', ...stackHeaderStyle }}
+          />
+          <Stack.Screen
+            name="Events"
+            component={EventsScreen}
+            options={{ headerShown: true, headerTitle: 'Events', ...stackHeaderStyle }}
+          />
+          <Stack.Screen
+            name="EventDetail"
+            component={EventDetailScreen}
+            options={{ headerShown: true, headerTitle: 'Event', ...stackHeaderStyle }}
+          />
+          <Stack.Screen
+            name="MyEvents"
+            component={MyEventsScreen}
+            options={{ headerShown: true, headerTitle: 'My events', ...stackHeaderStyle }}
           />
         </>
       ) : (

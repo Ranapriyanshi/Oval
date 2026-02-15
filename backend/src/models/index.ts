@@ -22,6 +22,10 @@ import CoachRating from './CoachRating';
 import UserStats from './UserStats';
 import GameHistory from './GameHistory';
 import PlayerRating from './PlayerRating';
+import Event from './Event';
+import EventRegistration from './EventRegistration';
+import Achievement from './Achievement';
+import UserAchievement from './UserAchievement';
 
 // Venue associations
 Venue.hasMany(VenueSport, { foreignKey: 'venue_id' });
@@ -127,6 +131,22 @@ User.hasMany(PlayerRating, { foreignKey: 'rated_user_id', as: 'RatingsReceived' 
 PlayerRating.belongsTo(User, { foreignKey: 'rater_id', as: 'Rater' });
 PlayerRating.belongsTo(User, { foreignKey: 'rated_user_id', as: 'RatedUser' });
 
+// Events & Tournaments
+User.hasMany(Event, { foreignKey: 'organizer_id', as: 'OrganizedEvents' });
+Event.belongsTo(User, { foreignKey: 'organizer_id', as: 'Organizer' });
+Venue.hasMany(Event, { foreignKey: 'venue_id', as: 'Events' });
+Event.belongsTo(Venue, { foreignKey: 'venue_id', as: 'Venue' });
+Event.hasMany(EventRegistration, { foreignKey: 'event_id', as: 'Registrations' });
+EventRegistration.belongsTo(Event, { foreignKey: 'event_id', as: 'Event' });
+User.hasMany(EventRegistration, { foreignKey: 'user_id', as: 'EventRegistrations' });
+EventRegistration.belongsTo(User, { foreignKey: 'user_id', as: 'User' });
+
+// Achievements
+Achievement.hasMany(UserAchievement, { foreignKey: 'achievement_id', as: 'UserAchievements' });
+UserAchievement.belongsTo(Achievement, { foreignKey: 'achievement_id', as: 'Achievement' });
+User.hasMany(UserAchievement, { foreignKey: 'user_id', as: 'Achievements' });
+UserAchievement.belongsTo(User, { foreignKey: 'user_id', as: 'User' });
+
 const models = {
   User,
   Venue,
@@ -151,6 +171,10 @@ const models = {
   UserStats,
   GameHistory,
   PlayerRating,
+  Event,
+  EventRegistration,
+  Achievement,
+  UserAchievement,
   sequelize,
 };
 
@@ -179,4 +203,8 @@ export {
   UserStats,
   GameHistory,
   PlayerRating,
+  Event,
+  EventRegistration,
+  Achievement,
+  UserAchievement,
 };
