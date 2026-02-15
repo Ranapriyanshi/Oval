@@ -146,6 +146,16 @@ const ProfileScreen = () => {
             <Text style={[styles.linkText, { color: colors.textPrimary }]}>Achievements</Text>
             <Text style={[styles.linkChevron, { color: colors.textTertiary }]}>›</Text>
           </TouchableOpacity>
+          <View style={[styles.separator, { backgroundColor: colors.separator }]} />
+          <TouchableOpacity
+            style={styles.linkRow}
+            onPress={() => navigation.navigate('Admin')}
+            activeOpacity={0.7}
+          >
+            <Text style={[styles.linkIcon]}>⚙️</Text>
+            <Text style={[styles.linkText, { color: colors.textPrimary }]}>Admin</Text>
+            <Text style={[styles.linkChevron, { color: colors.textTertiary }]}>›</Text>
+          </TouchableOpacity>
         </View>
 
         {/* Country Switch */}

@@ -30,6 +30,7 @@ import EventsScreen from '../screens/Events/EventsScreen';
 import EventDetailScreen from '../screens/Events/EventDetailScreen';
 import MyEventsScreen from '../screens/Events/MyEventsScreen';
 import AchievementsScreen from '../screens/Achievements/AchievementsScreen';
+import AdminScreen from '../screens/Admin/AdminScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -214,6 +215,11 @@ const AppNavigator = () => {
             name="Achievements"
             component={AchievementsScreen}
             options={{ headerShown: true, headerTitle: 'Achievements', ...stackHeaderStyle }}
+          />
+          <Stack.Screen
+            name="Admin"
+            component={AdminScreen}
+            options={{ headerShown: true, headerTitle: 'Admin', ...stackHeaderStyle }}
           />
         </>
       ) : (

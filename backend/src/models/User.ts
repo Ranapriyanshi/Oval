@@ -16,11 +16,12 @@ interface UserAttributes {
   longitude?: string | null;
   city?: string | null;
   bio?: string | null;
+  is_admin?: boolean;
   created_at: Date;
   updated_at: Date;
 }
 
-interface UserCreationAttributes extends Optional<UserAttributes, 'id' | 'sports_preferences' | 'karma_points' | 'created_at' | 'updated_at' | 'password_hash'> {
+interface UserCreationAttributes extends Optional<UserAttributes, 'id' | 'sports_preferences' | 'karma_points' | 'is_admin' | 'created_at' | 'updated_at' | 'password_hash'> {
   password?: string; // For creation/update, we accept password instead of password_hash (will be hashed automatically)
 }
 
@@ -38,6 +39,7 @@ class User extends Model<UserAttributes, UserCreationAttributes> implements User
   public longitude!: string | null;
   public city!: string | null;
   public bio!: string | null;
+  public is_admin!: boolean;
   public created_at!: Date;
   public updated_at!: Date;
 
@@ -97,6 +99,10 @@ User.init(
     karma_points: {
       type: DataTypes.INTEGER,
       defaultValue: 0,
+    },
+    is_admin: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
     },
     latitude: {
       type: DataTypes.DECIMAL(10, 8),
