@@ -12,10 +12,12 @@ import {
 import { useTranslation } from 'react-i18next';
 import { bookingsApi, BookingItem } from '../../services/bookings';
 import { formatCurrency } from '../../utils/formatting';
-import { colors, spacing, borderRadius, fontSize, fontWeight } from '../../theme';
+import { useTheme } from '../../context/ThemeContext';
+import { spacing, borderRadius, fontSize, fontWeight } from '../../theme';
 
 const BookingsScreen = () => {
   const { t } = useTranslation();
+  const { colors } = useTheme();
   const [bookings, setBookings] = useState<BookingItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -61,52 +63,58 @@ const BookingsScreen = () => {
     );
   };
 
-  const renderBooking = ({ item }: { item: BookingItem }) => {
+  const renderBooking = ({ item, index }: { item: BookingItem; index: number }) => {
     const start = new Date(item.start_time);
     const end = new Date(item.end_time);
     const isPast = end < new Date();
     const isCancelled = item.status === 'cancelled';
+    const isAlt = index % 2 === 1;
+    const bg = isAlt ? colors.cardAltBackground : colors.cardBackground;
+    const border = isAlt ? colors.cardAltBorder : colors.cardBorder;
+    const t1 = isAlt ? colors.cardAltTextPrimary : colors.textPrimary;
+    const t2 = isAlt ? colors.cardAltTextSecondary : colors.textSecondary;
+    const t3 = isAlt ? colors.cardAltTextSecondary : colors.textTertiary;
 
     return (
-      <View style={[styles.card, isCancelled && styles.cardCancelled]}>
+      <View style={[styles.card, { backgroundColor: bg, borderColor: border }, isCancelled && styles.cardCancelled]}>
         <View style={styles.cardContent}>
           <View style={styles.cardHeader}>
-            <View style={styles.sportBadge}>
-              <Text style={styles.sportBadgeText}>{item.sport_name.charAt(0)}</Text>
+            <View style={[styles.sportBadge, { backgroundColor: isAlt ? 'rgba(255,255,255,0.25)' : colors.primaryLight }]}>
+              <Text style={[styles.sportBadgeText, { color: isAlt ? colors.textInverse : colors.primary }]}>{item.sport_name.charAt(0)}</Text>
             </View>
             <View style={styles.cardInfo}>
-              <Text style={styles.venueName}>{item.Venue?.name ?? 'Venue'}</Text>
-              <Text style={styles.address}>{item.Venue?.address}</Text>
+              <Text style={[styles.venueName, { color: t1 }]}>{item.Venue?.name ?? 'Venue'}</Text>
+              <Text style={[styles.address, { color: t2 }]}>{item.Venue?.address}</Text>
             </View>
             {isCancelled && (
               <View style={styles.statusChip}>
-                <Text style={styles.statusChipText}>{t('bookings.cancelled')}</Text>
+                <Text style={[styles.statusChipText, { color: colors.accentRed }]}>{t('bookings.cancelled')}</Text>
               </View>
             )}
           </View>
 
-          <View style={styles.separator} />
+          <View style={[styles.separator, { backgroundColor: isAlt ? 'rgba(255,255,255,0.2)' : colors.separator }]} />
 
           <View style={styles.detailsRow}>
             <View style={styles.detailItem}>
-              <Text style={styles.detailLabel}>Sport</Text>
-              <Text style={styles.detailValue}>{item.sport_name}</Text>
+              <Text style={[styles.detailLabel, { color: t3 }]}>Sport</Text>
+              <Text style={[styles.detailValue, { color: t1 }]}>{item.sport_name}</Text>
             </View>
             <View style={styles.detailItem}>
-              <Text style={styles.detailLabel}>Date</Text>
-              <Text style={styles.detailValue}>
+              <Text style={[styles.detailLabel, { color: t3 }]}>Date</Text>
+              <Text style={[styles.detailValue, { color: t1 }]}>
                 {start.toLocaleDateString(undefined, { day: 'numeric', month: 'short' })}
               </Text>
             </View>
             <View style={styles.detailItem}>
-              <Text style={styles.detailLabel}>Time</Text>
-              <Text style={styles.detailValue}>
+              <Text style={[styles.detailLabel, { color: t3 }]}>Time</Text>
+              <Text style={[styles.detailValue, { color: t1 }]}>
                 {start.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}
               </Text>
             </View>
             <View style={styles.detailItem}>
-              <Text style={styles.detailLabel}>Price</Text>
-              <Text style={styles.priceValue}>
+              <Text style={[styles.detailLabel, { color: t3 }]}>Price</Text>
+              <Text style={[styles.priceValue, { color: isAlt ? colors.textInverse : colors.primary }]}>
                 {formatCurrency(item.total_cents / 100, item.currency)}
               </Text>
             </View>
@@ -118,7 +126,7 @@ const BookingsScreen = () => {
               onPress={() => handleCancel(item)}
               activeOpacity={0.7}
             >
-              <Text style={styles.cancelButtonText}>{t('bookings.cancelBooking')}</Text>
+              <Text style={[styles.cancelButtonText, { color: colors.accentRed }]}>{t('bookings.cancelBooking')}</Text>
             </TouchableOpacity>
           )}
         </View>
@@ -127,25 +135,25 @@ const BookingsScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>{t('bookings.title')}</Text>
+    <View style={[styles.container, { backgroundColor: colors.backgroundSecondary }]}>
+      <View style={[styles.header, { backgroundColor: colors.background, borderBottomColor: colors.borderLight }]}>
+        <Text style={[styles.title, { color: colors.textPrimary }]}>{t('bookings.title')}</Text>
         <View style={styles.toggleRow}>
           <TouchableOpacity
-            style={[styles.toggle, upcomingOnly && styles.toggleSelected]}
+            style={[styles.toggle, { backgroundColor: colors.chipBackground }, upcomingOnly && { backgroundColor: colors.chipSelectedBackground }]}
             onPress={() => setUpcomingOnly(true)}
             activeOpacity={0.7}
           >
-            <Text style={[styles.toggleText, upcomingOnly && styles.toggleTextSelected]}>
+            <Text style={[styles.toggleText, { color: colors.chipText }, upcomingOnly && { color: colors.chipSelectedText }]}>
               {t('bookings.upcoming')}
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={[styles.toggle, !upcomingOnly && styles.toggleSelected]}
+            style={[styles.toggle, { backgroundColor: colors.chipBackground }, !upcomingOnly && { backgroundColor: colors.chipSelectedBackground }]}
             onPress={() => setUpcomingOnly(false)}
             activeOpacity={0.7}
           >
-            <Text style={[styles.toggleText, !upcomingOnly && styles.toggleTextSelected]}>
+            <Text style={[styles.toggleText, { color: colors.chipText }, !upcomingOnly && { color: colors.chipSelectedText }]}>
               {t('bookings.past')}
             </Text>
           </TouchableOpacity>
@@ -172,7 +180,7 @@ const BookingsScreen = () => {
           ListEmptyComponent={
             <View style={styles.centered}>
               <Text style={styles.emptyIcon}>📋</Text>
-              <Text style={styles.emptyText}>{t('bookings.noBookings')}</Text>
+              <Text style={[styles.emptyText, { color: colors.textTertiary }]}>{t('bookings.noBookings')}</Text>
             </View>
           }
         />
@@ -182,19 +190,16 @@ const BookingsScreen = () => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.backgroundSecondary },
+  container: { flex: 1 },
   header: {
-    backgroundColor: colors.background,
     paddingHorizontal: spacing.xl,
     paddingTop: 56,
     paddingBottom: spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: colors.borderLight,
   },
   title: {
     fontSize: fontSize.title,
     fontWeight: fontWeight.bold,
-    color: colors.textPrimary,
     marginBottom: spacing.md,
     letterSpacing: -0.3,
   },
@@ -203,22 +208,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.sm + 2,
     borderRadius: borderRadius.pill,
-    backgroundColor: colors.chipBackground,
   },
-  toggleSelected: { backgroundColor: colors.chipSelectedBackground },
   toggleText: {
     fontSize: fontSize.base,
     fontWeight: fontWeight.medium,
-    color: colors.chipText,
   },
-  toggleTextSelected: { color: colors.chipSelectedText },
   list: { padding: spacing.xl, paddingBottom: spacing.xxxl },
   card: {
-    backgroundColor: colors.cardBackground,
     borderRadius: borderRadius.md,
     marginBottom: spacing.md,
     borderWidth: 1,
-    borderColor: colors.cardBorder,
   },
   cardCancelled: { opacity: 0.6 },
   cardContent: { padding: spacing.lg },
@@ -231,7 +230,6 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: borderRadius.sm,
-    backgroundColor: colors.primaryLight,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: spacing.md,
@@ -239,17 +237,14 @@ const styles = StyleSheet.create({
   sportBadgeText: {
     fontSize: fontSize.lg,
     fontWeight: fontWeight.bold,
-    color: colors.primary,
   },
   cardInfo: { flex: 1 },
   venueName: {
     fontSize: fontSize.lg,
     fontWeight: fontWeight.semibold,
-    color: colors.textPrimary,
   },
   address: {
     fontSize: fontSize.md,
-    color: colors.textSecondary,
     marginTop: 2,
   },
   statusChip: {
@@ -261,11 +256,9 @@ const styles = StyleSheet.create({
   statusChipText: {
     fontSize: fontSize.xs,
     fontWeight: fontWeight.semibold,
-    color: colors.accentRed,
   },
   separator: {
     height: 1,
-    backgroundColor: colors.separator,
     marginBottom: spacing.md,
   },
   detailsRow: {
@@ -275,7 +268,6 @@ const styles = StyleSheet.create({
   detailItem: { alignItems: 'center' },
   detailLabel: {
     fontSize: fontSize.xs,
-    color: colors.textTertiary,
     marginBottom: spacing.xs,
     textTransform: 'uppercase',
     fontWeight: fontWeight.medium,
@@ -284,12 +276,10 @@ const styles = StyleSheet.create({
   detailValue: {
     fontSize: fontSize.base,
     fontWeight: fontWeight.medium,
-    color: colors.textPrimary,
   },
   priceValue: {
     fontSize: fontSize.base,
     fontWeight: fontWeight.semibold,
-    color: colors.primary,
   },
   cancelButton: {
     alignSelf: 'flex-start',
@@ -298,12 +288,11 @@ const styles = StyleSheet.create({
   },
   cancelButtonText: {
     fontSize: fontSize.base,
-    color: colors.accentRed,
     fontWeight: fontWeight.medium,
   },
   centered: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: spacing.xxxl },
   emptyIcon: { fontSize: 40, marginBottom: spacing.md },
-  emptyText: { color: colors.textTertiary, fontSize: fontSize.lg },
+  emptyText: { fontSize: fontSize.lg },
 });
 
 export default BookingsScreen;

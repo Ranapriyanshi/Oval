@@ -12,14 +12,16 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useNavigation } from '@react-navigation/native';
 import { useLocale } from '../../context/LocaleContext';
+import { useTheme } from '../../context/ThemeContext';
 import { venuesApi, VenueListItem } from '../../services/venues';
 import { formatCurrency } from '../../utils/formatting';
 import { SPORTS } from '../../utils/constants';
-import { colors, spacing, borderRadius, fontSize, fontWeight, shadow } from '../../theme';
+import { spacing, borderRadius, fontSize, fontWeight, shadow } from '../../theme';
 
 const VenuesScreen = () => {
   const { t } = useTranslation();
   const { country } = useLocale();
+  const { colors } = useTheme();
   const navigation = useNavigation<any>();
   const [venues, setVenues] = useState<VenueListItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -59,35 +61,41 @@ const VenuesScreen = () => {
     return formatCurrency(min / 100, v.currency);
   };
 
-  const renderVenue = ({ item }: { item: VenueListItem }) => {
+  const renderVenue = ({ item, index }: { item: VenueListItem; index: number }) => {
     const priceStr = minPrice(item);
     const sportsStr = item.VenueSports?.map((s) => s.sport_name).join(', ') || '-';
     const rating = item.rating;
     const ratingStr = rating?.count
       ? `⭐ ${rating.avg} (${rating.count})`
       : t('venue.noReviews');
+    const isAlt = index % 2 === 1;
+    const bg = isAlt ? colors.cardAltBackground : colors.cardBackground;
+    const border = isAlt ? colors.cardAltBorder : colors.cardBorder;
+    const t1 = isAlt ? colors.cardAltTextPrimary : colors.textPrimary;
+    const t2 = isAlt ? colors.cardAltTextSecondary : colors.textSecondary;
+    const t3 = isAlt ? colors.cardAltTextSecondary : colors.textTertiary;
 
     return (
       <TouchableOpacity
-        style={styles.card}
+        style={[styles.card, { backgroundColor: bg, borderColor: border }]}
         onPress={() => onVenuePress(item.id)}
         activeOpacity={0.7}
       >
         <View style={styles.cardContent}>
           <View style={styles.cardHeader}>
-            <View style={styles.venueIconBadge}>
+            <View style={[styles.venueIconBadge, { backgroundColor: isAlt ? 'rgba(255,255,255,0.25)' : colors.primaryLight }]}>
               <Text style={styles.venueIcon}>🏟️</Text>
             </View>
             <View style={styles.cardInfo}>
-              <Text style={styles.venueName} numberOfLines={1}>{item.name}</Text>
-              <Text style={styles.city}>{item.city}</Text>
+              <Text style={[styles.venueName, { color: t1 }]} numberOfLines={1}>{item.name}</Text>
+              <Text style={[styles.city, { color: t2 }]}>{item.city}</Text>
             </View>
-            <Text style={styles.ratingBadge}>{ratingStr}</Text>
+            <Text style={[styles.ratingBadge, { color: t2 }]}>{ratingStr}</Text>
           </View>
-          <View style={styles.cardFooter}>
-            <Text style={styles.sports} numberOfLines={1}>{sportsStr}</Text>
+          <View style={[styles.cardFooter, { borderTopColor: isAlt ? 'rgba(255,255,255,0.2)' : colors.separator }]}>
+            <Text style={[styles.sports, { color: t3 }]} numberOfLines={1}>{sportsStr}</Text>
             {priceStr && (
-              <Text style={styles.price}>
+              <Text style={[styles.price, { color: isAlt ? colors.textInverse : colors.primary }]}>
                 {t('venue.from')} {priceStr}/{t('venue.perHour')}
               </Text>
             )}
@@ -101,11 +109,11 @@ const VenuesScreen = () => {
     const isSelected = item === sportFilter || (!item && !sportFilter);
     return (
       <TouchableOpacity
-        style={[styles.chip, isSelected && styles.chipSelected]}
+        style={[styles.chip, { backgroundColor: colors.chipBackground }, isSelected && { backgroundColor: colors.chipSelectedBackground }]}
         onPress={() => setSportFilter(item)}
         activeOpacity={0.7}
       >
-        <Text style={[styles.chipText, isSelected && styles.chipTextSelected]}>
+        <Text style={[styles.chipText, { color: colors.chipText }, isSelected && { color: colors.chipSelectedText }]}>
           {item ? item : 'All'}
         </Text>
       </TouchableOpacity>
@@ -113,13 +121,13 @@ const VenuesScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>{t('venue.title')}</Text>
-        <View style={styles.searchRow}>
+    <View style={[styles.container, { backgroundColor: colors.backgroundSecondary }]}>
+      <View style={[styles.header, { backgroundColor: colors.background, borderBottomColor: colors.borderLight }]}>
+        <Text style={[styles.title, { color: colors.textPrimary }]}>{t('venue.title')}</Text>
+        <View style={[styles.searchRow, { backgroundColor: colors.backgroundSecondary }]}>
           <Text style={styles.searchIcon}>🔍</Text>
           <TextInput
-            style={styles.searchInput}
+            style={[styles.searchInput, { color: colors.textPrimary }]}
             placeholder={t('common.search') + ' city...'}
             placeholderTextColor={colors.textTertiary}
             value={cityFilter}
@@ -157,7 +165,7 @@ const VenuesScreen = () => {
           ListEmptyComponent={
             <View style={styles.centered}>
               <Text style={styles.emptyIcon}>🏟️</Text>
-              <Text style={styles.emptyText}>No venues found</Text>
+              <Text style={[styles.emptyText, { color: colors.textTertiary }]}>No venues found</Text>
             </View>
           }
         />
@@ -167,26 +175,22 @@ const VenuesScreen = () => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.backgroundSecondary },
+  container: { flex: 1 },
   header: {
-    backgroundColor: colors.background,
     paddingHorizontal: spacing.xl,
     paddingTop: 56,
     paddingBottom: spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: colors.borderLight,
   },
   title: {
     fontSize: fontSize.title,
     fontWeight: fontWeight.bold,
-    color: colors.textPrimary,
     marginBottom: spacing.md,
     letterSpacing: -0.3,
   },
   searchRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.backgroundSecondary,
     borderRadius: borderRadius.sm,
     paddingHorizontal: spacing.md,
     marginBottom: spacing.md,
@@ -199,7 +203,6 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: spacing.md,
     fontSize: fontSize.base,
-    color: colors.textPrimary,
   },
   chipRow: {
     paddingBottom: spacing.sm,
@@ -208,27 +211,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.sm + 2,
     borderRadius: borderRadius.pill,
-    backgroundColor: colors.chipBackground,
     marginRight: spacing.sm,
-  },
-  chipSelected: {
-    backgroundColor: colors.chipSelectedBackground,
   },
   chipText: {
     fontSize: fontSize.base,
     fontWeight: fontWeight.medium,
-    color: colors.chipText,
-  },
-  chipTextSelected: {
-    color: colors.chipSelectedText,
   },
   list: { padding: spacing.xl, paddingBottom: spacing.xxxl },
   card: {
-    backgroundColor: colors.cardBackground,
     borderRadius: borderRadius.md,
     marginBottom: spacing.md,
     borderWidth: 1,
-    borderColor: colors.cardBorder,
   },
   cardContent: { padding: spacing.lg },
   cardHeader: {
@@ -240,7 +233,6 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: borderRadius.sm,
-    backgroundColor: colors.primaryLight,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: spacing.md,
@@ -250,16 +242,13 @@ const styles = StyleSheet.create({
   venueName: {
     fontSize: fontSize.lg,
     fontWeight: fontWeight.semibold,
-    color: colors.textPrimary,
   },
   city: {
     fontSize: fontSize.md,
-    color: colors.textSecondary,
     marginTop: 2,
   },
   ratingBadge: {
     fontSize: fontSize.sm,
-    color: colors.textSecondary,
     fontWeight: fontWeight.medium,
   },
   cardFooter: {
@@ -267,22 +256,19 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     borderTopWidth: 1,
-    borderTopColor: colors.separator,
     paddingTop: spacing.md,
   },
   sports: {
     fontSize: fontSize.md,
-    color: colors.textTertiary,
     flex: 1,
   },
   price: {
     fontSize: fontSize.base,
     fontWeight: fontWeight.semibold,
-    color: colors.primary,
   },
   centered: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: spacing.xxxl },
   emptyIcon: { fontSize: 40, marginBottom: spacing.md },
-  emptyText: { color: colors.textTertiary, fontSize: fontSize.lg },
+  emptyText: { fontSize: fontSize.lg },
 });
 
 export default VenuesScreen;
