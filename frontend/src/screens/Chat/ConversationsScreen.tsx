@@ -12,10 +12,12 @@ import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
 import chatApi, { ConversationItem } from '../../services/chat';
 import { connectSocket, getSocket } from '../../services/socket';
-import { colors, spacing, borderRadius, fontSize, fontWeight, shadow } from '../../theme';
+import { useTheme } from '../../context/ThemeContext';
+import { spacing, borderRadius, fontSize, fontWeight } from '../../theme';
 
 const ConversationsScreen = () => {
   const { t } = useTranslation();
+  const { colors } = useTheme();
   const navigation = useNavigation<any>();
   const [conversations, setConversations] = useState<ConversationItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -108,7 +110,7 @@ const ConversationsScreen = () => {
       .slice(0, 2);
   };
 
-  const renderConversation = ({ item }: { item: ConversationItem }) => {
+  const renderConversation = ({ item, index }: { item: ConversationItem; index: number }) => {
     const hasUnread = item.unread_count > 0;
     const lastMsg = item.last_message;
     let preview = '';
@@ -119,10 +121,15 @@ const ConversationsScreen = () => {
         preview = lastMsg.content.length > 60 ? lastMsg.content.slice(0, 60) + '...' : lastMsg.content;
       }
     }
+    const isAlt = index % 2 === 1;
+    const cardBg = hasUnread ? colors.primaryLight : (isAlt ? colors.cardAltBackground : colors.cardBackground);
+    const t1 = isAlt && !hasUnread ? colors.cardAltTextPrimary : colors.textPrimary;
+    const t2 = isAlt && !hasUnread ? colors.cardAltTextSecondary : colors.textSecondary;
+    const t3 = isAlt && !hasUnread ? colors.cardAltTextSecondary : colors.textTertiary;
 
     return (
       <TouchableOpacity
-        style={[styles.conversationCard, hasUnread && styles.unreadCard]}
+        style={[styles.conversationCard, { backgroundColor: cardBg }]}
         onPress={() =>
           navigation.navigate('ChatConversation', {
             conversationId: item.id,
@@ -131,30 +138,30 @@ const ConversationsScreen = () => {
         }
         activeOpacity={0.7}
       >
-        <View style={[styles.avatar, hasUnread && styles.avatarUnread]}>
-          <Text style={styles.avatarText}>{getInitials(item.other_user.name)}</Text>
+        <View style={[styles.avatar, { backgroundColor: hasUnread ? colors.primary : (isAlt ? 'rgba(255,255,255,0.25)' : colors.chipBackground) }]}>
+          <Text style={[styles.avatarText, { color: hasUnread ? colors.textInverse : (isAlt ? colors.textInverse : colors.textSecondary) }]}>{getInitials(item.other_user.name)}</Text>
         </View>
 
         <View style={styles.conversationContent}>
           <View style={styles.conversationHeader}>
-            <Text style={[styles.userName, hasUnread && styles.userNameUnread]} numberOfLines={1}>
+            <Text style={[styles.userName, hasUnread && styles.userNameUnread, { color: t1 }]} numberOfLines={1}>
               {item.other_user.name}
             </Text>
-            <Text style={[styles.timeText, hasUnread && styles.timeTextUnread]}>
+            <Text style={[styles.timeText, hasUnread && styles.timeTextUnread, { color: hasUnread ? colors.primary : t3 }]}>
               {formatTime(item.last_message_at)}
             </Text>
           </View>
 
           <View style={styles.conversationFooter}>
             <Text
-              style={[styles.previewText, hasUnread && styles.previewTextUnread]}
+              style={[styles.previewText, hasUnread && styles.previewTextUnread, { color: hasUnread ? t1 : t2 }]}
               numberOfLines={1}
             >
               {preview || t('chat.noMessages', 'No messages yet')}
             </Text>
             {hasUnread && (
-              <View style={styles.unreadBadge}>
-                <Text style={styles.unreadBadgeText}>
+              <View style={[styles.unreadBadge, { backgroundColor: colors.primary }]}>
+                <Text style={[styles.unreadBadgeText, { color: colors.textInverse }]}>
                   {item.unread_count > 99 ? '99+' : item.unread_count}
                 </Text>
               </View>
@@ -167,23 +174,23 @@ const ConversationsScreen = () => {
 
   if (loading) {
     return (
-      <View style={styles.center}>
+      <View style={[styles.center, { backgroundColor: colors.background }]}>
         <ActivityIndicator size="large" color={colors.primary} />
       </View>
     );
   }
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>{t('chat.title', 'Messages')}</Text>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <View style={[styles.header, { backgroundColor: colors.background, borderBottomColor: colors.separator }]}>
+        <Text style={[styles.title, { color: colors.textPrimary }]}>{t('chat.title', 'Messages')}</Text>
       </View>
 
       {conversations.length === 0 ? (
         <View style={styles.emptyContainer}>
           <Text style={styles.emptyIcon}>💬</Text>
-          <Text style={styles.emptyTitle}>{t('chat.emptyTitle', 'No conversations yet')}</Text>
-          <Text style={styles.emptySubtitle}>
+          <Text style={[styles.emptyTitle, { color: colors.textPrimary }]}>{t('chat.emptyTitle', 'No conversations yet')}</Text>
+          <Text style={[styles.emptySubtitle, { color: colors.textSecondary }]}>
             {t('chat.emptySubtitle', 'Match with playpals to start chatting!')}
           </Text>
         </View>
@@ -196,7 +203,7 @@ const ConversationsScreen = () => {
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />
           }
-          ItemSeparatorComponent={() => <View style={styles.separator} />}
+          ItemSeparatorComponent={() => <View style={[styles.separator, { backgroundColor: colors.separator }]} />}
         />
       )}
     </View>
@@ -206,26 +213,21 @@ const ConversationsScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
   },
   center: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: colors.background,
   },
   header: {
     paddingHorizontal: spacing.xl,
     paddingTop: spacing.lg,
     paddingBottom: spacing.md,
-    backgroundColor: colors.background,
     borderBottomWidth: 1,
-    borderBottomColor: colors.separator,
   },
   title: {
     fontSize: fontSize.title,
     fontWeight: fontWeight.bold,
-    color: colors.textPrimary,
   },
   list: {
     paddingVertical: spacing.sm,
@@ -236,25 +238,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.xl,
     paddingVertical: spacing.md,
   },
-  unreadCard: {
-    backgroundColor: colors.primaryLight,
-  },
   avatar: {
     width: 52,
     height: 52,
     borderRadius: 26,
-    backgroundColor: colors.chipBackground,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: spacing.md,
   },
-  avatarUnread: {
-    backgroundColor: colors.primary,
-  },
   avatarText: {
     fontSize: fontSize.lg,
     fontWeight: fontWeight.semibold,
-    color: colors.textSecondary,
   },
   conversationContent: {
     flex: 1,
@@ -268,7 +262,6 @@ const styles = StyleSheet.create({
   userName: {
     fontSize: fontSize.lg,
     fontWeight: fontWeight.medium,
-    color: colors.textPrimary,
     flex: 1,
     marginRight: spacing.sm,
   },
@@ -277,10 +270,8 @@ const styles = StyleSheet.create({
   },
   timeText: {
     fontSize: fontSize.xs,
-    color: colors.textTertiary,
   },
   timeTextUnread: {
-    color: colors.primary,
     fontWeight: fontWeight.semibold,
   },
   conversationFooter: {
@@ -290,16 +281,13 @@ const styles = StyleSheet.create({
   },
   previewText: {
     fontSize: fontSize.md,
-    color: colors.textSecondary,
     flex: 1,
     marginRight: spacing.sm,
   },
   previewTextUnread: {
-    color: colors.textPrimary,
     fontWeight: fontWeight.medium,
   },
   unreadBadge: {
-    backgroundColor: colors.primary,
     borderRadius: borderRadius.pill,
     minWidth: 22,
     height: 22,
@@ -310,11 +298,9 @@ const styles = StyleSheet.create({
   unreadBadgeText: {
     fontSize: fontSize.xs,
     fontWeight: fontWeight.bold,
-    color: colors.textInverse,
   },
   separator: {
     height: 1,
-    backgroundColor: colors.separator,
     marginLeft: 52 + spacing.md + spacing.xl, // avatar width + margin + padding
   },
   emptyContainer: {
@@ -330,12 +316,10 @@ const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: fontSize.xl,
     fontWeight: fontWeight.semibold,
-    color: colors.textPrimary,
     marginBottom: spacing.sm,
   },
   emptySubtitle: {
     fontSize: fontSize.base,
-    color: colors.textSecondary,
     textAlign: 'center',
     lineHeight: 20,
   },

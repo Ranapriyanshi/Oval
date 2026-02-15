@@ -15,10 +15,12 @@ import { useTranslation } from 'react-i18next';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import chatApi, { ChatMessage } from '../../services/chat';
 import { connectSocket, getSocket } from '../../services/socket';
-import { colors, spacing, borderRadius, fontSize, fontWeight, shadow } from '../../theme';
+import { useTheme } from '../../context/ThemeContext';
+import { spacing, borderRadius, fontSize, fontWeight, shadow } from '../../theme';
 
 const ChatScreen = () => {
   const { t } = useTranslation();
+  const { colors } = useTheme();
   const navigation = useNavigation<any>();
   const route = useRoute<any>();
   const { conversationId, otherUser } = route.params;
@@ -248,24 +250,24 @@ const ChatScreen = () => {
       <View>
         {showDate && (
           <View style={styles.dateSeparator}>
-            <View style={styles.dateLine} />
-            <Text style={styles.dateText}>{formatDate(item.created_at)}</Text>
-            <View style={styles.dateLine} />
+            <View style={[styles.dateLine, { backgroundColor: colors.border }]} />
+            <Text style={[styles.dateText, { color: colors.textTertiary }]}>{formatDate(item.created_at)}</Text>
+            <View style={[styles.dateLine, { backgroundColor: colors.border }]} />
           </View>
         )}
 
         {isSystem ? (
           <View style={styles.systemMessage}>
-            <Text style={styles.systemMessageText}>{item.content}</Text>
+            <Text style={[styles.systemMessageText, { color: colors.textTertiary, backgroundColor: colors.chipBackground }]}>{item.content}</Text>
           </View>
         ) : (
           <View style={[styles.messageBubbleRow, isMe && styles.messageBubbleRowMe]}>
-            <View style={[styles.messageBubble, isMe ? styles.bubbleMe : styles.bubbleOther]}>
-              <Text style={[styles.messageText, isMe && styles.messageTextMe]}>
+            <View style={[styles.messageBubble, isMe ? [styles.bubbleMe, { backgroundColor: colors.primary }] : [styles.bubbleOther, { backgroundColor: colors.surface }]]}>
+              <Text style={[styles.messageText, { color: isMe ? colors.textInverse : colors.textPrimary }]}>
                 {item.content}
               </Text>
               <View style={styles.messageFooter}>
-                <Text style={[styles.messageTime, isMe && styles.messageTimeMe]}>
+                <Text style={[styles.messageTime, isMe && styles.messageTimeMe, { color: isMe ? undefined : colors.textTertiary }]}>
                   {formatMessageTime(item.created_at)}
                 </Text>
                 {isMe && (
@@ -283,7 +285,7 @@ const ChatScreen = () => {
 
   if (loading) {
     return (
-      <View style={styles.center}>
+      <View style={[styles.center, { backgroundColor: colors.backgroundSecondary }]}>
         <ActivityIndicator size="large" color={colors.primary} />
       </View>
     );
@@ -291,7 +293,7 @@ const ChatScreen = () => {
 
   return (
     <KeyboardAvoidingView
-      style={styles.container}
+      style={[styles.container, { backgroundColor: colors.backgroundSecondary }]}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       keyboardVerticalOffset={90}
     >
@@ -319,7 +321,7 @@ const ChatScreen = () => {
         ListEmptyComponent={
           <View style={styles.emptyMessages}>
             <Text style={styles.emptyIcon}>👋</Text>
-            <Text style={styles.emptyText}>
+            <Text style={[styles.emptyText, { color: colors.textSecondary }]}>
               {t('chat.startConversation', 'Say hello!')}
             </Text>
           </View>
@@ -328,15 +330,15 @@ const ChatScreen = () => {
 
       {isTyping && (
         <View style={styles.typingIndicator}>
-          <Text style={styles.typingText}>
+          <Text style={[styles.typingText, { color: colors.textTertiary }]}>
             {otherUser?.name || 'User'} {t('chat.isTyping', 'is typing...')}
           </Text>
         </View>
       )}
 
-      <View style={styles.inputContainer}>
+      <View style={[styles.inputContainer, { backgroundColor: colors.background, borderTopColor: colors.separator }]}>
         <TextInput
-          style={styles.textInput}
+          style={[styles.textInput, { backgroundColor: colors.backgroundSecondary, color: colors.textPrimary }]}
           value={inputText}
           onChangeText={handleInputChange}
           placeholder={t('chat.typeMessage', 'Type a message...')}
@@ -345,7 +347,7 @@ const ChatScreen = () => {
           maxLength={5000}
         />
         <TouchableOpacity
-          style={[styles.sendButton, (!inputText.trim() || sending) && styles.sendButtonDisabled]}
+          style={[styles.sendButton, { backgroundColor: colors.primary }, (!inputText.trim() || sending) && { backgroundColor: colors.chipBackground }]}
           onPress={handleSend}
           disabled={!inputText.trim() || sending}
           activeOpacity={0.7}
@@ -353,7 +355,7 @@ const ChatScreen = () => {
           {sending ? (
             <ActivityIndicator size="small" color={colors.textInverse} />
           ) : (
-            <Text style={styles.sendButtonText}>▶</Text>
+            <Text style={[styles.sendButtonText, { color: colors.textInverse }]}>▶</Text>
           )}
         </TouchableOpacity>
       </View>
@@ -364,13 +366,11 @@ const ChatScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.backgroundSecondary,
   },
   center: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: colors.backgroundSecondary,
   },
   messageList: {
     paddingHorizontal: spacing.lg,
@@ -387,11 +387,9 @@ const styles = StyleSheet.create({
   dateLine: {
     flex: 1,
     height: 1,
-    backgroundColor: colors.border,
   },
   dateText: {
     fontSize: fontSize.xs,
-    color: colors.textTertiary,
     marginHorizontal: spacing.md,
     fontWeight: fontWeight.medium,
   },
@@ -402,9 +400,7 @@ const styles = StyleSheet.create({
   },
   systemMessageText: {
     fontSize: fontSize.xs,
-    color: colors.textTertiary,
     fontStyle: 'italic',
-    backgroundColor: colors.chipBackground,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.xs,
     borderRadius: borderRadius.pill,
@@ -427,21 +423,15 @@ const styles = StyleSheet.create({
     borderRadius: borderRadius.lg,
   },
   bubbleMe: {
-    backgroundColor: colors.primary,
     borderBottomRightRadius: spacing.xs,
   },
   bubbleOther: {
-    backgroundColor: colors.surface,
     borderBottomLeftRadius: spacing.xs,
     ...shadow.sm,
   },
   messageText: {
     fontSize: fontSize.base,
-    color: colors.textPrimary,
     lineHeight: 20,
-  },
-  messageTextMe: {
-    color: colors.textInverse,
   },
   messageFooter: {
     flexDirection: 'row',
@@ -451,7 +441,6 @@ const styles = StyleSheet.create({
   },
   messageTime: {
     fontSize: fontSize.xs - 1,
-    color: colors.textTertiary,
   },
   messageTimeMe: {
     color: 'rgba(255,255,255,0.65)',
@@ -468,7 +457,6 @@ const styles = StyleSheet.create({
   },
   typingText: {
     fontSize: fontSize.xs,
-    color: colors.textTertiary,
     fontStyle: 'italic',
   },
   // Input
@@ -477,18 +465,14 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
-    backgroundColor: colors.background,
     borderTopWidth: 1,
-    borderTopColor: colors.separator,
   },
   textInput: {
     flex: 1,
-    backgroundColor: colors.backgroundSecondary,
     borderRadius: borderRadius.xl,
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.sm + 2,
     fontSize: fontSize.base,
-    color: colors.textPrimary,
     maxHeight: 100,
     minHeight: 40,
   },
@@ -496,17 +480,12 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
     marginLeft: spacing.sm,
   },
-  sendButtonDisabled: {
-    backgroundColor: colors.chipBackground,
-  },
   sendButtonText: {
     fontSize: fontSize.lg,
-    color: colors.textInverse,
   },
   // Loading
   loadingMore: {
@@ -526,7 +505,6 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: fontSize.lg,
-    color: colors.textSecondary,
     fontWeight: fontWeight.medium,
   },
 });
