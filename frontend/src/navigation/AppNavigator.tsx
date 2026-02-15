@@ -19,6 +19,9 @@ import GametimeDetailScreen from '../screens/Gametime/GametimeDetailScreen';
 import GametimeCreateScreen from '../screens/Gametime/GametimeCreateScreen';
 import ConversationsScreen from '../screens/Chat/ConversationsScreen';
 import ChatScreen from '../screens/Chat/ChatScreen';
+import CoachesScreen from '../screens/Coaching/CoachesScreen';
+import CoachProfileScreen from '../screens/Coaching/CoachProfileScreen';
+import MySessionsScreen from '../screens/Coaching/MySessionsScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -30,6 +33,7 @@ const TabIcon = ({ label, focused }: { label: string; focused: boolean }) => {
     Discover: '🔍',
     Chat: '💬',
     Gametime: '🎮',
+    Coaching: '🏋️',
     Venues: '🏟️',
     Profile: '👤',
   };
@@ -95,19 +99,11 @@ const MainTabs = () => {
         }}
       />
       <Tab.Screen
-        name="Gametime"
-        component={GametimeScreen}
+        name="Coaching"
+        component={CoachesScreen}
         options={{
-          tabBarLabel: 'Gametime',
-          tabBarIcon: ({ focused }) => <TabIcon label="Gametime" focused={focused} />,
-        }}
-      />
-      <Tab.Screen
-        name="Venues"
-        component={VenuesScreen}
-        options={{
-          tabBarLabel: 'Venues',
-          tabBarIcon: ({ focused }) => <TabIcon label="Venues" focused={focused} />,
+          tabBarLabel: 'Coaching',
+          tabBarIcon: ({ focused }) => <TabIcon label="Coaching" focused={focused} />,
         }}
       />
       <Tab.Screen
@@ -143,6 +139,18 @@ const AppNavigator = () => {
             component={ChatScreen}
             options={{ headerShown: true, headerTitle: 'Chat' }}
           />
+          <Stack.Screen
+            name="CoachProfile"
+            component={CoachProfileScreen}
+            options={{ headerShown: true, headerTitle: 'Coach Profile' }}
+          />
+          <Stack.Screen
+            name="MySessions"
+            component={MySessionsScreen}
+            options={{ headerShown: true, headerTitle: 'My Sessions' }}
+          />
+          <Stack.Screen name="Gametime" component={GametimeScreen} options={{ headerShown: true, headerTitle: 'Gametime' }} />
+          <Stack.Screen name="Venues" component={VenuesScreen} options={{ headerShown: true, headerTitle: 'Venues' }} />
           <Stack.Screen name="Bookings" component={BookingsScreen} />
           <Stack.Screen name="MatchesList" component={MatchesScreen} />
         </>
