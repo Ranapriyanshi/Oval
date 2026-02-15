@@ -13,6 +13,7 @@ import bookingRoutes from './routes/bookings';
 import playpalRoutes from './routes/playpals';
 import gametimeRoutes from './routes/gametime';
 import chatRoutes from './routes/chat';
+import coachingRoutes from './routes/coaching';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 import { setupChatSocket } from './socket/chatHandler';
@@ -52,6 +53,7 @@ app.use('/api/bookings', bookingRoutes);
 app.use('/api/playpals', playpalRoutes);
 app.use('/api/gametime', gametimeRoutes);
 app.use('/api/chat', chatRoutes);
+app.use('/api/coaching', coachingRoutes);
 
 // Health check
 app.get('/health', (req, res) => {

@@ -15,6 +15,10 @@ import Gametime from './Gametime';
 import GametimeParticipant from './GametimeParticipant';
 import Conversation from './Conversation';
 import Message from './Message';
+import Coach from './Coach';
+import CoachAvailability from './CoachAvailability';
+import CoachingSession from './CoachingSession';
+import CoachRating from './CoachRating';
 
 // Venue associations
 Venue.hasMany(VenueSport, { foreignKey: 'venue_id' });
@@ -82,6 +86,28 @@ User.hasMany(Conversation, { foreignKey: 'participant1_id', as: 'ConversationsAs
 User.hasMany(Conversation, { foreignKey: 'participant2_id', as: 'ConversationsAsP2' });
 User.hasMany(Message, { foreignKey: 'sender_id', as: 'SentMessages' });
 
+// Coaching associations
+User.hasOne(Coach, { foreignKey: 'user_id', as: 'CoachProfile' });
+Coach.belongsTo(User, { foreignKey: 'user_id', as: 'User' });
+
+Coach.hasMany(CoachAvailability, { foreignKey: 'coach_id', as: 'Availabilities' });
+CoachAvailability.belongsTo(Coach, { foreignKey: 'coach_id', as: 'Coach' });
+
+Coach.hasMany(CoachingSession, { foreignKey: 'coach_id', as: 'Sessions' });
+CoachingSession.belongsTo(Coach, { foreignKey: 'coach_id', as: 'Coach' });
+
+User.hasMany(CoachingSession, { foreignKey: 'student_id', as: 'BookedSessions' });
+CoachingSession.belongsTo(User, { foreignKey: 'student_id', as: 'Student' });
+
+Coach.hasMany(CoachRating, { foreignKey: 'coach_id', as: 'Ratings' });
+CoachRating.belongsTo(Coach, { foreignKey: 'coach_id', as: 'Coach' });
+
+User.hasMany(CoachRating, { foreignKey: 'user_id', as: 'CoachRatingsGiven' });
+CoachRating.belongsTo(User, { foreignKey: 'user_id', as: 'User' });
+
+CoachingSession.hasOne(CoachRating, { foreignKey: 'session_id', as: 'Rating' });
+CoachRating.belongsTo(CoachingSession, { foreignKey: 'session_id', as: 'Session' });
+
 const models = {
   User,
   Venue,
@@ -99,6 +125,10 @@ const models = {
   GametimeParticipant,
   Conversation,
   Message,
+  Coach,
+  CoachAvailability,
+  CoachingSession,
+  CoachRating,
   sequelize,
 };
 
@@ -120,4 +150,8 @@ export {
   GametimeParticipant,
   Conversation,
   Message,
+  Coach,
+  CoachAvailability,
+  CoachingSession,
+  CoachRating,
 };
