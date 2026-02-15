@@ -29,6 +29,7 @@ import GameRatingScreen from '../screens/Stats/GameRatingScreen';
 import EventsScreen from '../screens/Events/EventsScreen';
 import EventDetailScreen from '../screens/Events/EventDetailScreen';
 import MyEventsScreen from '../screens/Events/MyEventsScreen';
+import AchievementsScreen from '../screens/Achievements/AchievementsScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -208,6 +209,11 @@ const AppNavigator = () => {
             name="MyEvents"
             component={MyEventsScreen}
             options={{ headerShown: true, headerTitle: 'My events', ...stackHeaderStyle }}
+          />
+          <Stack.Screen
+            name="Achievements"
+            component={AchievementsScreen}
+            options={{ headerShown: true, headerTitle: 'Achievements', ...stackHeaderStyle }}
           />
         </>
       ) : (
