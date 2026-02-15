@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -12,6 +12,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useLocale } from '../../context/LocaleContext';
 import { useTheme } from '../../context/ThemeContext';
 import { spacing, borderRadius, fontSize, fontWeight, shadow } from '../../theme';
+import { weatherApi, WeatherResponse } from '../../services/weather';
 
 const HomeScreen = () => {
   const { t } = useTranslation();
@@ -19,6 +20,11 @@ const HomeScreen = () => {
   const { user } = useAuth();
   const { country, currency, formatCurrency } = useLocale();
   const { colors } = useTheme();
+  const [weather, setWeather] = useState<WeatherResponse | null>(null);
+
+  useEffect(() => {
+    weatherApi.get({ city: user?.city || (country === 'AU' ? 'Sydney' : 'New York') }).then(setWeather).catch(() => {});
+  }, [country, user?.city]);
 
   const quickActions = [
     { icon: '🏋️', label: 'Coaching', key: 'coaching', screen: 'Coaches' },
@@ -69,6 +75,23 @@ const HomeScreen = () => {
             ))}
           </View>
         </View>
+
+        {/* Weather Widget */}
+        {weather && (
+          <View style={[styles.section]}>
+            <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>Weather</Text>
+            <View style={[styles.weatherCard, { backgroundColor: colors.surface }, shadow.sm]}>
+              <View style={styles.weatherRow}>
+                <Text style={styles.weatherEmoji}>🌤️</Text>
+                <View>
+                  <Text style={[styles.weatherTemp, { color: colors.textPrimary }]}>{weather.temp}°</Text>
+                  <Text style={[styles.weatherCity, { color: colors.textSecondary }]}>{weather.city} · {weather.condition}</Text>
+                </View>
+              </View>
+              <Text style={[styles.weatherRec, { color: colors.textTertiary }]}>{weather.recommendation}</Text>
+            </View>
+          </View>
+        )}
 
         {/* Info Cards */}
         <View style={styles.section}>
@@ -139,6 +162,12 @@ const styles = StyleSheet.create({
   emptyCard: { borderRadius: borderRadius.md, padding: spacing.xxxl, alignItems: 'center' },
   emptyIcon: { fontSize: 32, marginBottom: spacing.md },
   emptyText: { fontSize: fontSize.base, textAlign: 'center' },
+  weatherCard: { borderRadius: borderRadius.md, padding: spacing.lg },
+  weatherRow: { flexDirection: 'row', alignItems: 'center', marginBottom: spacing.sm },
+  weatherEmoji: { fontSize: 40, marginRight: spacing.md },
+  weatherTemp: { fontSize: 28, fontWeight: fontWeight.bold },
+  weatherCity: { fontSize: fontSize.sm },
+  weatherRec: { fontSize: fontSize.sm, fontStyle: 'italic' },
 });
 
 export default HomeScreen;
