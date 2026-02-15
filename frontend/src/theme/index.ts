@@ -1,20 +1,26 @@
 /**
  * Oval App Design System
- * Based on clean, minimal sports UI reference (Gemscore-style)
+ * Based on modern UI reference with blue/orange accents
+ *
+ * Color palette:
+ * - Primary Dark/Text: #010100
+ * - Accent Blue: #485ff0 (primary interactive)
+ * - Accent Orange: #fe9820 (secondary accent)
+ * - Primary Light: #ffffff
  *
  * Key principles:
- * - White backgrounds, clean typography
- * - Indigo/purple as primary accent
- * - Subtle separators instead of heavy shadows
- * - Rounded pill chips for filters
- * - Consistent spacing and sizing
+ * - White/dark backgrounds, clean typography
+ * - Rounded corners (10–15px) on cards, buttons, inputs
+ * - Pill-shaped tags and chips
  */
 
-export const colors = {
-  // Primary
-  primary: '#5B5FC7',
-  primaryLight: '#EDEDF8',
-  primaryDark: '#4547A9',
+export type ThemeColors = typeof lightColors;
+
+export const lightColors = {
+  // Primary accent (blue)
+  primary: '#485ff0',
+  primaryLight: '#E8EBFC',
+  primaryDark: '#3A4FDB',
 
   // Backgrounds
   background: '#FFFFFF',
@@ -22,45 +28,114 @@ export const colors = {
   surface: '#FFFFFF',
 
   // Text
-  textPrimary: '#1A1A2E',
-  textSecondary: '#6E6E82',
+  textPrimary: '#010100',
+  textSecondary: '#666666',
   textTertiary: '#9E9EB0',
   textInverse: '#FFFFFF',
 
   // Accents
-  accent: '#F5C518',      // Gold/yellow for stars, highlights
+  accent: '#fe9820',       // Orange - stars, highlights, secondary accent
   accentGreen: '#34C759',  // Success states
   accentRed: '#E53935',    // Destructive actions, errors
 
   // Borders & Separators
-  border: '#EBEBF0',
-  borderLight: '#F2F2F5',
+  border: '#E0E0E0',
+  borderLight: '#EBEBF0',
   separator: '#F0F0F5',
 
   // Tab bar
-  tabInactive: '#B0B0C0',
-  tabActive: '#5B5FC7',
+  tabInactive: '#9E9EB0',
+  tabActive: '#485ff0',
 
   // Status
   success: '#34C759',
-  warning: '#FF9500',
+  warning: '#fe9820',
   error: '#E53935',
-  info: '#5B5FC7',
+  info: '#485ff0',
 
   // Chips
   chipBackground: '#F0F0F5',
-  chipSelectedBackground: '#5B5FC7',
-  chipText: '#6E6E82',
+  chipSelectedBackground: '#485ff0',
+  chipText: '#666666',
   chipSelectedText: '#FFFFFF',
 
   // Cards
   cardBackground: '#FFFFFF',
-  cardBorder: '#F0F0F5',
+  cardBorder: '#EBEBF0',
+  /** Alternate card (blue-tinted) for list alternating pattern */
+  cardAltBackground: '#E8EBFC',
+  cardAltBorder: '#D0D6F8',
+  cardAltTextPrimary: '#010100',
+  cardAltTextSecondary: '#666666',
+  cardAltChipBackground: 'rgba(72,95,240,0.15)',
+  cardAltChipText: '#333333',
 
   // Slots
   slotAvailable: '#E8F5E9',
   slotUnavailable: '#F5F5F5',
 };
+
+export const darkColors: ThemeColors = {
+  // Primary accent (blue)
+  primary: '#5C72F5',
+  primaryLight: '#252A50',
+  primaryDark: '#485ff0',
+
+  // Backgrounds
+  background: '#121212',
+  backgroundSecondary: '#1A1A1A',
+  surface: '#282828',
+
+  // Text
+  textPrimary: '#FFFFFF',
+  textSecondary: '#B0B0B0',
+  textTertiary: '#6E6E82',
+  textInverse: '#010100',
+
+  // Accents
+  accent: '#fe9820',
+  accentGreen: '#34C759',
+  accentRed: '#FF6B6B',
+
+  // Borders & Separators
+  border: '#2A2A2A',
+  borderLight: '#252525',
+  separator: '#333333',
+
+  // Tab bar
+  tabInactive: '#6E6E82',
+  tabActive: '#5C72F5',
+
+  // Status
+  success: '#34C759',
+  warning: '#fe9820',
+  error: '#FF6B6B',
+  info: '#5C72F5',
+
+  // Chips
+  chipBackground: '#333333',
+  chipSelectedBackground: '#485ff0',
+  chipText: '#B0B0B0',
+  chipSelectedText: '#FFFFFF',
+
+  // Cards
+  cardBackground: '#282828',
+  cardBorder: '#333333',
+  /** Alternate card (solid blue) for list alternating pattern */
+  cardAltBackground: '#485ff0',
+  cardAltBorder: '#5C72F5',
+  cardAltTextPrimary: '#FFFFFF',
+  cardAltTextSecondary: 'rgba(255,255,255,0.85)',
+  cardAltChipBackground: 'rgba(255,255,255,0.2)',
+  cardAltChipText: '#FFFFFF',
+
+  // Slots
+  slotAvailable: '#1A3020',
+  slotUnavailable: '#333333',
+};
+
+// Default export for backward compatibility (light mode)
+export const colors = lightColors;
 
 export const spacing = {
   xs: 4,

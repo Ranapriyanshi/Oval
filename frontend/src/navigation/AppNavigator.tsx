@@ -3,7 +3,8 @@ import { View, Text, StyleSheet } from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useAuth } from '../context/AuthContext';
-import { colors, fontSize, fontWeight } from '../theme';
+import { useTheme } from '../context/ThemeContext';
+import { fontSize, fontWeight } from '../theme';
 import LoginScreen from '../screens/Auth/LoginScreen';
 import RegisterScreen from '../screens/Auth/RegisterScreen';
 import HomeScreen from '../screens/Home/HomeScreen';
@@ -53,6 +54,7 @@ const tabIconStyles = StyleSheet.create({
 });
 
 const MainTabs = () => {
+  const { colors, isDark } = useTheme();
   return (
     <Tab.Navigator
       screenOptions={{
@@ -99,11 +101,19 @@ const MainTabs = () => {
         }}
       />
       <Tab.Screen
-        name="Coaching"
-        component={CoachesScreen}
+        name="Gametime"
+        component={GametimeScreen}
         options={{
-          tabBarLabel: 'Coaching',
-          tabBarIcon: ({ focused }) => <TabIcon label="Coaching" focused={focused} />,
+          tabBarLabel: 'Gametime',
+          tabBarIcon: ({ focused }) => <TabIcon label="Gametime" focused={focused} />,
+        }}
+      />
+      <Tab.Screen
+        name="Venues"
+        component={VenuesScreen}
+        options={{
+          tabBarLabel: 'Venues',
+          tabBarIcon: ({ focused }) => <TabIcon label="Venues" focused={focused} />,
         }}
       />
       <Tab.Screen
@@ -120,13 +130,20 @@ const MainTabs = () => {
 
 const AppNavigator = () => {
   const { user, loading } = useAuth();
+  const { colors, isDark } = useTheme();
 
   if (loading) {
     return null;
   }
 
+  const stackHeaderStyle = {
+    headerStyle: { backgroundColor: colors.background },
+    headerTintColor: colors.textPrimary,
+    headerTitleStyle: { color: colors.textPrimary },
+  };
+
   return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
+    <Stack.Navigator screenOptions={{ headerShown: false, ...stackHeaderStyle }}>
       {user ? (
         <>
           <Stack.Screen name="Main" component={MainTabs} />
@@ -137,20 +154,23 @@ const AppNavigator = () => {
           <Stack.Screen
             name="ChatConversation"
             component={ChatScreen}
-            options={{ headerShown: true, headerTitle: 'Chat' }}
+            options={{ headerShown: true, headerTitle: 'Chat', ...stackHeaderStyle }}
           />
           <Stack.Screen
             name="CoachProfile"
             component={CoachProfileScreen}
-            options={{ headerShown: true, headerTitle: 'Coach Profile' }}
+            options={{ headerShown: true, headerTitle: 'Coach Profile', ...stackHeaderStyle }}
           />
           <Stack.Screen
             name="MySessions"
             component={MySessionsScreen}
-            options={{ headerShown: true, headerTitle: 'My Sessions' }}
+            options={{ headerShown: true, headerTitle: 'My Sessions', ...stackHeaderStyle }}
           />
-          <Stack.Screen name="Gametime" component={GametimeScreen} options={{ headerShown: true, headerTitle: 'Gametime' }} />
-          <Stack.Screen name="Venues" component={VenuesScreen} options={{ headerShown: true, headerTitle: 'Venues' }} />
+          <Stack.Screen
+            name="Coaches"
+            component={CoachesScreen}
+            options={{ headerShown: true, headerTitle: 'Coaching', ...stackHeaderStyle }}
+          />
           <Stack.Screen name="Bookings" component={BookingsScreen} />
           <Stack.Screen name="MatchesList" component={MatchesScreen} />
         </>
