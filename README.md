@@ -1,10 +1,6 @@
 <div>
   
 # ⚽ Oval - Community Sports App
-<div>
-  
-# ⚽ Oval - Community Sports App
-
 </div>
 
 <table>
