@@ -13,6 +13,8 @@ import UserSwipe from './UserSwipe';
 import UserMatch from './UserMatch';
 import Gametime from './Gametime';
 import GametimeParticipant from './GametimeParticipant';
+import Conversation from './Conversation';
+import Message from './Message';
 
 // Venue associations
 Venue.hasMany(VenueSport, { foreignKey: 'venue_id' });
@@ -67,6 +69,19 @@ GametimeParticipant.belongsTo(Gametime, { foreignKey: 'gametime_id', as: 'Gameti
 User.hasMany(GametimeParticipant, { foreignKey: 'user_id', as: 'GametimeJoined' });
 GametimeParticipant.belongsTo(User, { foreignKey: 'user_id', as: 'User' });
 
+// Chat associations
+Conversation.belongsTo(User, { foreignKey: 'participant1_id', as: 'Participant1' });
+Conversation.belongsTo(User, { foreignKey: 'participant2_id', as: 'Participant2' });
+Conversation.belongsTo(Message, { foreignKey: 'last_message_id', as: 'LastMessage' });
+Conversation.hasMany(Message, { foreignKey: 'conversation_id', as: 'Messages' });
+
+Message.belongsTo(Conversation, { foreignKey: 'conversation_id', as: 'Conversation' });
+Message.belongsTo(User, { foreignKey: 'sender_id', as: 'Sender' });
+
+User.hasMany(Conversation, { foreignKey: 'participant1_id', as: 'ConversationsAsP1' });
+User.hasMany(Conversation, { foreignKey: 'participant2_id', as: 'ConversationsAsP2' });
+User.hasMany(Message, { foreignKey: 'sender_id', as: 'SentMessages' });
+
 const models = {
   User,
   Venue,
@@ -82,6 +97,8 @@ const models = {
   UserMatch,
   Gametime,
   GametimeParticipant,
+  Conversation,
+  Message,
   sequelize,
 };
 
@@ -101,4 +118,6 @@ export {
   UserMatch,
   Gametime,
   GametimeParticipant,
+  Conversation,
+  Message,
 };

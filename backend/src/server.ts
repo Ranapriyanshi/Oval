@@ -12,8 +12,10 @@ import venueRoutes from './routes/venues';
 import bookingRoutes from './routes/bookings';
 import playpalRoutes from './routes/playpals';
 import gametimeRoutes from './routes/gametime';
+import chatRoutes from './routes/chat';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
+import { setupChatSocket } from './socket/chatHandler';
 
 const app = express();
 const httpServer = createServer(app);
@@ -49,20 +51,15 @@ app.use('/api/venues', venueRoutes);
 app.use('/api/bookings', bookingRoutes);
 app.use('/api/playpals', playpalRoutes);
 app.use('/api/gametime', gametimeRoutes);
+app.use('/api/chat', chatRoutes);
 
 // Health check
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
-// Socket.io connection handling
-io.on('connection', (socket) => {
-  console.log('Client connected:', socket.id);
-
-  socket.on('disconnect', () => {
-    console.log('Client disconnected:', socket.id);
-  });
-});
+// Socket.io chat handler (auth, messaging, typing, online status)
+setupChatSocket(io);
 
 // Test database connection and start server
 const PORT = config.port;
