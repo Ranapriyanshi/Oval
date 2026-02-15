@@ -13,7 +13,8 @@ import {
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useNavigation } from '@react-navigation/native';
-import { colors, spacing, borderRadius, fontSize, fontWeight, shadow } from '../../theme';
+import { useTheme } from '../../context/ThemeContext';
+import { spacing, borderRadius, fontSize, fontWeight, shadow } from '../../theme';
 import { playpalsApi, PlaypalUser } from '../../services/playpals';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
@@ -46,7 +47,7 @@ const SPORT_EMOJIS: Record<string, string> = {
 const SKILL_COLORS: Record<string, string> = {
   beginner: '#34C759',
   intermediate: '#FF9500',
-  advanced: '#5B5FC7',
+  advanced: '#485ff0',
   professional: '#E53935',
 };
 
@@ -55,6 +56,7 @@ const DAY_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const DiscoveryScreen = () => {
   const { t } = useTranslation();
   const navigation = useNavigation<any>();
+  const { colors } = useTheme();
 
   const [profiles, setProfiles] = useState<PlaypalUser[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -155,29 +157,29 @@ const DiscoveryScreen = () => {
       <View style={styles.matchOverlay}>
         <View style={styles.matchContent}>
           <Text style={styles.matchEmoji}>🎉</Text>
-          <Text style={styles.matchTitle}>{t('playpals.itsAMatch')}</Text>
+          <Text style={[styles.matchTitle, { color: colors.textInverse }]}>{t('playpals.itsAMatch')}</Text>
           <Text style={styles.matchSubtitle}>
             {t('playpals.matchMessage', { name: showMatch.name })}
           </Text>
 
           <View style={styles.matchAvatarRow}>
             <View style={styles.matchAvatar}>
-              <Text style={styles.matchAvatarText}>You</Text>
+              <Text style={[styles.matchAvatarText, { color: colors.textInverse }]}>You</Text>
             </View>
             <Text style={styles.matchHeart}>❤️</Text>
             <View style={styles.matchAvatar}>
-              <Text style={styles.matchAvatarText}>
+              <Text style={[styles.matchAvatarText, { color: colors.textInverse }]}>
                 {showMatch.name?.charAt(0)?.toUpperCase() || '?'}
               </Text>
             </View>
           </View>
 
           <TouchableOpacity
-            style={styles.matchButton}
+            style={[styles.matchButton, { backgroundColor: colors.textInverse }]}
             onPress={() => setShowMatch(null)}
             activeOpacity={0.7}
           >
-            <Text style={styles.matchButtonText}>{t('playpals.keepSwiping')}</Text>
+            <Text style={[styles.matchButtonText, { color: colors.primary }]}>{t('playpals.keepSwiping')}</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -186,9 +188,9 @@ const DiscoveryScreen = () => {
 
   if (loading) {
     return (
-      <View style={styles.container}>
-        <View style={styles.header}>
-          <Text style={styles.headerTitle}>{t('playpals.discover')}</Text>
+      <View style={[styles.container, { backgroundColor: colors.backgroundSecondary }]}>
+        <View style={[styles.header, { backgroundColor: colors.background, borderBottomColor: colors.borderLight }]}>
+          <Text style={[styles.headerTitle, { color: colors.textPrimary }]}>{t('playpals.discover')}</Text>
         </View>
         <View style={styles.center}>
           <ActivityIndicator size="large" color={colors.primary} />
@@ -198,33 +200,33 @@ const DiscoveryScreen = () => {
   }
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.backgroundSecondary }]}>
       {/* Header */}
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>{t('playpals.discover')}</Text>
+      <View style={[styles.header, { backgroundColor: colors.background, borderBottomColor: colors.borderLight }]}>
+        <Text style={[styles.headerTitle, { color: colors.textPrimary }]}>{t('playpals.discover')}</Text>
       </View>
 
       {/* Sport filter row */}
-      <View style={styles.filterContainer}>
+      <View style={[styles.filterContainer, { backgroundColor: colors.background, borderBottomColor: colors.borderLight }]}>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filterScroll}>
           <TouchableOpacity
-            style={[styles.filterChip, !sportFilter && styles.filterChipActive]}
+            style={[styles.filterChip, { backgroundColor: colors.chipBackground }, !sportFilter && { backgroundColor: colors.primary }]}
             onPress={() => setSportFilter(null)}
             activeOpacity={0.7}
           >
-            <Text style={[styles.filterChipText, !sportFilter && styles.filterChipTextActive]}>
+            <Text style={[styles.filterChipText, { color: colors.chipText }, !sportFilter && { color: colors.textInverse }]}>
               {t('playpals.allSports')}
             </Text>
           </TouchableOpacity>
           {Object.keys(SPORT_EMOJIS).slice(0, 8).map((sport) => (
             <TouchableOpacity
               key={sport}
-              style={[styles.filterChip, sportFilter === sport && styles.filterChipActive]}
+              style={[styles.filterChip, { backgroundColor: colors.chipBackground }, sportFilter === sport && { backgroundColor: colors.primary }]}
               onPress={() => setSportFilter(sportFilter === sport ? null : sport)}
               activeOpacity={0.7}
             >
               <Text style={styles.filterEmoji}>{SPORT_EMOJIS[sport]}</Text>
-              <Text style={[styles.filterChipText, sportFilter === sport && styles.filterChipTextActive]}>
+              <Text style={[styles.filterChipText, { color: colors.chipText }, sportFilter === sport && { color: colors.textInverse }]}>
                 {sport.charAt(0).toUpperCase() + sport.slice(1)}
               </Text>
             </TouchableOpacity>
@@ -237,21 +239,21 @@ const DiscoveryScreen = () => {
         {!currentProfile ? (
           <View style={styles.emptyState}>
             <Text style={styles.emptyEmoji}>🔍</Text>
-            <Text style={styles.emptyTitle}>{t('playpals.noMore')}</Text>
-            <Text style={styles.emptySubtitle}>{t('playpals.checkBack')}</Text>
+            <Text style={[styles.emptyTitle, { color: colors.textPrimary }]}>{t('playpals.noMore')}</Text>
+            <Text style={[styles.emptySubtitle, { color: colors.textSecondary }]}>{t('playpals.checkBack')}</Text>
             <TouchableOpacity
-              style={styles.retryButton}
+              style={[styles.retryButton, { backgroundColor: colors.primary }]}
               onPress={loadProfiles}
               activeOpacity={0.7}
             >
-              <Text style={styles.retryButtonText}>{t('common.retry')}</Text>
+              <Text style={[styles.retryButtonText, { color: colors.textInverse }]}>{t('common.retry')}</Text>
             </TouchableOpacity>
           </View>
         ) : (
           <>
             {/* Next card (behind) */}
             {nextProfile && (
-              <View style={[styles.card, styles.cardBehind]}>
+              <View style={[styles.card, { backgroundColor: colors.cardBackground, borderColor: colors.cardBorder }, styles.cardBehind]}>
                 <CardContent profile={nextProfile} t={t} />
               </View>
             )}
@@ -261,6 +263,7 @@ const DiscoveryScreen = () => {
               {...panResponder.panHandlers}
               style={[
                 styles.card,
+                { backgroundColor: colors.cardBackground, borderColor: colors.cardBorder },
                 {
                   transform: [
                     { translateX: position.x },
@@ -271,11 +274,11 @@ const DiscoveryScreen = () => {
               ]}
             >
               {/* Like / Pass overlay labels */}
-              <Animated.View style={[styles.stampContainer, styles.stampLike, { opacity: likeOpacity }]}>
-                <Text style={styles.stampLikeText}>LIKE ❤️</Text>
+              <Animated.View style={[styles.stampContainer, styles.stampLike, { borderColor: colors.accentGreen, opacity: likeOpacity }]}>
+                <Text style={[styles.stampLikeText, { color: colors.accentGreen }]}>LIKE ❤️</Text>
               </Animated.View>
-              <Animated.View style={[styles.stampContainer, styles.stampPass, { opacity: passOpacity }]}>
-                <Text style={styles.stampPassText}>PASS ✋</Text>
+              <Animated.View style={[styles.stampContainer, styles.stampPass, { borderColor: colors.accentRed, opacity: passOpacity }]}>
+                <Text style={[styles.stampPassText, { color: colors.accentRed }]}>PASS ✋</Text>
               </Animated.View>
 
               <CardContent
@@ -292,20 +295,20 @@ const DiscoveryScreen = () => {
 
       {/* Action buttons */}
       {currentProfile && (
-        <View style={styles.actionsRow}>
+        <View style={[styles.actionsRow, { backgroundColor: colors.background, borderTopColor: colors.borderLight }]}>
           <TouchableOpacity
-            style={[styles.actionButton, styles.actionPass]}
+            style={[styles.actionButton, styles.actionPass, { backgroundColor: colors.background, borderColor: colors.accentRed }]}
             onPress={() => swipeCard('left')}
             activeOpacity={0.7}
           >
-            <Text style={styles.actionPassText}>✕</Text>
+            <Text style={[styles.actionPassText, { color: colors.accentRed }]}>✕</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={[styles.actionButton, styles.actionLike]}
+            style={[styles.actionButton, { backgroundColor: colors.primary }]}
             onPress={() => swipeCard('right')}
             activeOpacity={0.7}
           >
-            <Text style={styles.actionLikeText}>♥</Text>
+            <Text style={[styles.actionLikeText, { color: colors.textInverse }]}>♥</Text>
           </TouchableOpacity>
         </View>
       )}
@@ -323,6 +326,7 @@ const CardContent = ({
   t: any;
   onViewProfile?: () => void;
 }) => {
+  const { colors } = useTheme();
   const skills = profile.UserSportsSkills || [];
   const availability = profile.UserAvailabilities || [];
   const photo = profile.UserProfilePhotos?.[0];
@@ -338,38 +342,38 @@ const CardContent = ({
       {/* Avatar / Photo */}
       <View style={styles.cardAvatarArea}>
         {photo ? (
-          <View style={styles.cardAvatarLarge}>
-            <Text style={styles.cardAvatarText}>{initial}</Text>
+          <View style={[styles.cardAvatarLarge, { backgroundColor: colors.primaryLight }]}>
+            <Text style={[styles.cardAvatarText, { color: colors.primary }]}>{initial}</Text>
           </View>
         ) : (
-          <View style={styles.cardAvatarLarge}>
-            <Text style={styles.cardAvatarText}>{initial}</Text>
+          <View style={[styles.cardAvatarLarge, { backgroundColor: colors.primaryLight }]}>
+            <Text style={[styles.cardAvatarText, { color: colors.primary }]}>{initial}</Text>
           </View>
         )}
         {profile.match_score != null && profile.match_score > 0 && (
-          <View style={styles.scoreBadge}>
-            <Text style={styles.scoreBadgeText}>{profile.match_score}%</Text>
+          <View style={[styles.scoreBadge, { backgroundColor: colors.accent }]}>
+            <Text style={[styles.scoreBadgeText, { color: colors.textPrimary }]}>{profile.match_score}%</Text>
           </View>
         )}
       </View>
 
       {/* Name + location */}
-      <Text style={styles.cardName}>{profile.name}</Text>
+      <Text style={[styles.cardName, { color: colors.textPrimary }]}>{profile.name}</Text>
       {profile.city && (
-        <Text style={styles.cardLocation}>📍 {profile.city}{profile.country ? `, ${profile.country}` : ''}</Text>
+        <Text style={[styles.cardLocation, { color: colors.textSecondary }]}>📍 {profile.city}{profile.country ? `, ${profile.country}` : ''}</Text>
       )}
 
       {/* Bio */}
       {profile.bio ? (
-        <Text style={styles.cardBio}>{profile.bio}</Text>
+        <Text style={[styles.cardBio, { color: colors.textSecondary }]}>{profile.bio}</Text>
       ) : null}
 
       {/* Match reasons */}
       {profile.match_reasons && profile.match_reasons.length > 0 && (
         <View style={styles.reasonsRow}>
           {profile.match_reasons.map((reason, idx) => (
-            <View key={idx} style={styles.reasonChip}>
-              <Text style={styles.reasonChipText}>{reason}</Text>
+            <View key={idx} style={[styles.reasonChip, { backgroundColor: colors.primaryLight }]}>
+              <Text style={[styles.reasonChipText, { color: colors.primary }]}>{reason}</Text>
             </View>
           ))}
         </View>
@@ -378,15 +382,15 @@ const CardContent = ({
       {/* Sports + skills */}
       {skills.length > 0 && (
         <View style={styles.sectionBlock}>
-          <Text style={styles.sectionLabel}>{t('playpals.sports')}</Text>
+          <Text style={[styles.sectionLabel, { color: colors.textTertiary }]}>{t('playpals.sports')}</Text>
           <View style={styles.skillsRow}>
             {skills.map((skill) => (
-              <View key={skill.id} style={styles.skillChip}>
+              <View key={skill.id} style={[styles.skillChip, { backgroundColor: colors.backgroundSecondary }]}>
                 <Text style={styles.skillEmoji}>
                   {SPORT_EMOJIS[skill.sport_name.toLowerCase()] || '🏅'}
                 </Text>
                 <View>
-                  <Text style={styles.skillName}>{skill.sport_name}</Text>
+                  <Text style={[styles.skillName, { color: colors.textPrimary }]}>{skill.sport_name}</Text>
                   <View style={[styles.skillLevelBadge, { backgroundColor: SKILL_COLORS[skill.skill_level] || colors.textTertiary }]}>
                     <Text style={styles.skillLevelText}>
                       {skill.skill_level.charAt(0).toUpperCase() + skill.skill_level.slice(1)}
@@ -402,12 +406,12 @@ const CardContent = ({
       {/* Availability */}
       {availability.length > 0 && (
         <View style={styles.sectionBlock}>
-          <Text style={styles.sectionLabel}>{t('playpals.availability')}</Text>
+          <Text style={[styles.sectionLabel, { color: colors.textTertiary }]}>{t('playpals.availability')}</Text>
           <View style={styles.availRow}>
             {availability.map((slot) => (
-              <View key={slot.id} style={styles.availChip}>
-                <Text style={styles.availDay}>{DAY_LABELS[slot.day_of_week]}</Text>
-                <Text style={styles.availTime}>{slot.start_time}–{slot.end_time}</Text>
+              <View key={slot.id} style={[styles.availChip, { backgroundColor: colors.backgroundSecondary }]}>
+                <Text style={[styles.availDay, { color: colors.textPrimary }]}>{DAY_LABELS[slot.day_of_week]}</Text>
+                <Text style={[styles.availTime, { color: colors.textSecondary }]}>{slot.start_time}–{slot.end_time}</Text>
               </View>
             ))}
           </View>
@@ -417,7 +421,7 @@ const CardContent = ({
       {/* View full profile link */}
       {onViewProfile && (
         <TouchableOpacity style={styles.viewProfileButton} onPress={onViewProfile} activeOpacity={0.7}>
-          <Text style={styles.viewProfileText}>{t('playpals.viewProfile')} →</Text>
+          <Text style={[styles.viewProfileText, { color: colors.primary }]}>{t('playpals.viewProfile')} →</Text>
         </TouchableOpacity>
       )}
     </ScrollView>
@@ -427,20 +431,16 @@ const CardContent = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.backgroundSecondary,
   },
   header: {
-    backgroundColor: colors.background,
     paddingHorizontal: spacing.xl,
     paddingTop: 56,
     paddingBottom: spacing.lg,
     borderBottomWidth: 1,
-    borderBottomColor: colors.borderLight,
   },
   headerTitle: {
     fontSize: fontSize.title,
     fontWeight: fontWeight.bold,
-    color: colors.textPrimary,
     letterSpacing: -0.3,
   },
   center: {
@@ -451,10 +451,8 @@ const styles = StyleSheet.create({
 
   // Filters
   filterContainer: {
-    backgroundColor: colors.background,
     paddingVertical: spacing.sm,
     borderBottomWidth: 1,
-    borderBottomColor: colors.borderLight,
   },
   filterScroll: {
     paddingHorizontal: spacing.xl,
@@ -466,20 +464,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.sm,
     borderRadius: borderRadius.pill,
-    backgroundColor: colors.chipBackground,
     marginRight: spacing.sm,
     gap: 4,
-  },
-  filterChipActive: {
-    backgroundColor: colors.primary,
   },
   filterChipText: {
     fontSize: fontSize.sm,
     fontWeight: fontWeight.medium,
-    color: colors.chipText,
-  },
-  filterChipTextActive: {
-    color: colors.textInverse,
   },
   filterEmoji: {
     fontSize: 14,
@@ -497,10 +487,8 @@ const styles = StyleSheet.create({
     position: 'absolute',
     width: CARD_WIDTH,
     maxHeight: '90%',
-    backgroundColor: colors.cardBackground,
     borderRadius: borderRadius.lg,
     borderWidth: 1,
-    borderColor: colors.cardBorder,
     ...shadow.lg,
     overflow: 'hidden',
   },
@@ -526,20 +514,17 @@ const styles = StyleSheet.create({
     width: 96,
     height: 96,
     borderRadius: 48,
-    backgroundColor: colors.primaryLight,
     alignItems: 'center',
     justifyContent: 'center',
   },
   cardAvatarText: {
     fontSize: 36,
     fontWeight: fontWeight.bold,
-    color: colors.primary,
   },
   scoreBadge: {
     position: 'absolute',
     bottom: -4,
     right: '32%',
-    backgroundColor: colors.accent,
     paddingHorizontal: spacing.sm,
     paddingVertical: 2,
     borderRadius: borderRadius.pill,
@@ -547,25 +532,21 @@ const styles = StyleSheet.create({
   scoreBadgeText: {
     fontSize: fontSize.xs,
     fontWeight: fontWeight.bold,
-    color: colors.textPrimary,
   },
 
   // Card text
   cardName: {
     fontSize: fontSize.xxl,
     fontWeight: fontWeight.bold,
-    color: colors.textPrimary,
     textAlign: 'center',
   },
   cardLocation: {
     fontSize: fontSize.base,
-    color: colors.textSecondary,
     textAlign: 'center',
     marginTop: spacing.xs,
   },
   cardBio: {
     fontSize: fontSize.base,
-    color: colors.textSecondary,
     textAlign: 'center',
     marginTop: spacing.md,
     lineHeight: 20,
@@ -580,7 +561,6 @@ const styles = StyleSheet.create({
     marginTop: spacing.md,
   },
   reasonChip: {
-    backgroundColor: colors.primaryLight,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.xs,
     borderRadius: borderRadius.pill,
@@ -588,7 +568,6 @@ const styles = StyleSheet.create({
   reasonChipText: {
     fontSize: fontSize.xs,
     fontWeight: fontWeight.medium,
-    color: colors.primary,
   },
 
   // Sections
@@ -598,7 +577,6 @@ const styles = StyleSheet.create({
   sectionLabel: {
     fontSize: fontSize.sm,
     fontWeight: fontWeight.semibold,
-    color: colors.textTertiary,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
     marginBottom: spacing.sm,
@@ -609,7 +587,6 @@ const styles = StyleSheet.create({
   skillChip: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.backgroundSecondary,
     padding: spacing.md,
     borderRadius: borderRadius.sm,
     gap: spacing.md,
@@ -620,7 +597,6 @@ const styles = StyleSheet.create({
   skillName: {
     fontSize: fontSize.base,
     fontWeight: fontWeight.medium,
-    color: colors.textPrimary,
   },
   skillLevelBadge: {
     paddingHorizontal: spacing.sm,
@@ -643,7 +619,6 @@ const styles = StyleSheet.create({
   },
   availChip: {
     alignItems: 'center',
-    backgroundColor: colors.backgroundSecondary,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
     borderRadius: borderRadius.sm,
@@ -652,11 +627,9 @@ const styles = StyleSheet.create({
   availDay: {
     fontSize: fontSize.sm,
     fontWeight: fontWeight.semibold,
-    color: colors.textPrimary,
   },
   availTime: {
     fontSize: fontSize.xs,
-    color: colors.textSecondary,
     marginTop: 2,
   },
 
@@ -668,7 +641,6 @@ const styles = StyleSheet.create({
   viewProfileText: {
     fontSize: fontSize.base,
     fontWeight: fontWeight.semibold,
-    color: colors.primary,
   },
 
   // Stamp overlays
@@ -683,23 +655,19 @@ const styles = StyleSheet.create({
   },
   stampLike: {
     right: 20,
-    borderColor: colors.accentGreen,
     transform: [{ rotate: '15deg' }],
   },
   stampLikeText: {
     fontSize: fontSize.xl,
     fontWeight: fontWeight.bold,
-    color: colors.accentGreen,
   },
   stampPass: {
     left: 20,
-    borderColor: colors.accentRed,
     transform: [{ rotate: '-15deg' }],
   },
   stampPassText: {
     fontSize: fontSize.xl,
     fontWeight: fontWeight.bold,
-    color: colors.accentRed,
   },
 
   // Action buttons
@@ -709,9 +677,7 @@ const styles = StyleSheet.create({
     gap: spacing.xxxl,
     paddingVertical: spacing.xl,
     paddingBottom: spacing.xxl,
-    backgroundColor: colors.background,
     borderTopWidth: 1,
-    borderTopColor: colors.borderLight,
   },
   actionButton: {
     width: 64,
@@ -722,21 +688,14 @@ const styles = StyleSheet.create({
     ...shadow.md,
   },
   actionPass: {
-    backgroundColor: colors.background,
     borderWidth: 2,
-    borderColor: colors.accentRed,
   },
   actionPassText: {
     fontSize: 28,
-    color: colors.accentRed,
     fontWeight: fontWeight.bold,
-  },
-  actionLike: {
-    backgroundColor: colors.primary,
   },
   actionLikeText: {
     fontSize: 28,
-    color: colors.textInverse,
   },
 
   // Empty state
@@ -751,18 +710,15 @@ const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: fontSize.xl,
     fontWeight: fontWeight.bold,
-    color: colors.textPrimary,
     textAlign: 'center',
   },
   emptySubtitle: {
     fontSize: fontSize.base,
-    color: colors.textSecondary,
     textAlign: 'center',
     marginTop: spacing.sm,
   },
   retryButton: {
     marginTop: spacing.xl,
-    backgroundColor: colors.primary,
     paddingHorizontal: spacing.xxl,
     paddingVertical: spacing.md,
     borderRadius: borderRadius.pill,
@@ -770,13 +726,12 @@ const styles = StyleSheet.create({
   retryButtonText: {
     fontSize: fontSize.base,
     fontWeight: fontWeight.semibold,
-    color: colors.textInverse,
   },
 
   // Match overlay
   matchOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(91, 95, 199, 0.95)',
+    backgroundColor: 'rgba(72, 95, 240, 0.95)',
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: spacing.xxxl,
@@ -791,7 +746,6 @@ const styles = StyleSheet.create({
   matchTitle: {
     fontSize: fontSize.hero,
     fontWeight: fontWeight.bold,
-    color: colors.textInverse,
     textAlign: 'center',
   },
   matchSubtitle: {
@@ -819,14 +773,12 @@ const styles = StyleSheet.create({
   matchAvatarText: {
     fontSize: 24,
     fontWeight: fontWeight.bold,
-    color: colors.textInverse,
   },
   matchHeart: {
     fontSize: 32,
   },
   matchButton: {
     marginTop: spacing.xxxl,
-    backgroundColor: colors.textInverse,
     paddingHorizontal: spacing.xxxl,
     paddingVertical: spacing.lg,
     borderRadius: borderRadius.pill,
@@ -834,7 +786,6 @@ const styles = StyleSheet.create({
   matchButtonText: {
     fontSize: fontSize.lg,
     fontWeight: fontWeight.bold,
-    color: colors.primary,
   },
 });
 

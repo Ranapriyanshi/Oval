@@ -11,7 +11,8 @@ import {
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useNavigation } from '@react-navigation/native';
-import { colors, spacing, borderRadius, fontSize, fontWeight, shadow } from '../../theme';
+import { useTheme } from '../../context/ThemeContext';
+import { spacing, borderRadius, fontSize, fontWeight, shadow } from '../../theme';
 import { playpalsApi, MatchItem } from '../../services/playpals';
 import chatApi from '../../services/chat';
 
@@ -31,6 +32,7 @@ const SPORT_EMOJIS: Record<string, string> = {
 };
 
 const MatchesScreen = () => {
+  const { colors } = useTheme();
   const { t } = useTranslation();
   const navigation = useNavigation<any>();
 
@@ -90,49 +92,57 @@ const MatchesScreen = () => {
     });
   };
 
-  const renderMatchItem = ({ item }: { item: MatchItem }) => {
+  const renderMatchItem = ({ item, index }: { item: MatchItem; index: number }) => {
     const user = item.user;
     const initial = user.name?.charAt(0)?.toUpperCase() || '?';
     const skills = user.UserSportsSkills || [];
     const photo = user.UserProfilePhotos?.[0];
+    const isAlt = index % 2 === 1;
+    const bg = isAlt ? colors.cardAltBackground : colors.cardBackground;
+    const border = isAlt ? colors.cardAltBorder : colors.cardBorder;
+    const t1 = isAlt ? colors.cardAltTextPrimary : colors.textPrimary;
+    const t2 = isAlt ? colors.cardAltTextSecondary : colors.textSecondary;
+    const t3 = isAlt ? colors.cardAltTextSecondary : colors.textTertiary;
+    const chipBg = isAlt ? colors.cardAltChipBackground : colors.chipBackground;
+    const chipTxt = isAlt ? colors.cardAltChipText : colors.chipText;
 
     return (
       <TouchableOpacity
-        style={styles.matchCard}
+        style={[styles.matchCard, { backgroundColor: bg, borderColor: border }]}
         onPress={() => navigation.navigate('PlaypalProfile', { userId: user.id })}
         activeOpacity={0.7}
       >
         <View style={styles.matchCardInner}>
           {/* Avatar */}
-          <View style={styles.avatar}>
-            <Text style={styles.avatarText}>{initial}</Text>
+          <View style={[styles.avatar, { backgroundColor: isAlt ? 'rgba(255,255,255,0.25)' : colors.primaryLight }]}>
+            <Text style={[styles.avatarText, { color: isAlt ? colors.textInverse : colors.primary }]}>{initial}</Text>
           </View>
 
           {/* Info */}
           <View style={styles.matchInfo}>
-            <Text style={styles.matchName}>{user.name}</Text>
+            <Text style={[styles.matchName, { color: t1 }]}>{user.name}</Text>
             {user.city && (
-              <Text style={styles.matchLocation}>📍 {user.city}</Text>
+              <Text style={[styles.matchLocation, { color: t2 }]}>📍 {user.city}</Text>
             )}
             {/* Sports chips */}
             {skills.length > 0 && (
               <View style={styles.sportsRow}>
                 {skills.slice(0, 3).map((skill) => (
-                  <View key={skill.id} style={styles.sportMiniChip}>
+                  <View key={skill.id} style={[styles.sportMiniChip, { backgroundColor: chipBg }]}>
                     <Text style={styles.sportMiniEmoji}>
                       {SPORT_EMOJIS[skill.sport_name.toLowerCase()] || '🏅'}
                     </Text>
-                    <Text style={styles.sportMiniText}>{skill.sport_name}</Text>
+                    <Text style={[styles.sportMiniText, { color: chipTxt }]}>{skill.sport_name}</Text>
                   </View>
                 ))}
                 {skills.length > 3 && (
-                  <View style={styles.sportMiniChip}>
-                    <Text style={styles.sportMiniText}>+{skills.length - 3}</Text>
+                  <View style={[styles.sportMiniChip, { backgroundColor: chipBg }]}>
+                    <Text style={[styles.sportMiniText, { color: chipTxt }]}>+{skills.length - 3}</Text>
                   </View>
                 )}
               </View>
             )}
-            <Text style={styles.matchDate}>
+            <Text style={[styles.matchDate, { color: t3 }]}>
               {t('playpals.matchedOn', { date: formatDate(item.matched_at) })}
             </Text>
           </View>
@@ -140,7 +150,7 @@ const MatchesScreen = () => {
           {/* Actions */}
           <View style={styles.matchActions}>
             <TouchableOpacity
-              style={styles.messageButton}
+              style={[styles.messageButton, { backgroundColor: isAlt ? 'rgba(255,255,255,0.25)' : colors.primaryLight }]}
               onPress={async () => {
                 try {
                   const conv = await chatApi.startConversation(user.id);
@@ -161,7 +171,7 @@ const MatchesScreen = () => {
               onPress={() => handleUnmatch(item)}
               hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
             >
-              <Text style={styles.unmatchIcon}>•••</Text>
+              <Text style={[styles.unmatchIcon, { color: t3 }]}>•••</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -171,9 +181,9 @@ const MatchesScreen = () => {
 
   if (loading) {
     return (
-      <View style={styles.container}>
-        <View style={styles.header}>
-          <Text style={styles.headerTitle}>{t('playpals.matches')}</Text>
+      <View style={[styles.container, { backgroundColor: colors.backgroundSecondary }]}>
+        <View style={[styles.header, { backgroundColor: colors.background, borderBottomColor: colors.borderLight }]}>
+          <Text style={[styles.headerTitle, { color: colors.textPrimary }]}>{t('playpals.matches')}</Text>
         </View>
         <View style={styles.center}>
           <ActivityIndicator size="large" color={colors.primary} />
@@ -183,12 +193,12 @@ const MatchesScreen = () => {
   }
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>{t('playpals.matches')}</Text>
+    <View style={[styles.container, { backgroundColor: colors.backgroundSecondary }]}>
+      <View style={[styles.header, { backgroundColor: colors.background, borderBottomColor: colors.borderLight }]}>
+        <Text style={[styles.headerTitle, { color: colors.textPrimary }]}>{t('playpals.matches')}</Text>
         {matches.length > 0 && (
-          <View style={styles.countBadge}>
-            <Text style={styles.countBadgeText}>{matches.length}</Text>
+          <View style={[styles.countBadge, { backgroundColor: colors.primary }]}>
+            <Text style={[styles.countBadgeText, { color: colors.textInverse }]}>{matches.length}</Text>
           </View>
         )}
       </View>
@@ -196,14 +206,14 @@ const MatchesScreen = () => {
       {matches.length === 0 ? (
         <View style={styles.emptyState}>
           <Text style={styles.emptyEmoji}>🤝</Text>
-          <Text style={styles.emptyTitle}>{t('playpals.noMatches')}</Text>
-          <Text style={styles.emptySubtitle}>{t('playpals.startDiscovering')}</Text>
+          <Text style={[styles.emptyTitle, { color: colors.textPrimary }]}>{t('playpals.noMatches')}</Text>
+          <Text style={[styles.emptySubtitle, { color: colors.textSecondary }]}>{t('playpals.startDiscovering')}</Text>
           <TouchableOpacity
-            style={styles.discoverButton}
+            style={[styles.discoverButton, { backgroundColor: colors.primary }]}
             onPress={() => navigation.navigate('Discover')}
             activeOpacity={0.7}
           >
-            <Text style={styles.discoverButtonText}>{t('playpals.goDiscover')}</Text>
+            <Text style={[styles.discoverButtonText, { color: colors.textInverse }]}>{t('playpals.goDiscover')}</Text>
           </TouchableOpacity>
         </View>
       ) : (
@@ -229,15 +239,12 @@ const MatchesScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.backgroundSecondary,
   },
   header: {
-    backgroundColor: colors.background,
     paddingHorizontal: spacing.xl,
     paddingTop: 56,
     paddingBottom: spacing.lg,
     borderBottomWidth: 1,
-    borderBottomColor: colors.borderLight,
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.sm,
@@ -245,11 +252,9 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: fontSize.title,
     fontWeight: fontWeight.bold,
-    color: colors.textPrimary,
     letterSpacing: -0.3,
   },
   countBadge: {
-    backgroundColor: colors.primary,
     paddingHorizontal: spacing.sm + 2,
     paddingVertical: 2,
     borderRadius: borderRadius.pill,
@@ -257,7 +262,6 @@ const styles = StyleSheet.create({
   countBadgeText: {
     fontSize: fontSize.xs,
     fontWeight: fontWeight.bold,
-    color: colors.textInverse,
   },
   center: {
     flex: 1,
@@ -272,10 +276,8 @@ const styles = StyleSheet.create({
 
   // Match card
   matchCard: {
-    backgroundColor: colors.cardBackground,
     borderRadius: borderRadius.md,
     borderWidth: 1,
-    borderColor: colors.cardBorder,
     ...shadow.sm,
   },
   matchCardInner: {
@@ -288,14 +290,12 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: colors.primaryLight,
     alignItems: 'center',
     justifyContent: 'center',
   },
   avatarText: {
     fontSize: 22,
     fontWeight: fontWeight.bold,
-    color: colors.primary,
   },
   matchInfo: {
     flex: 1,
@@ -303,11 +303,9 @@ const styles = StyleSheet.create({
   matchName: {
     fontSize: fontSize.lg,
     fontWeight: fontWeight.semibold,
-    color: colors.textPrimary,
   },
   matchLocation: {
     fontSize: fontSize.sm,
-    color: colors.textSecondary,
     marginTop: 2,
   },
   sportsRow: {
@@ -319,7 +317,6 @@ const styles = StyleSheet.create({
   sportMiniChip: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.chipBackground,
     paddingHorizontal: spacing.sm,
     paddingVertical: 2,
     borderRadius: borderRadius.pill,
@@ -330,12 +327,10 @@ const styles = StyleSheet.create({
   },
   sportMiniText: {
     fontSize: fontSize.xs,
-    color: colors.chipText,
     fontWeight: fontWeight.medium,
   },
   matchDate: {
     fontSize: fontSize.xs,
-    color: colors.textTertiary,
     marginTop: spacing.sm,
   },
   matchActions: {
@@ -346,7 +341,6 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: colors.primaryLight,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -358,7 +352,6 @@ const styles = StyleSheet.create({
   },
   unmatchIcon: {
     fontSize: fontSize.lg,
-    color: colors.textTertiary,
     fontWeight: fontWeight.bold,
   },
 
@@ -376,18 +369,15 @@ const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: fontSize.xl,
     fontWeight: fontWeight.bold,
-    color: colors.textPrimary,
     textAlign: 'center',
   },
   emptySubtitle: {
     fontSize: fontSize.base,
-    color: colors.textSecondary,
     textAlign: 'center',
     marginTop: spacing.sm,
   },
   discoverButton: {
     marginTop: spacing.xl,
-    backgroundColor: colors.primary,
     paddingHorizontal: spacing.xxl,
     paddingVertical: spacing.md,
     borderRadius: borderRadius.pill,
@@ -395,7 +385,6 @@ const styles = StyleSheet.create({
   discoverButtonText: {
     fontSize: fontSize.base,
     fontWeight: fontWeight.semibold,
-    color: colors.textInverse,
   },
 });
 
