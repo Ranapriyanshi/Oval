@@ -365,6 +365,17 @@ const GametimeDetailScreen = () => {
           )}
         </View>
       )}
+      {event.status === 'completed' && event.is_joined && (
+        <View style={[styles.actionBar, { backgroundColor: colors.background, borderTopColor: colors.borderLight }]}>
+          <TouchableOpacity
+            style={[styles.actionButton, { backgroundColor: colors.primary }]}
+            onPress={() => navigation.navigate('GameRating', { gameId: event.id })}
+            activeOpacity={0.7}
+          >
+            <Text style={[styles.joinButtonText, { color: colors.textInverse }]}>Rate players</Text>
+          </TouchableOpacity>
+        </View>
+      )}
     </View>
   );
 };

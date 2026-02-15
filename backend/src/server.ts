@@ -14,6 +14,8 @@ import playpalRoutes from './routes/playpals';
 import gametimeRoutes from './routes/gametime';
 import chatRoutes from './routes/chat';
 import coachingRoutes from './routes/coaching';
+import statsRoutes from './routes/stats';
+import leaderboardsRoutes from './routes/leaderboards';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 import { setupChatSocket } from './socket/chatHandler';
@@ -54,6 +56,8 @@ app.use('/api/playpals', playpalRoutes);
 app.use('/api/gametime', gametimeRoutes);
 app.use('/api/chat', chatRoutes);
 app.use('/api/coaching', coachingRoutes);
+app.use('/api/stats', statsRoutes);
+app.use('/api/leaderboards', leaderboardsRoutes);
 
 // Health check
 app.get('/health', (req, res) => {

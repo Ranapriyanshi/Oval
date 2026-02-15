@@ -25,6 +25,7 @@ const HomeScreen = () => {
     { icon: '📋', label: 'Bookings', key: 'bookings', screen: 'Bookings' },
     { icon: '🤝', label: 'Matches', key: 'matches', screen: 'MatchesList' },
     { icon: '📅', label: 'Sessions', key: 'sessions', screen: 'MySessions' },
+    { icon: '📊', label: 'Stats', key: 'stats', screen: 'Stats' },
   ];
 
   return (

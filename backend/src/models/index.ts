@@ -19,6 +19,9 @@ import Coach from './Coach';
 import CoachAvailability from './CoachAvailability';
 import CoachingSession from './CoachingSession';
 import CoachRating from './CoachRating';
+import UserStats from './UserStats';
+import GameHistory from './GameHistory';
+import PlayerRating from './PlayerRating';
 
 // Venue associations
 Venue.hasMany(VenueSport, { foreignKey: 'venue_id' });
@@ -108,6 +111,22 @@ CoachRating.belongsTo(User, { foreignKey: 'user_id', as: 'User' });
 CoachingSession.hasOne(CoachRating, { foreignKey: 'session_id', as: 'Rating' });
 CoachRating.belongsTo(CoachingSession, { foreignKey: 'session_id', as: 'Session' });
 
+// Stats & leaderboards associations
+User.hasMany(UserStats, { foreignKey: 'user_id', as: 'Stats' });
+UserStats.belongsTo(User, { foreignKey: 'user_id', as: 'User' });
+
+User.hasMany(GameHistory, { foreignKey: 'user_id', as: 'GameHistory' });
+GameHistory.belongsTo(User, { foreignKey: 'user_id', as: 'User' });
+Gametime.hasMany(GameHistory, { foreignKey: 'gametime_id', as: 'GameHistory' });
+GameHistory.belongsTo(Gametime, { foreignKey: 'gametime_id', as: 'Gametime' });
+
+Gametime.hasMany(PlayerRating, { foreignKey: 'gametime_id', as: 'PlayerRatings' });
+PlayerRating.belongsTo(Gametime, { foreignKey: 'gametime_id', as: 'Gametime' });
+User.hasMany(PlayerRating, { foreignKey: 'rater_id', as: 'RatingsGiven' });
+User.hasMany(PlayerRating, { foreignKey: 'rated_user_id', as: 'RatingsReceived' });
+PlayerRating.belongsTo(User, { foreignKey: 'rater_id', as: 'Rater' });
+PlayerRating.belongsTo(User, { foreignKey: 'rated_user_id', as: 'RatedUser' });
+
 const models = {
   User,
   Venue,
@@ -129,6 +148,9 @@ const models = {
   CoachAvailability,
   CoachingSession,
   CoachRating,
+  UserStats,
+  GameHistory,
+  PlayerRating,
   sequelize,
 };
 
@@ -154,4 +176,7 @@ export {
   CoachAvailability,
   CoachingSession,
   CoachRating,
+  UserStats,
+  GameHistory,
+  PlayerRating,
 };

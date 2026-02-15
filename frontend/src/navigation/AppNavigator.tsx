@@ -23,6 +23,9 @@ import ChatScreen from '../screens/Chat/ChatScreen';
 import CoachesScreen from '../screens/Coaching/CoachesScreen';
 import CoachProfileScreen from '../screens/Coaching/CoachProfileScreen';
 import MySessionsScreen from '../screens/Coaching/MySessionsScreen';
+import StatsScreen from '../screens/Stats/StatsScreen';
+import LeaderboardsScreen from '../screens/Stats/LeaderboardsScreen';
+import GameRatingScreen from '../screens/Stats/GameRatingScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -173,6 +176,21 @@ const AppNavigator = () => {
           />
           <Stack.Screen name="Bookings" component={BookingsScreen} />
           <Stack.Screen name="MatchesList" component={MatchesScreen} />
+          <Stack.Screen
+            name="Stats"
+            component={StatsScreen}
+            options={{ headerShown: true, headerTitle: 'My Stats', ...stackHeaderStyle }}
+          />
+          <Stack.Screen
+            name="Leaderboards"
+            component={LeaderboardsScreen}
+            options={{ headerShown: true, headerTitle: 'Leaderboards', ...stackHeaderStyle }}
+          />
+          <Stack.Screen
+            name="GameRating"
+            component={GameRatingScreen}
+            options={{ headerShown: true, headerTitle: 'Rate players', ...stackHeaderStyle }}
+          />
         </>
       ) : (
         <>

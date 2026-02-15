@@ -8,6 +8,7 @@ import {
   Switch,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { useNavigation } from '@react-navigation/native';
 import { useAuth } from '../../context/AuthContext';
 import { useLocale } from '../../context/LocaleContext';
 import { useTheme } from '../../context/ThemeContext';
@@ -15,6 +16,7 @@ import { spacing, borderRadius, fontSize, fontWeight } from '../../theme';
 
 const ProfileScreen = () => {
   const { t } = useTranslation();
+  const navigation = useNavigation<any>();
   const { user, logout } = useAuth();
   const { country, timezone, setCountry } = useLocale();
   const { mode, isDark, colors, setMode, toggleTheme } = useTheme();
@@ -110,6 +112,30 @@ const ProfileScreen = () => {
             <Text style={[styles.infoLabel, { color: colors.textSecondary }]}>{t('profile.timezone')}</Text>
             <Text style={[styles.infoValue, { color: colors.textPrimary }]}>{timezone}</Text>
           </View>
+        </View>
+
+        {/* Stats & Leaderboards */}
+        <View style={[styles.card, { backgroundColor: colors.background, borderColor: colors.cardBorder }]}>
+          <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>Stats & leaderboards</Text>
+          <TouchableOpacity
+            style={styles.linkRow}
+            onPress={() => navigation.navigate('Stats')}
+            activeOpacity={0.7}
+          >
+            <Text style={[styles.linkIcon]}>📊</Text>
+            <Text style={[styles.linkText, { color: colors.textPrimary }]}>My stats</Text>
+            <Text style={[styles.linkChevron, { color: colors.textTertiary }]}>›</Text>
+          </TouchableOpacity>
+          <View style={[styles.separator, { backgroundColor: colors.separator }]} />
+          <TouchableOpacity
+            style={styles.linkRow}
+            onPress={() => navigation.navigate('Leaderboards')}
+            activeOpacity={0.7}
+          >
+            <Text style={[styles.linkIcon]}>🏆</Text>
+            <Text style={[styles.linkText, { color: colors.textPrimary }]}>Leaderboards</Text>
+            <Text style={[styles.linkChevron, { color: colors.textTertiary }]}>›</Text>
+          </TouchableOpacity>
         </View>
 
         {/* Country Switch */}
@@ -215,6 +241,14 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.lg, alignItems: 'center', marginTop: spacing.sm,
   },
   logoutButtonText: { fontSize: fontSize.lg, fontWeight: fontWeight.semibold },
+  linkRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: spacing.md,
+  },
+  linkIcon: { fontSize: 20, marginRight: spacing.md },
+  linkText: { flex: 1, fontSize: fontSize.base, fontWeight: fontWeight.medium },
+  linkChevron: { fontSize: fontSize.xl },
 });
 
 export default ProfileScreen;
