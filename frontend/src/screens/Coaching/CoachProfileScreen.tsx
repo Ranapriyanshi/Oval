@@ -12,11 +12,13 @@ import {
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
 import coachingApi, { CoachItem } from '../../services/coaching';
-import { colors, spacing, borderRadius, fontSize, fontWeight, shadow } from '../../theme';
+import { useTheme } from '../../context/ThemeContext';
+import { spacing, borderRadius, fontSize, fontWeight, shadow } from '../../theme';
 
 const DAY_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
 const CoachProfileScreen = () => {
+  const { colors } = useTheme();
   const { t } = useTranslation();
   const navigation = useNavigation<any>();
   const route = useRoute<any>();
@@ -89,7 +91,7 @@ const CoachProfileScreen = () => {
 
   if (loading) {
     return (
-      <View style={styles.center}>
+      <View style={[styles.center, { backgroundColor: colors.backgroundSecondary }]}>
         <ActivityIndicator size="large" color={colors.primary} />
       </View>
     );
@@ -97,8 +99,8 @@ const CoachProfileScreen = () => {
 
   if (!coach) {
     return (
-      <View style={styles.center}>
-        <Text style={styles.errorText}>Coach not found</Text>
+      <View style={[styles.center, { backgroundColor: colors.backgroundSecondary }]}>
+        <Text style={[styles.errorText, { color: colors.textSecondary }]}>Coach not found</Text>
       </View>
     );
   }
@@ -106,23 +108,23 @@ const CoachProfileScreen = () => {
   const cost = ((Number(coach.hourly_rate) * (parseInt(bookDuration) || 60)) / 60).toFixed(2);
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+    <ScrollView style={[styles.container, { backgroundColor: colors.backgroundSecondary }]} contentContainerStyle={styles.content}>
       {/* Header */}
-      <View style={styles.profileHeader}>
-        <View style={styles.avatar}>
-          <Text style={styles.avatarText}>
+      <View style={[styles.profileHeader, { backgroundColor: colors.background }]}>
+        <View style={[styles.avatar, { backgroundColor: colors.primaryLight }]}>
+          <Text style={[styles.avatarText, { color: colors.primary }]}>
             {coach.User?.name?.charAt(0)?.toUpperCase() || '?'}
           </Text>
         </View>
         <View style={styles.headerInfo}>
           <View style={styles.nameRow}>
-            <Text style={styles.coachName}>{coach.User?.name}</Text>
-            {coach.is_verified && <Text style={styles.verifiedBadge}>✓</Text>}
+            <Text style={[styles.coachName, { color: colors.textPrimary }]}>{coach.User?.name}</Text>
+            {coach.is_verified && <Text style={[styles.verifiedBadge, { color: colors.textInverse, backgroundColor: colors.accentGreen }]}>✓</Text>}
           </View>
-          <Text style={styles.coachCity}>📍 {coach.city || coach.User?.city}</Text>
+          <Text style={[styles.coachCity, { color: colors.textSecondary }]}>📍 {coach.city || coach.User?.city}</Text>
           <View style={styles.ratingRow}>
-            <Text style={styles.stars}>{renderStars(Number(coach.rating_avg))}</Text>
-            <Text style={styles.ratingText}>
+            <Text style={[styles.stars, { color: colors.accent }]}>{renderStars(Number(coach.rating_avg))}</Text>
+            <Text style={[styles.ratingText, { color: colors.textSecondary }]}>
               {Number(coach.rating_avg).toFixed(1)} ({coach.rating_count} {t('coaching.reviews', 'reviews')})
             </Text>
           </View>
@@ -130,36 +132,36 @@ const CoachProfileScreen = () => {
       </View>
 
       {/* Stats */}
-      <View style={styles.statsRow}>
+      <View style={[styles.statsRow, { backgroundColor: colors.background }]}>
         <View style={styles.statItem}>
-          <Text style={styles.statValue}>{coach.experience_years}</Text>
-          <Text style={styles.statLabel}>{t('coaching.yearsExp', 'Years Exp.')}</Text>
+          <Text style={[styles.statValue, { color: colors.primary }]}>{coach.experience_years}</Text>
+          <Text style={[styles.statLabel, { color: colors.textTertiary }]}>{t('coaching.yearsExp', 'Years Exp.')}</Text>
         </View>
-        <View style={styles.statDivider} />
+        <View style={[styles.statDivider, { backgroundColor: colors.separator }]} />
         <View style={styles.statItem}>
-          <Text style={styles.statValue}>{coach.total_sessions}</Text>
-          <Text style={styles.statLabel}>{t('coaching.sessions', 'Sessions')}</Text>
+          <Text style={[styles.statValue, { color: colors.primary }]}>{coach.total_sessions}</Text>
+          <Text style={[styles.statLabel, { color: colors.textTertiary }]}>{t('coaching.sessions', 'Sessions')}</Text>
         </View>
-        <View style={styles.statDivider} />
+        <View style={[styles.statDivider, { backgroundColor: colors.separator }]} />
         <View style={styles.statItem}>
-          <Text style={styles.statValue}>${Number(coach.hourly_rate).toFixed(0)}</Text>
-          <Text style={styles.statLabel}>{t('coaching.perHour', '/hour')}</Text>
+          <Text style={[styles.statValue, { color: colors.primary }]}>${Number(coach.hourly_rate).toFixed(0)}</Text>
+          <Text style={[styles.statLabel, { color: colors.textTertiary }]}>{t('coaching.perHour', '/hour')}</Text>
         </View>
       </View>
 
       {/* Bio */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>{t('coaching.about', 'About')}</Text>
-        <Text style={styles.bioText}>{coach.bio}</Text>
+      <View style={[styles.section, { backgroundColor: colors.background }]}>
+        <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>{t('coaching.about', 'About')}</Text>
+        <Text style={[styles.bioText, { color: colors.textSecondary }]}>{coach.bio}</Text>
       </View>
 
       {/* Specializations */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>{t('coaching.specializations', 'Specializations')}</Text>
+      <View style={[styles.section, { backgroundColor: colors.background }]}>
+        <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>{t('coaching.specializations', 'Specializations')}</Text>
         <View style={styles.chipWrap}>
           {coach.specializations.map((spec) => (
-            <View key={spec} style={styles.specChip}>
-              <Text style={styles.specChipText}>{spec}</Text>
+            <View key={spec} style={[styles.specChip, { backgroundColor: colors.primaryLight }]}>
+              <Text style={[styles.specChipText, { color: colors.primary }]}>{spec}</Text>
             </View>
           ))}
         </View>
@@ -167,12 +169,12 @@ const CoachProfileScreen = () => {
 
       {/* Certifications */}
       {coach.certifications.length > 0 && (
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>{t('coaching.certifications', 'Certifications')}</Text>
+        <View style={[styles.section, { backgroundColor: colors.background }]}>
+          <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>{t('coaching.certifications', 'Certifications')}</Text>
           {coach.certifications.map((cert, i) => (
             <View key={i} style={styles.certRow}>
               <Text style={styles.certIcon}>📜</Text>
-              <Text style={styles.certText}>{cert}</Text>
+              <Text style={[styles.certText, { color: colors.textSecondary }]}>{cert}</Text>
             </View>
           ))}
         </View>
@@ -180,18 +182,18 @@ const CoachProfileScreen = () => {
 
       {/* Availability */}
       {coach.Availabilities && coach.Availabilities.length > 0 && (
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>{t('coaching.availability', 'Availability')}</Text>
+        <View style={[styles.section, { backgroundColor: colors.background }]}>
+          <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>{t('coaching.availability', 'Availability')}</Text>
           {Array.from(new Set(coach.Availabilities.map((a) => a.day_of_week)))
             .sort()
             .map((day) => {
               const slots = coach.Availabilities!.filter((a) => a.day_of_week === day);
               return (
-                <View key={day} style={styles.availRow}>
-                  <Text style={styles.availDay}>{DAY_NAMES[day]}</Text>
+                <View key={day} style={[styles.availRow, { borderBottomColor: colors.separator }]}>
+                  <Text style={[styles.availDay, { color: colors.textPrimary }]}>{DAY_NAMES[day]}</Text>
                   <View style={styles.availSlots}>
                     {slots.map((s) => (
-                      <Text key={s.id} style={styles.availTime}>
+                      <Text key={s.id} style={[styles.availTime, { color: colors.textSecondary }]}>
                         {s.start_time} - {s.end_time}
                       </Text>
                     ))}
@@ -204,15 +206,15 @@ const CoachProfileScreen = () => {
 
       {/* Reviews */}
       {coach.Ratings && coach.Ratings.length > 0 && (
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>{t('coaching.recentReviews', 'Recent Reviews')}</Text>
+        <View style={[styles.section, { backgroundColor: colors.background }]}>
+          <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>{t('coaching.recentReviews', 'Recent Reviews')}</Text>
           {coach.Ratings.map((r) => (
-            <View key={r.id} style={styles.reviewCard}>
+            <View key={r.id} style={[styles.reviewCard, { backgroundColor: colors.backgroundSecondary }]}>
               <View style={styles.reviewHeader}>
-                <Text style={styles.reviewName}>{r.User?.name || 'Anonymous'}</Text>
-                <Text style={styles.reviewStars}>{renderStars(r.rating)}</Text>
+                <Text style={[styles.reviewName, { color: colors.textPrimary }]}>{r.User?.name || 'Anonymous'}</Text>
+                <Text style={[styles.reviewStars, { color: colors.accent }]}>{renderStars(r.rating)}</Text>
               </View>
-              {r.review && <Text style={styles.reviewText}>{r.review}</Text>}
+              {r.review && <Text style={[styles.reviewText, { color: colors.textSecondary }]}>{r.review}</Text>}
             </View>
           ))}
         </View>
@@ -220,66 +222,66 @@ const CoachProfileScreen = () => {
 
       {/* Book Button */}
       {!showBooking ? (
-        <TouchableOpacity style={styles.bookButton} onPress={() => setShowBooking(true)} activeOpacity={0.7}>
-          <Text style={styles.bookButtonText}>
+        <TouchableOpacity style={[styles.bookButton, { backgroundColor: colors.primary }]} onPress={() => setShowBooking(true)} activeOpacity={0.7}>
+          <Text style={[styles.bookButtonText, { color: colors.textInverse }]}>
             {t('coaching.bookSession', 'Book a Session')} - ${Number(coach.hourly_rate).toFixed(0)}/hr
           </Text>
         </TouchableOpacity>
       ) : (
-        <View style={styles.bookingForm}>
-          <Text style={styles.sectionTitle}>{t('coaching.bookSession', 'Book a Session')}</Text>
+        <View style={[styles.bookingForm, { backgroundColor: colors.background }]}>
+          <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>{t('coaching.bookSession', 'Book a Session')}</Text>
 
-          <Text style={styles.fieldLabel}>{t('coaching.sport', 'Sport')}</Text>
+          <Text style={[styles.fieldLabel, { color: colors.textPrimary }]}>{t('coaching.sport', 'Sport')}</Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.sportPicker}>
             {coach.specializations.map((spec) => (
               <TouchableOpacity
                 key={spec}
-                style={[styles.sportOption, bookSport === spec && styles.sportOptionActive]}
+                style={[styles.sportOption, { backgroundColor: colors.chipBackground }, bookSport === spec && { backgroundColor: colors.primary }]}
                 onPress={() => setBookSport(spec)}
               >
-                <Text style={[styles.sportOptionText, bookSport === spec && styles.sportOptionTextActive]}>
+                <Text style={[styles.sportOptionText, { color: colors.chipText }, bookSport === spec && { color: colors.textInverse }]}>
                   {spec}
                 </Text>
               </TouchableOpacity>
             ))}
           </ScrollView>
 
-          <Text style={styles.fieldLabel}>{t('coaching.date', 'Date')} (YYYY-MM-DD)</Text>
+          <Text style={[styles.fieldLabel, { color: colors.textPrimary }]}>{t('coaching.date', 'Date')} (YYYY-MM-DD)</Text>
           <TextInput
-            style={styles.input}
+            style={[styles.input, { backgroundColor: colors.backgroundSecondary, color: colors.textPrimary }]}
             value={bookDate}
             onChangeText={setBookDate}
             placeholder="2026-02-20"
             placeholderTextColor={colors.textTertiary}
           />
 
-          <Text style={styles.fieldLabel}>{t('coaching.time', 'Start Time')} (HH:MM)</Text>
+          <Text style={[styles.fieldLabel, { color: colors.textPrimary }]}>{t('coaching.time', 'Start Time')} (HH:MM)</Text>
           <TextInput
-            style={styles.input}
+            style={[styles.input, { backgroundColor: colors.backgroundSecondary, color: colors.textPrimary }]}
             value={bookTime}
             onChangeText={setBookTime}
             placeholder="10:00"
             placeholderTextColor={colors.textTertiary}
           />
 
-          <Text style={styles.fieldLabel}>{t('coaching.duration', 'Duration (minutes)')}</Text>
+          <Text style={[styles.fieldLabel, { color: colors.textPrimary }]}>{t('coaching.duration', 'Duration (minutes)')}</Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.sportPicker}>
             {['30', '60', '90', '120'].map((d) => (
               <TouchableOpacity
                 key={d}
-                style={[styles.sportOption, bookDuration === d && styles.sportOptionActive]}
+                style={[styles.sportOption, { backgroundColor: colors.chipBackground }, bookDuration === d && { backgroundColor: colors.primary }]}
                 onPress={() => setBookDuration(d)}
               >
-                <Text style={[styles.sportOptionText, bookDuration === d && styles.sportOptionTextActive]}>
+                <Text style={[styles.sportOptionText, { color: colors.chipText }, bookDuration === d && { color: colors.textInverse }]}>
                   {d} min
                 </Text>
               </TouchableOpacity>
             ))}
           </ScrollView>
 
-          <Text style={styles.fieldLabel}>{t('coaching.notes', 'Notes (optional)')}</Text>
+          <Text style={[styles.fieldLabel, { color: colors.textPrimary }]}>{t('coaching.notes', 'Notes (optional)')}</Text>
           <TextInput
-            style={[styles.input, styles.inputMultiline]}
+            style={[styles.input, styles.inputMultiline, { backgroundColor: colors.backgroundSecondary, color: colors.textPrimary }]}
             value={bookNotes}
             onChangeText={setBookNotes}
             placeholder="Any specific focus areas..."
@@ -287,23 +289,23 @@ const CoachProfileScreen = () => {
             multiline
           />
 
-          <Text style={styles.costPreview}>
+          <Text style={[styles.costPreview, { color: colors.primary }]}>
             {t('coaching.estimatedCost', 'Estimated cost')}: ${cost} {coach.currency}
           </Text>
 
           <View style={styles.bookActions}>
-            <TouchableOpacity style={styles.cancelBtn} onPress={() => setShowBooking(false)}>
-              <Text style={styles.cancelBtnText}>{t('common.cancel', 'Cancel')}</Text>
+            <TouchableOpacity style={[styles.cancelBtn, { borderColor: colors.border }]} onPress={() => setShowBooking(false)}>
+              <Text style={[styles.cancelBtnText, { color: colors.textSecondary }]}>{t('common.cancel', 'Cancel')}</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={[styles.confirmBtn, booking && styles.confirmBtnDisabled]}
+              style={[styles.confirmBtn, { backgroundColor: colors.primary }, booking && styles.confirmBtnDisabled]}
               onPress={handleBook}
               disabled={booking}
             >
               {booking ? (
                 <ActivityIndicator size="small" color={colors.textInverse} />
               ) : (
-                <Text style={styles.confirmBtnText}>{t('coaching.confirmBooking', 'Confirm Booking')}</Text>
+                <Text style={[styles.confirmBtnText, { color: colors.textInverse }]}>{t('coaching.confirmBooking', 'Confirm Booking')}</Text>
               )}
             </TouchableOpacity>
           </View>
@@ -316,14 +318,13 @@ const CoachProfileScreen = () => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.backgroundSecondary },
+  container: { flex: 1 },
   content: { paddingBottom: spacing.xxxl },
-  center: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: colors.backgroundSecondary },
-  errorText: { fontSize: fontSize.lg, color: colors.textSecondary },
+  center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  errorText: { fontSize: fontSize.lg },
 
   // Header
   profileHeader: {
-    backgroundColor: colors.background,
     padding: spacing.xl,
     flexDirection: 'row',
     alignItems: 'center',
@@ -331,112 +332,103 @@ const styles = StyleSheet.create({
   },
   avatar: {
     width: 72, height: 72, borderRadius: 36,
-    backgroundColor: colors.primaryLight,
     justifyContent: 'center', alignItems: 'center',
   },
-  avatarText: { fontSize: 28, fontWeight: fontWeight.bold, color: colors.primary },
+  avatarText: { fontSize: 28, fontWeight: fontWeight.bold },
   headerInfo: { flex: 1 },
   nameRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs },
-  coachName: { fontSize: fontSize.xxl, fontWeight: fontWeight.bold, color: colors.textPrimary },
+  coachName: { fontSize: fontSize.xxl, fontWeight: fontWeight.bold },
   verifiedBadge: {
-    fontSize: fontSize.xs, fontWeight: fontWeight.bold, color: colors.textInverse,
-    backgroundColor: colors.accentGreen, borderRadius: 10,
+    fontSize: fontSize.xs, fontWeight: fontWeight.bold,
+    borderRadius: 10,
     width: 20, height: 20, textAlign: 'center', lineHeight: 20, overflow: 'hidden',
   },
-  coachCity: { fontSize: fontSize.base, color: colors.textSecondary, marginTop: 2 },
+  coachCity: { fontSize: fontSize.base, marginTop: 2 },
   ratingRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs, marginTop: spacing.xs },
-  stars: { fontSize: fontSize.base, color: colors.accent },
-  ratingText: { fontSize: fontSize.sm, color: colors.textSecondary },
+  stars: { fontSize: fontSize.base },
+  ratingText: { fontSize: fontSize.sm },
 
   // Stats
   statsRow: {
-    flexDirection: 'row', backgroundColor: colors.background,
+    flexDirection: 'row',
     marginTop: 1, paddingVertical: spacing.lg, paddingHorizontal: spacing.xl,
     justifyContent: 'space-around', alignItems: 'center',
   },
   statItem: { alignItems: 'center' },
-  statValue: { fontSize: fontSize.xxl, fontWeight: fontWeight.bold, color: colors.primary },
-  statLabel: { fontSize: fontSize.xs, color: colors.textTertiary, marginTop: 2 },
-  statDivider: { width: 1, height: 30, backgroundColor: colors.separator },
+  statValue: { fontSize: fontSize.xxl, fontWeight: fontWeight.bold },
+  statLabel: { fontSize: fontSize.xs, marginTop: 2 },
+  statDivider: { width: 1, height: 30 },
 
   // Section
   section: {
-    backgroundColor: colors.background,
     marginTop: spacing.sm,
     padding: spacing.xl,
   },
   sectionTitle: {
-    fontSize: fontSize.lg, fontWeight: fontWeight.semibold, color: colors.textPrimary,
+    fontSize: fontSize.lg, fontWeight: fontWeight.semibold,
     marginBottom: spacing.md,
   },
-  bioText: { fontSize: fontSize.base, color: colors.textSecondary, lineHeight: 22 },
+  bioText: { fontSize: fontSize.base, lineHeight: 22 },
 
   chipWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
   specChip: {
-    backgroundColor: colors.primaryLight,
     paddingHorizontal: spacing.md, paddingVertical: spacing.xs + 2,
     borderRadius: borderRadius.pill,
   },
-  specChipText: { fontSize: fontSize.sm, fontWeight: fontWeight.medium, color: colors.primary },
+  specChipText: { fontSize: fontSize.sm, fontWeight: fontWeight.medium },
 
   certRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, marginBottom: spacing.sm },
   certIcon: { fontSize: 16 },
-  certText: { fontSize: fontSize.base, color: colors.textSecondary, flex: 1 },
+  certText: { fontSize: fontSize.base, flex: 1 },
 
   // Availability
   availRow: {
     flexDirection: 'row', alignItems: 'center',
-    paddingVertical: spacing.xs, borderBottomWidth: 1, borderBottomColor: colors.separator,
+    paddingVertical: spacing.xs, borderBottomWidth: 1,
   },
-  availDay: { width: 40, fontSize: fontSize.sm, fontWeight: fontWeight.semibold, color: colors.textPrimary },
+  availDay: { width: 40, fontSize: fontSize.sm, fontWeight: fontWeight.semibold },
   availSlots: { flexDirection: 'row', gap: spacing.md, flex: 1 },
-  availTime: { fontSize: fontSize.sm, color: colors.textSecondary },
+  availTime: { fontSize: fontSize.sm },
 
   // Reviews
   reviewCard: {
-    backgroundColor: colors.backgroundSecondary, borderRadius: borderRadius.sm,
+    borderRadius: borderRadius.sm,
     padding: spacing.md, marginBottom: spacing.sm,
   },
   reviewHeader: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: spacing.xs },
-  reviewName: { fontSize: fontSize.sm, fontWeight: fontWeight.semibold, color: colors.textPrimary },
-  reviewStars: { fontSize: fontSize.sm, color: colors.accent },
-  reviewText: { fontSize: fontSize.md, color: colors.textSecondary, lineHeight: 18 },
+  reviewName: { fontSize: fontSize.sm, fontWeight: fontWeight.semibold },
+  reviewStars: { fontSize: fontSize.sm },
+  reviewText: { fontSize: fontSize.md, lineHeight: 18 },
 
   // Book button
   bookButton: {
-    backgroundColor: colors.primary,
     marginHorizontal: spacing.xl, marginTop: spacing.lg,
     paddingVertical: spacing.md + 2,
     borderRadius: borderRadius.pill, alignItems: 'center',
   },
-  bookButtonText: { fontSize: fontSize.lg, fontWeight: fontWeight.semibold, color: colors.textInverse },
+  bookButtonText: { fontSize: fontSize.lg, fontWeight: fontWeight.semibold },
 
   // Booking form
   bookingForm: {
-    backgroundColor: colors.background,
     marginTop: spacing.sm, padding: spacing.xl,
   },
   fieldLabel: {
-    fontSize: fontSize.sm, fontWeight: fontWeight.semibold, color: colors.textPrimary,
+    fontSize: fontSize.sm, fontWeight: fontWeight.semibold,
     marginTop: spacing.md, marginBottom: spacing.xs,
   },
   input: {
-    backgroundColor: colors.backgroundSecondary,
     borderRadius: borderRadius.sm, paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm + 2, fontSize: fontSize.base, color: colors.textPrimary,
+    paddingVertical: spacing.sm + 2, fontSize: fontSize.base,
   },
   inputMultiline: { minHeight: 60, textAlignVertical: 'top' },
   sportPicker: { marginBottom: spacing.xs },
   sportOption: {
-    backgroundColor: colors.chipBackground,
     paddingHorizontal: spacing.md, paddingVertical: spacing.xs + 2,
     borderRadius: borderRadius.pill, marginRight: spacing.sm,
   },
-  sportOptionActive: { backgroundColor: colors.primary },
-  sportOptionText: { fontSize: fontSize.sm, fontWeight: fontWeight.medium, color: colors.chipText },
-  sportOptionTextActive: { color: colors.textInverse },
+  sportOptionText: { fontSize: fontSize.sm, fontWeight: fontWeight.medium },
   costPreview: {
-    fontSize: fontSize.lg, fontWeight: fontWeight.semibold, color: colors.primary,
+    fontSize: fontSize.lg, fontWeight: fontWeight.semibold,
     textAlign: 'center', marginTop: spacing.lg,
   },
   bookActions: {
@@ -444,17 +436,17 @@ const styles = StyleSheet.create({
   },
   cancelBtn: {
     flex: 1, paddingVertical: spacing.md,
-    borderRadius: borderRadius.pill, borderWidth: 1, borderColor: colors.border,
+    borderRadius: borderRadius.pill, borderWidth: 1,
     alignItems: 'center',
   },
-  cancelBtnText: { fontSize: fontSize.base, fontWeight: fontWeight.medium, color: colors.textSecondary },
+  cancelBtnText: { fontSize: fontSize.base, fontWeight: fontWeight.medium },
   confirmBtn: {
     flex: 2, paddingVertical: spacing.md,
-    borderRadius: borderRadius.pill, backgroundColor: colors.primary,
+    borderRadius: borderRadius.pill,
     alignItems: 'center',
   },
   confirmBtnDisabled: { opacity: 0.6 },
-  confirmBtnText: { fontSize: fontSize.base, fontWeight: fontWeight.semibold, color: colors.textInverse },
+  confirmBtnText: { fontSize: fontSize.base, fontWeight: fontWeight.semibold },
 });
 
 export default CoachProfileScreen;
