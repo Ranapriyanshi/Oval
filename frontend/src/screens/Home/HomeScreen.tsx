@@ -7,34 +7,38 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { useNavigation } from '@react-navigation/native';
 import { useAuth } from '../../context/AuthContext';
 import { useLocale } from '../../context/LocaleContext';
-import { colors, spacing, borderRadius, fontSize, fontWeight, shadow } from '../../theme';
+import { useTheme } from '../../context/ThemeContext';
+import { spacing, borderRadius, fontSize, fontWeight, shadow } from '../../theme';
 
 const HomeScreen = () => {
   const { t } = useTranslation();
+  const navigation = useNavigation<any>();
   const { user } = useAuth();
   const { country, currency, formatCurrency } = useLocale();
+  const { colors } = useTheme();
 
   const quickActions = [
-    { icon: '🏟️', label: 'Venues', key: 'venues' },
-    { icon: '📋', label: 'Bookings', key: 'bookings' },
-    { icon: '👥', label: 'Playpals', key: 'playpals' },
-    { icon: '⭐', label: 'Favourites', key: 'favourites' },
+    { icon: '🏋️', label: 'Coaching', key: 'coaching', screen: 'Coaches' },
+    { icon: '📋', label: 'Bookings', key: 'bookings', screen: 'Bookings' },
+    { icon: '🤝', label: 'Matches', key: 'matches', screen: 'MatchesList' },
+    { icon: '📅', label: 'Sessions', key: 'sessions', screen: 'MySessions' },
   ];
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.backgroundSecondary }]}>
       {/* Header */}
-      <View style={styles.header}>
+      <View style={[styles.header, { backgroundColor: colors.background, borderBottomColor: colors.borderLight }]}>
         <View>
-          <Text style={styles.greeting}>
+          <Text style={[styles.greeting, { color: colors.textPrimary }]}>
             Hello, {user?.name?.split(' ')[0] || 'Player'} 👋
           </Text>
-          <Text style={styles.subtitle}>Ready to play?</Text>
+          <Text style={[styles.subtitle, { color: colors.textSecondary }]}>Ready to play?</Text>
         </View>
-        <View style={styles.avatarBadge}>
-          <Text style={styles.avatarText}>
+        <View style={[styles.avatarBadge, { backgroundColor: colors.primaryLight }]}>
+          <Text style={[styles.avatarText, { color: colors.primary }]}>
             {user?.name?.charAt(0)?.toUpperCase() || 'U'}
           </Text>
         </View>
@@ -53,11 +57,12 @@ const HomeScreen = () => {
                 key={action.key}
                 style={styles.quickAction}
                 activeOpacity={0.7}
+                onPress={() => navigation.navigate(action.screen)}
               >
-                <View style={styles.quickActionIcon}>
+                <View style={[styles.quickActionIcon, { backgroundColor: colors.surface }, shadow.sm]}>
                   <Text style={styles.quickActionEmoji}>{action.icon}</Text>
                 </View>
-                <Text style={styles.quickActionLabel}>{action.label}</Text>
+                <Text style={[styles.quickActionLabel, { color: colors.textSecondary }]}>{action.label}</Text>
               </TouchableOpacity>
             ))}
           </View>
@@ -65,31 +70,31 @@ const HomeScreen = () => {
 
         {/* Info Cards */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Your Info</Text>
-          <View style={styles.infoCard}>
+          <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>Your Info</Text>
+          <View style={[styles.infoCard, { backgroundColor: colors.surface }, shadow.sm]}>
             <View style={styles.infoRow}>
-              <Text style={styles.infoLabel}>Country</Text>
-              <Text style={styles.infoValue}>{country === 'AU' ? '🇦🇺 Australia' : '🇺🇸 United States'}</Text>
+              <Text style={[styles.infoLabel, { color: colors.textSecondary }]}>Country</Text>
+              <Text style={[styles.infoValue, { color: colors.textPrimary }]}>{country === 'AU' ? '🇦🇺 Australia' : '🇺🇸 United States'}</Text>
             </View>
-            <View style={styles.separator} />
+            <View style={[styles.separator, { backgroundColor: colors.separator }]} />
             <View style={styles.infoRow}>
-              <Text style={styles.infoLabel}>Currency</Text>
-              <Text style={styles.infoValue}>{currency}</Text>
+              <Text style={[styles.infoLabel, { color: colors.textSecondary }]}>Currency</Text>
+              <Text style={[styles.infoValue, { color: colors.textPrimary }]}>{currency}</Text>
             </View>
-            <View style={styles.separator} />
+            <View style={[styles.separator, { backgroundColor: colors.separator }]} />
             <View style={styles.infoRow}>
-              <Text style={styles.infoLabel}>Sample Price</Text>
-              <Text style={styles.infoValue}>{formatCurrency(99.99)}</Text>
+              <Text style={[styles.infoLabel, { color: colors.textSecondary }]}>Sample Price</Text>
+              <Text style={[styles.infoValue, { color: colors.textPrimary }]}>{formatCurrency(99.99)}</Text>
             </View>
           </View>
         </View>
 
         {/* Recent Activity placeholder */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Recent Activity</Text>
-          <View style={styles.emptyCard}>
+          <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>Recent Activity</Text>
+          <View style={[styles.emptyCard, { backgroundColor: colors.surface }, shadow.sm]}>
             <Text style={styles.emptyIcon}>📊</Text>
-            <Text style={styles.emptyText}>Your recent sports activity will appear here</Text>
+            <Text style={[styles.emptyText, { color: colors.textTertiary }]}>Your recent sports activity will appear here</Text>
           </View>
         </View>
       </ScrollView>
@@ -98,12 +103,8 @@ const HomeScreen = () => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.backgroundSecondary,
-  },
+  container: { flex: 1 },
   header: {
-    backgroundColor: colors.background,
     paddingHorizontal: spacing.xl,
     paddingTop: 56,
     paddingBottom: spacing.xl,
@@ -111,116 +112,31 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     borderBottomWidth: 1,
-    borderBottomColor: colors.borderLight,
   },
-  greeting: {
-    fontSize: fontSize.xxl,
-    fontWeight: fontWeight.bold,
-    color: colors.textPrimary,
-    letterSpacing: -0.3,
-  },
-  subtitle: {
-    fontSize: fontSize.base,
-    color: colors.textSecondary,
-    marginTop: spacing.xs,
-  },
-  avatarBadge: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: colors.primaryLight,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  avatarText: {
-    fontSize: fontSize.xl,
-    fontWeight: fontWeight.semibold,
-    color: colors.primary,
-  },
-  scrollView: {
-    flex: 1,
-  },
-  scrollContent: {
-    paddingHorizontal: spacing.xl,
-    paddingTop: spacing.xl,
-    paddingBottom: spacing.xxxl,
-  },
-  section: {
-    marginBottom: spacing.xxl,
-  },
-  sectionTitle: {
-    fontSize: fontSize.lg,
-    fontWeight: fontWeight.semibold,
-    color: colors.textPrimary,
-    marginBottom: spacing.md,
-  },
-  quickActionsRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  quickAction: {
-    alignItems: 'center',
-    flex: 1,
-  },
+  greeting: { fontSize: fontSize.xxl, fontWeight: fontWeight.bold, letterSpacing: -0.3 },
+  subtitle: { fontSize: fontSize.base, marginTop: spacing.xs },
+  avatarBadge: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center' },
+  avatarText: { fontSize: fontSize.xl, fontWeight: fontWeight.semibold },
+  scrollView: { flex: 1 },
+  scrollContent: { paddingHorizontal: spacing.xl, paddingTop: spacing.xl, paddingBottom: spacing.xxxl },
+  section: { marginBottom: spacing.xxl },
+  sectionTitle: { fontSize: fontSize.lg, fontWeight: fontWeight.semibold, marginBottom: spacing.md },
+  quickActionsRow: { flexDirection: 'row', justifyContent: 'space-between' },
+  quickAction: { alignItems: 'center', flex: 1 },
   quickActionIcon: {
-    width: 56,
-    height: 56,
-    borderRadius: borderRadius.md,
-    backgroundColor: colors.background,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: spacing.sm,
-    ...shadow.sm,
+    width: 56, height: 56, borderRadius: borderRadius.md,
+    alignItems: 'center', justifyContent: 'center', marginBottom: spacing.sm,
   },
-  quickActionEmoji: {
-    fontSize: 24,
-  },
-  quickActionLabel: {
-    fontSize: fontSize.sm,
-    fontWeight: fontWeight.medium,
-    color: colors.textSecondary,
-  },
-  infoCard: {
-    backgroundColor: colors.background,
-    borderRadius: borderRadius.md,
-    padding: spacing.lg,
-    ...shadow.sm,
-  },
-  infoRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: spacing.md,
-  },
-  infoLabel: {
-    fontSize: fontSize.base,
-    color: colors.textSecondary,
-  },
-  infoValue: {
-    fontSize: fontSize.base,
-    fontWeight: fontWeight.medium,
-    color: colors.textPrimary,
-  },
-  separator: {
-    height: 1,
-    backgroundColor: colors.separator,
-  },
-  emptyCard: {
-    backgroundColor: colors.background,
-    borderRadius: borderRadius.md,
-    padding: spacing.xxxl,
-    alignItems: 'center',
-    ...shadow.sm,
-  },
-  emptyIcon: {
-    fontSize: 32,
-    marginBottom: spacing.md,
-  },
-  emptyText: {
-    fontSize: fontSize.base,
-    color: colors.textTertiary,
-    textAlign: 'center',
-  },
+  quickActionEmoji: { fontSize: 24 },
+  quickActionLabel: { fontSize: fontSize.sm, fontWeight: fontWeight.medium },
+  infoCard: { borderRadius: borderRadius.md, padding: spacing.lg },
+  infoRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: spacing.md },
+  infoLabel: { fontSize: fontSize.base },
+  infoValue: { fontSize: fontSize.base, fontWeight: fontWeight.medium },
+  separator: { height: 1 },
+  emptyCard: { borderRadius: borderRadius.md, padding: spacing.xxxl, alignItems: 'center' },
+  emptyIcon: { fontSize: 32, marginBottom: spacing.md },
+  emptyText: { fontSize: fontSize.base, textAlign: 'center' },
 });
 
 export default HomeScreen;
