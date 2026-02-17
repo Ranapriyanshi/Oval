@@ -39,7 +39,7 @@
   - `PUT /api/bookings/:id/cancel` - Cancel booking
   - `POST /api/venues/:id/rate` - Rate a venue
 
-- [ ] **Location Services**
+- [x] **Location Services**
   - Integration with Google Maps API
   - Geocoding (address to coordinates)
   - Distance calculation
