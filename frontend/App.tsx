@@ -3,6 +3,8 @@ import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/
 import { StatusBar } from 'expo-status-bar';
 import { I18nextProvider } from 'react-i18next';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { Text } from 'react-native';
+import { useFonts, Nunito_400Regular, Nunito_600SemiBold, Nunito_800ExtraBold } from '@expo-google-fonts/nunito';
 import { AuthProvider } from './src/context/AuthContext';
 import { LocaleProvider } from './src/context/LocaleContext';
 import { ThemeProvider, useTheme } from './src/context/ThemeContext';
@@ -34,6 +36,22 @@ function AppInner() {
 }
 
 export default function App() {
+  const [fontsLoaded] = useFonts({
+    Nunito_400Regular,
+    Nunito_600SemiBold,
+    Nunito_800ExtraBold,
+  });
+
+  if (!fontsLoaded) {
+    return null;
+  }
+
+  // Set a rounded, friendly default font for all Text
+  if (!Text.defaultProps) {
+    Text.defaultProps = {};
+  }
+  Text.defaultProps.style = [{ fontFamily: 'Nunito_400Regular' }, Text.defaultProps.style].filter(Boolean);
+
   return (
     <SafeAreaProvider>
       <I18nextProvider i18n={i18n}>

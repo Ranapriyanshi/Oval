@@ -1,12 +1,14 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { fontSize, fontWeight } from '../theme';
 import LoginScreen from '../screens/Auth/LoginScreen';
 import RegisterScreen from '../screens/Auth/RegisterScreen';
+import OnboardingScreen from '../screens/Onboarding/OnboardingScreen';
 import HomeScreen from '../screens/Home/HomeScreen';
 import ProfileScreen from '../screens/Profile/ProfileScreen';
 import VenuesScreen from '../screens/Venues/VenuesScreen';
@@ -38,13 +40,13 @@ const Tab = createBottomTabNavigator();
 // Simple text-based tab icon (no external icon library needed)
 const TabIcon = ({ label, focused }: { label: string; focused: boolean }) => {
   const iconMap: Record<string, string> = {
-    Home: '⚽',
-    Discover: '🔍',
-    Chat: '💬',
-    Gametime: '🎮',
-    Coaching: '🏋️',
-    Venues: '🏟️',
-    Profile: '👤',
+    Home: '🏟️',
+    Discover: '🧭',
+    Chat: '💭',
+    Gametime: '🎯',
+    Coaching: '💪',
+    Venues: '📍',
+    Profile: '🙂',
   };
   return (
     <View style={tabIconStyles.container}>
@@ -140,14 +142,38 @@ const AppNavigator = () => {
   const { user, loading } = useAuth();
   const { colors, isDark } = useTheme();
 
-  if (loading) {
+  const [hasSeenOnboarding, setHasSeenOnboarding] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    const loadOnboardingFlag = async () => {
+      try {
+        const value = await AsyncStorage.getItem('oval_has_seen_onboarding');
+        setHasSeenOnboarding(value === 'true');
+      } catch (err) {
+        console.error('Failed to load onboarding flag', err);
+        setHasSeenOnboarding(true);
+      }
+    };
+    loadOnboardingFlag();
+  }, []);
+
+  const handleOnboardingDone = async () => {
+    try {
+      await AsyncStorage.setItem('oval_has_seen_onboarding', 'true');
+      setHasSeenOnboarding(true);
+    } catch (err) {
+      console.error('Failed to save onboarding flag', err);
+    }
+  };
+
+  if (loading || hasSeenOnboarding === null) {
     return null;
   }
 
   const stackHeaderStyle = {
     headerStyle: { backgroundColor: colors.background },
     headerTintColor: colors.textPrimary,
-    headerTitleStyle: { color: colors.textPrimary },
+    headerTitleStyle: { color: colors.textPrimary, textTransform: 'capitalize' },
   };
 
   return (
@@ -222,8 +248,16 @@ const AppNavigator = () => {
             options={{ headerShown: true, headerTitle: 'Admin', ...stackHeaderStyle }}
           />
         </>
+      ) : hasSeenOnboarding ? (
+        <>
+          <Stack.Screen name="Login" component={LoginScreen} />
+          <Stack.Screen name="Register" component={RegisterScreen} />
+        </>
       ) : (
         <>
+          <Stack.Screen name="Onboarding">
+            {(props) => <OnboardingScreen {...props} onDone={handleOnboardingDone} />}
+          </Stack.Screen>
           <Stack.Screen name="Login" component={LoginScreen} />
           <Stack.Screen name="Register" component={RegisterScreen} />
         </>
