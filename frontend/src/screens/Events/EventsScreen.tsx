@@ -143,7 +143,7 @@ const styles = StyleSheet.create({
   list: { padding: spacing.lg, paddingBottom: 100 },
   card: { padding: spacing.lg, borderRadius: borderRadius.md, marginBottom: spacing.md, borderWidth: 1 },
   cardRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  title: { fontSize: fontSize.lg, fontWeight: fontWeight.semibold, flex: 1 },
+  title: { fontSize: fontSize.lg, fontWeight: fontWeight.semibold, flex: 1, textTransform: 'capitalize' },
   typeChip: { paddingHorizontal: spacing.sm, paddingVertical: 2, borderRadius: borderRadius.sm },
   typeChipText: { fontSize: fontSize.xs, fontWeight: fontWeight.semibold },
   sport: { fontSize: fontSize.sm, marginTop: spacing.xs },

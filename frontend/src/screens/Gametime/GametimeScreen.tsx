@@ -116,7 +116,7 @@ const GametimeScreen = () => {
         <View style={[styles.infoRow, { borderBottomColor: isAlt ? 'rgba(255,255,255,0.2)' : colors.separator }]}>
           <Text style={[styles.infoItem, { color: t2 }]}>📅 {formatDate(item.start_time)}</Text>
           <Text style={[styles.infoItem, { color: t2 }]}>🕐 {formatTime(item.start_time)}</Text>
-          {item.city && <Text style={[styles.infoItem, { color: t2 }]}>📍 {item.city}</Text>}
+          {item.city && <Text style={[styles.infoItem, { color: t2 }]}>📌 {item.city}</Text>}
         </View>
 
         {/* Bottom row: players + cost */}
@@ -198,7 +198,7 @@ const GametimeScreen = () => {
 
       {events.length === 0 ? (
         <View style={styles.emptyState}>
-          <Text style={styles.emptyEmoji}>🎮</Text>
+          <Text style={styles.emptyEmoji}>🏅</Text>
           <Text style={[styles.emptyTitle, { color: colors.textPrimary }]}>{t('gametime.noEvents')}</Text>
           <Text style={[styles.emptySubtitle, { color: colors.textSecondary }]}>{t('gametime.noEventsHint')}</Text>
         </View>
@@ -235,6 +235,7 @@ const styles = StyleSheet.create({
     fontSize: fontSize.title,
     fontWeight: fontWeight.bold,
     letterSpacing: -0.3,
+    textTransform: 'capitalize',
   },
   createButton: {
     paddingHorizontal: spacing.lg,

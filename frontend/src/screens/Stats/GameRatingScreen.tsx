@@ -173,7 +173,7 @@ const styles = StyleSheet.create({
   centered: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   scroll: { flex: 1 },
   scrollContent: { padding: spacing.xl, paddingBottom: spacing.xxxl },
-  title: { fontSize: fontSize.xxl, fontWeight: fontWeight.bold, marginBottom: spacing.xs },
+  title: { fontSize: fontSize.xxl, fontWeight: fontWeight.bold, marginBottom: spacing.xs, textTransform: 'capitalize' },
   subtitle: { fontSize: fontSize.base, marginBottom: spacing.xl },
   emptyCard: {
     borderRadius: borderRadius.md,

@@ -228,6 +228,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: fontSize.title,
     fontWeight: fontWeight.bold,
+    textTransform: 'capitalize',
   },
   list: {
     paddingVertical: spacing.sm,

@@ -62,7 +62,7 @@ const styles = StyleSheet.create({
   container: { flex: 1 },
   centered: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   scroll: { padding: spacing.xl },
-  title: { fontSize: fontSize.xxl, fontWeight: fontWeight.bold, marginBottom: spacing.xl },
+  title: { fontSize: fontSize.xxl, fontWeight: fontWeight.bold, marginBottom: spacing.xl, textTransform: 'capitalize' },
   card: { padding: spacing.lg, borderRadius: borderRadius.md, borderWidth: 1, marginBottom: spacing.md, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   label: { fontSize: fontSize.base },
   value: { fontSize: fontSize.xl, fontWeight: fontWeight.bold },

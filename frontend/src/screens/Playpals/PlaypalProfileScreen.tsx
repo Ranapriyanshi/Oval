@@ -160,12 +160,12 @@ const PlaypalProfileScreen = () => {
           <Text style={[styles.name, { color: colors.textPrimary }]}>{profile.name}</Text>
           {profile.city && (
             <Text style={[styles.location, { color: colors.textSecondary }]}>
-              📍 {profile.city}{profile.country ? `, ${profile.country}` : ''}
+              📌 {profile.city}{profile.country ? `, ${profile.country}` : ''}
             </Text>
           )}
           {profile.karma_points != null && profile.karma_points > 0 && (
             <View style={[styles.karmaBadge, { backgroundColor: colors.accent }]}>
-              <Text style={[styles.karmaText, { color: colors.textPrimary }]}>⭐ {profile.karma_points} karma</Text>
+              <Text style={[styles.karmaText, { color: colors.textPrimary }]}>🏅 {profile.karma_points} karma</Text>
             </View>
           )}
         </View>

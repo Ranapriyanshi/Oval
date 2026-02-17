@@ -8,6 +8,7 @@ import {
   ActivityIndicator,
   RefreshControl,
   Alert,
+  Image,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useNavigation } from '@react-navigation/native';
@@ -15,6 +16,7 @@ import { useTheme } from '../../context/ThemeContext';
 import { spacing, borderRadius, fontSize, fontWeight, shadow } from '../../theme';
 import { playpalsApi, MatchItem } from '../../services/playpals';
 import chatApi from '../../services/chat';
+import { matchesEmptyIllustration } from '../../assets/illustrations';
 
 const SPORT_EMOJIS: Record<string, string> = {
   tennis: '🎾',
@@ -122,7 +124,7 @@ const MatchesScreen = () => {
           <View style={styles.matchInfo}>
             <Text style={[styles.matchName, { color: t1 }]}>{user.name}</Text>
             {user.city && (
-              <Text style={[styles.matchLocation, { color: t2 }]}>📍 {user.city}</Text>
+              <Text style={[styles.matchLocation, { color: t2 }]}>📌 {user.city}</Text>
             )}
             {/* Sports chips */}
             {skills.length > 0 && (
@@ -163,8 +165,8 @@ const MatchesScreen = () => {
                 }
               }}
               activeOpacity={0.7}
-            >
-              <Text style={styles.messageButtonText}>💬</Text>
+              >
+              <Text style={styles.messageButtonText}>📨</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.unmatchButton}
@@ -183,6 +185,13 @@ const MatchesScreen = () => {
     return (
       <View style={[styles.container, { backgroundColor: colors.backgroundSecondary }]}>
         <View style={[styles.header, { backgroundColor: colors.background, borderBottomColor: colors.borderLight }]}>
+          <TouchableOpacity
+            style={styles.backButton}
+            onPress={() => navigation.goBack()}
+            activeOpacity={0.7}
+          >
+            <Text style={[styles.backText, { color: colors.primary }]}>← Back</Text>
+          </TouchableOpacity>
           <Text style={[styles.headerTitle, { color: colors.textPrimary }]}>{t('playpals.matches')}</Text>
         </View>
         <View style={styles.center}>
@@ -195,6 +204,13 @@ const MatchesScreen = () => {
   return (
     <View style={[styles.container, { backgroundColor: colors.backgroundSecondary }]}>
       <View style={[styles.header, { backgroundColor: colors.background, borderBottomColor: colors.borderLight }]}>
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => navigation.goBack()}
+          activeOpacity={0.7}
+        >
+          <Text style={[styles.backText, { color: colors.primary }]}>← Back</Text>
+        </TouchableOpacity>
         <Text style={[styles.headerTitle, { color: colors.textPrimary }]}>{t('playpals.matches')}</Text>
         {matches.length > 0 && (
           <View style={[styles.countBadge, { backgroundColor: colors.primary }]}>
@@ -205,7 +221,7 @@ const MatchesScreen = () => {
 
       {matches.length === 0 ? (
         <View style={styles.emptyState}>
-          <Text style={styles.emptyEmoji}>🤝</Text>
+          <Image source={matchesEmptyIllustration} style={styles.emptyIllustration} resizeMode="contain" />
           <Text style={[styles.emptyTitle, { color: colors.textPrimary }]}>{t('playpals.noMatches')}</Text>
           <Text style={[styles.emptySubtitle, { color: colors.textSecondary }]}>{t('playpals.startDiscovering')}</Text>
           <TouchableOpacity
@@ -249,10 +265,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: spacing.sm,
   },
+  backButton: {
+    paddingVertical: spacing.xs,
+    paddingRight: spacing.sm,
+  },
+  backText: {
+    fontSize: fontSize.lg,
+    fontWeight: fontWeight.medium,
+  },
   headerTitle: {
     fontSize: fontSize.title,
     fontWeight: fontWeight.bold,
     letterSpacing: -0.3,
+    textTransform: 'capitalize',
   },
   countBadge: {
     paddingHorizontal: spacing.sm + 2,
@@ -362,8 +387,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: spacing.xxxl,
   },
-  emptyEmoji: {
-    fontSize: 56,
+  emptyIllustration: {
+    width: 200,
+    height: 200,
     marginBottom: spacing.lg,
   },
   emptyTitle: {

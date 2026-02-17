@@ -320,7 +320,7 @@ const ChatScreen = () => {
         }
         ListEmptyComponent={
           <View style={styles.emptyMessages}>
-            <Text style={styles.emptyIcon}>👋</Text>
+            <Text style={styles.emptyIcon}>💌</Text>
             <Text style={[styles.emptyText, { color: colors.textSecondary }]}>
               {t('chat.startConversation', 'Say hello!')}
             </Text>

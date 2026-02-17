@@ -283,7 +283,7 @@ const styles = StyleSheet.create({
   },
   backButton: { paddingVertical: spacing.xs, width: 60 },
   backText: { fontSize: fontSize.lg, fontWeight: fontWeight.medium },
-  headerTitle: { fontSize: fontSize.xl, fontWeight: fontWeight.bold },
+  headerTitle: { fontSize: fontSize.xl, fontWeight: fontWeight.bold, textTransform: 'capitalize' },
   scroll: { flex: 1 },
   scrollContent: { padding: spacing.xl, paddingBottom: spacing.xxxl * 2 },
 

@@ -12,6 +12,7 @@ export interface VenueListItem {
   VenueSports?: { sport_name: string; hourly_rate_cents: number }[];
   VenueImages?: { url: string; sort_order: number }[];
   rating?: { avg: string; count: number };
+  distance_km?: number; // Added for nearby venues
 }
 
 export interface VenueDetail extends VenueListItem {
@@ -33,9 +34,20 @@ export interface AvailabilityResponse {
   currency: string;
 }
 
+export interface Coordinates {
+  lat: number;
+  lng: number;
+}
+
 export const venuesApi = {
   list: (params?: { country?: string; city?: string; sport?: string; limit?: number; offset?: number }) =>
     api.get<{ venues: VenueListItem[]; total: number }>('/venues', { params }),
+
+  nearby: (params: { lat: number; lng: number; radius_km?: number; sport?: string; country?: string }) =>
+    api.get<{ venues: VenueListItem[] }>('/venues/nearby', { params }),
+
+  geocode: (address: string) =>
+    api.get<Coordinates>('/venues/geocode', { params: { address } }),
 
   getById: (id: string) => api.get<VenueDetail>(`/venues/${id}`),
 

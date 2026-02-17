@@ -214,7 +214,7 @@ const styles = StyleSheet.create({
     paddingBottom: spacing.lg,
     borderBottomWidth: 1,
   },
-  title: { fontSize: fontSize.title, fontWeight: fontWeight.bold, letterSpacing: -0.3 },
+  title: { fontSize: fontSize.title, fontWeight: fontWeight.bold, letterSpacing: -0.3, textTransform: 'capitalize' },
   scrollView: { flex: 1 },
   scrollContent: {
     paddingHorizontal: spacing.xl,

@@ -234,7 +234,7 @@ const GametimeDetailScreen = () => {
             <>
               <View style={[styles.separator, { backgroundColor: colors.separator }]} />
               <View style={styles.detailRow}>
-                <Text style={styles.detailIcon}>📍</Text>
+                <Text style={styles.detailIcon}>📌</Text>
                 <View>
                   <Text style={[styles.detailLabel, { color: colors.textTertiary }]}>{t('gametime.location')}</Text>
                   {event.venue_name && <Text style={[styles.detailValue, { color: colors.textPrimary }]}>{event.venue_name}</Text>}
@@ -329,7 +329,7 @@ const GametimeDetailScreen = () => {
               <View>
                 <Text style={[styles.organizerName, { color: colors.textPrimary }]}>{event.Creator.name}</Text>
                 {event.Creator.city && (
-                  <Text style={[styles.organizerCity, { color: colors.textSecondary }]}>📍 {event.Creator.city}</Text>
+                  <Text style={[styles.organizerCity, { color: colors.textSecondary }]}>📌 {event.Creator.city}</Text>
                 )}
               </View>
             </View>

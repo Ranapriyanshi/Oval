@@ -8,15 +8,19 @@ import {
   ActivityIndicator,
   RefreshControl,
   TextInput,
+  Alert,
+  Image,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useNavigation } from '@react-navigation/native';
+import * as Location from 'expo-location';
 import { useLocale } from '../../context/LocaleContext';
 import { useTheme } from '../../context/ThemeContext';
 import { venuesApi, VenueListItem } from '../../services/venues';
 import { formatCurrency } from '../../utils/formatting';
 import { SPORTS } from '../../utils/constants';
 import { spacing, borderRadius, fontSize, fontWeight, shadow } from '../../theme';
+import { venuesCardIllustration, venuesEmptyIllustration } from '../../assets/illustrations';
 
 const VenuesScreen = () => {
   const { t } = useTranslation();
@@ -28,27 +32,97 @@ const VenuesScreen = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [sportFilter, setSportFilter] = useState<string>('');
   const [cityFilter, setCityFilter] = useState('');
+  const [useNearby, setUseNearby] = useState(false);
+  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const [locationPermissionGranted, setLocationPermissionGranted] = useState(false);
+
+  const requestLocationPermission = useCallback(async () => {
+    try {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status === 'granted') {
+        setLocationPermissionGranted(true);
+        const location = await Location.getCurrentPositionAsync({});
+        setUserLocation({
+          lat: location.coords.latitude,
+          lng: location.coords.longitude,
+        });
+        return true;
+      } else {
+        Alert.alert(
+          'Location Permission',
+          'Location permission is required to find nearby venues. Please enable it in your device settings.'
+        );
+        return false;
+      }
+    } catch (error) {
+      console.error('Location permission error:', error);
+      return false;
+    }
+  }, []);
 
   const loadVenues = useCallback(async (refresh = false) => {
     if (refresh) setRefreshing(true);
     else setLoading(true);
     try {
-      const params: Record<string, string | number> = { limit: 30 };
-      if (sportFilter) params.sport = sportFilter;
-      if (cityFilter.trim()) params.city = cityFilter.trim();
-      const res = await venuesApi.list(params);
-      setVenues(res.data.venues);
+      if (useNearby && userLocation) {
+        // Use nearby endpoint
+        const params: Record<string, string | number> = {
+          lat: userLocation.lat,
+          lng: userLocation.lng,
+          radius_km: 10,
+        };
+        if (sportFilter) params.sport = sportFilter;
+        if (country) params.country = country;
+        const res = await venuesApi.nearby(params);
+        setVenues(res.data.venues);
+      } else {
+        // Use regular list endpoint
+        const params: Record<string, string | number> = { limit: 30 };
+        if (sportFilter) params.sport = sportFilter;
+        if (cityFilter.trim()) params.city = cityFilter.trim();
+        if (country) params.country = country;
+        const res = await venuesApi.list(params);
+        setVenues(res.data.venues);
+      }
     } catch (err) {
       console.error('Failed to load venues', err);
     } finally {
       setLoading(false);
       setRefreshing(false);
     }
-  }, [sportFilter, cityFilter]);
+  }, [sportFilter, cityFilter, useNearby, userLocation, country]);
+
+  const toggleNearby = useCallback(async () => {
+    if (!useNearby) {
+      // Turning on nearby mode - need location permission
+      const granted = await requestLocationPermission();
+      if (granted) {
+        setUseNearby(true);
+      }
+    } else {
+      // Turning off nearby mode
+      setUseNearby(false);
+    }
+  }, [useNearby, requestLocationPermission]);
 
   useEffect(() => {
     loadVenues();
   }, [loadVenues]);
+
+  // Check location permission on mount
+  useEffect(() => {
+    Location.getForegroundPermissionsAsync().then(({ status }) => {
+      if (status === 'granted') {
+        setLocationPermissionGranted(true);
+        Location.getCurrentPositionAsync({}).then((location) => {
+          setUserLocation({
+            lat: location.coords.latitude,
+            lng: location.coords.longitude,
+          });
+        });
+      }
+    });
+  }, []);
 
   const onVenuePress = (id: string) => {
     navigation.navigate('VenueDetail', { venueId: id });
@@ -68,6 +142,7 @@ const VenuesScreen = () => {
     const ratingStr = rating?.count
       ? `⭐ ${rating.avg} (${rating.count})`
       : t('venue.noReviews');
+    const distanceStr = item.distance_km !== undefined ? `${item.distance_km.toFixed(1)} km` : null;
     const isAlt = index % 2 === 1;
     const bg = isAlt ? colors.cardAltBackground : colors.cardBackground;
     const border = isAlt ? colors.cardAltBorder : colors.cardBorder;
@@ -84,11 +159,16 @@ const VenuesScreen = () => {
         <View style={styles.cardContent}>
           <View style={styles.cardHeader}>
             <View style={[styles.venueIconBadge, { backgroundColor: isAlt ? 'rgba(255,255,255,0.25)' : colors.primaryLight }]}>
-              <Text style={styles.venueIcon}>🏟️</Text>
+              <Image source={venuesCardIllustration} style={styles.venueIconImage} resizeMode="contain" />
             </View>
             <View style={styles.cardInfo}>
               <Text style={[styles.venueName, { color: t1 }]} numberOfLines={1}>{item.name}</Text>
-              <Text style={[styles.city, { color: t2 }]}>{item.city}</Text>
+              <View style={styles.locationRow}>
+                <Text style={[styles.city, { color: t2 }]}>{item.city}</Text>
+                {distanceStr && (
+                  <Text style={[styles.distance, { color: colors.primary }]}>📍 {distanceStr}</Text>
+                )}
+              </View>
             </View>
             <Text style={[styles.ratingBadge, { color: t2 }]}>{ratingStr}</Text>
           </View>
@@ -123,18 +203,44 @@ const VenuesScreen = () => {
   return (
     <View style={[styles.container, { backgroundColor: colors.backgroundSecondary }]}>
       <View style={[styles.header, { backgroundColor: colors.background, borderBottomColor: colors.borderLight }]}>
-        <Text style={[styles.title, { color: colors.textPrimary }]}>{t('venue.title')}</Text>
-        <View style={[styles.searchRow, { backgroundColor: colors.backgroundSecondary }]}>
-          <Text style={styles.searchIcon}>🔍</Text>
-          <TextInput
-            style={[styles.searchInput, { color: colors.textPrimary }]}
-            placeholder={t('common.search') + ' city...'}
-            placeholderTextColor={colors.textTertiary}
-            value={cityFilter}
-            onChangeText={setCityFilter}
-            onSubmitEditing={() => loadVenues()}
-          />
+        <View style={styles.titleRow}>
+          <Text style={[styles.title, { color: colors.textPrimary }]}>{t('venue.title')}</Text>
+          <TouchableOpacity
+            style={[
+              styles.nearbyButton,
+              {
+                backgroundColor: useNearby ? colors.primary : colors.backgroundSecondary,
+                borderColor: useNearby ? colors.primary : colors.borderLight,
+              },
+            ]}
+            onPress={toggleNearby}
+            activeOpacity={0.7}
+          >
+            <Text style={[styles.nearbyButtonText, { color: useNearby ? colors.textInverse : colors.textPrimary }]}>
+              📍 {useNearby ? 'Nearby' : 'Nearby'}
+            </Text>
+          </TouchableOpacity>
         </View>
+        {!useNearby && (
+          <View style={[styles.searchRow, { backgroundColor: colors.backgroundSecondary }]}>
+            <Text style={styles.searchIcon}>🔍</Text>
+            <TextInput
+              style={[styles.searchInput, { color: colors.textPrimary }]}
+              placeholder={t('common.search') + ' city...'}
+              placeholderTextColor={colors.textTertiary}
+              value={cityFilter}
+              onChangeText={setCityFilter}
+              onSubmitEditing={() => loadVenues()}
+            />
+          </View>
+        )}
+        {useNearby && (
+          <View style={styles.nearbyInfo}>
+            <Text style={[styles.nearbyInfoText, { color: colors.textSecondary }]}>
+              Showing venues within 10 km of your location
+            </Text>
+          </View>
+        )}
         <FlatList
           horizontal
           data={['', ...SPORTS]}
@@ -164,7 +270,7 @@ const VenuesScreen = () => {
           }
           ListEmptyComponent={
             <View style={styles.centered}>
-              <Text style={styles.emptyIcon}>🏟️</Text>
+              <Image source={venuesEmptyIllustration} style={styles.emptyIllustration} resizeMode="contain" />
               <Text style={[styles.emptyText, { color: colors.textTertiary }]}>No venues found</Text>
             </View>
           }
@@ -182,11 +288,34 @@ const styles = StyleSheet.create({
     paddingBottom: spacing.md,
     borderBottomWidth: 1,
   },
+  titleRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: spacing.md,
+  },
   title: {
     fontSize: fontSize.title,
     fontWeight: fontWeight.bold,
-    marginBottom: spacing.md,
     letterSpacing: -0.3,
+    flex: 1,
+    textTransform: 'capitalize',
+  },
+  nearbyButton: {
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    borderRadius: borderRadius.pill,
+    borderWidth: 1,
+  },
+  nearbyButtonText: {
+    fontSize: fontSize.base,
+    fontWeight: fontWeight.semibold,
+  },
+  nearbyInfo: {
+    marginBottom: spacing.md,
+  },
+  nearbyInfoText: {
+    fontSize: fontSize.sm,
   },
   searchRow: {
     flexDirection: 'row',
@@ -237,15 +366,28 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginRight: spacing.md,
   },
-  venueIcon: { fontSize: 20 },
+  venueIconImage: {
+    width: 32,
+    height: 32,
+    borderRadius: borderRadius.xs,
+  },
   cardInfo: { flex: 1 },
   venueName: {
     fontSize: fontSize.lg,
     fontWeight: fontWeight.semibold,
   },
+  locationRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 2,
+    gap: spacing.sm,
+  },
   city: {
     fontSize: fontSize.md,
-    marginTop: 2,
+  },
+  distance: {
+    fontSize: fontSize.sm,
+    fontWeight: fontWeight.semibold,
   },
   ratingBadge: {
     fontSize: fontSize.sm,
@@ -267,7 +409,7 @@ const styles = StyleSheet.create({
     fontWeight: fontWeight.semibold,
   },
   centered: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: spacing.xxxl },
-  emptyIcon: { fontSize: 40, marginBottom: spacing.md },
+  emptyIllustration: { width: 180, height: 180, marginBottom: spacing.md },
   emptyText: { fontSize: fontSize.lg },
 });
 

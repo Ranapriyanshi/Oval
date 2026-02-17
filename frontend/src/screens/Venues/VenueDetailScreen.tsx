@@ -295,6 +295,7 @@ const styles = StyleSheet.create({
     fontWeight: fontWeight.semibold,
     flex: 1,
     textAlign: 'center',
+    textTransform: 'capitalize',
   },
   centered: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   errorText: { fontSize: fontSize.lg },

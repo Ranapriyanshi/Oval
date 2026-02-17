@@ -117,7 +117,7 @@ const styles = StyleSheet.create({
   centered: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   scroll: { flex: 1 },
   scrollContent: { padding: spacing.xl, paddingBottom: 100 },
-  title: { fontSize: fontSize.xxl, fontWeight: fontWeight.bold, marginBottom: spacing.sm },
+  title: { fontSize: fontSize.xxl, fontWeight: fontWeight.bold, marginBottom: spacing.sm, textTransform: 'capitalize' },
   badge: { alignSelf: 'flex-start', paddingHorizontal: spacing.md, paddingVertical: spacing.xs, borderRadius: borderRadius.sm, marginBottom: spacing.sm },
   badgeText: { fontSize: fontSize.sm, fontWeight: fontWeight.semibold },
   sport: { fontSize: fontSize.base, marginBottom: spacing.md },

@@ -166,7 +166,7 @@ const CoachesScreen = () => {
         </View>
       ) : coaches.length === 0 ? (
         <View style={styles.emptyState}>
-          <Text style={styles.emptyIcon}>🏋️</Text>
+          <Text style={styles.emptyIcon}>💪</Text>
           <Text style={[styles.emptyTitle, { color: colors.textPrimary }]}>{t('coaching.noCoaches', 'No coaches found')}</Text>
           <Text style={[styles.emptySubtitle, { color: colors.textSecondary }]}>
             {t('coaching.noCoachesHint', 'Try a different sport or check back later!')}
@@ -199,7 +199,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-  title: { fontSize: fontSize.title, fontWeight: fontWeight.bold },
+  title: { fontSize: fontSize.title, fontWeight: fontWeight.bold, textTransform: 'capitalize' },
   mySessionsButton: {
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.xs + 2,

@@ -156,7 +156,7 @@ const DiscoveryScreen = () => {
     return (
       <View style={styles.matchOverlay}>
         <View style={styles.matchContent}>
-          <Text style={styles.matchEmoji}>🎉</Text>
+          <Text style={styles.matchEmoji}>🏆</Text>
           <Text style={[styles.matchTitle, { color: colors.textInverse }]}>{t('playpals.itsAMatch')}</Text>
           <Text style={styles.matchSubtitle}>
             {t('playpals.matchMessage', { name: showMatch.name })}
@@ -166,7 +166,7 @@ const DiscoveryScreen = () => {
             <View style={styles.matchAvatar}>
               <Text style={[styles.matchAvatarText, { color: colors.textInverse }]}>You</Text>
             </View>
-            <Text style={styles.matchHeart}>❤️</Text>
+            <Text style={styles.matchHeart}>💙</Text>
             <View style={styles.matchAvatar}>
               <Text style={[styles.matchAvatarText, { color: colors.textInverse }]}>
                 {showMatch.name?.charAt(0)?.toUpperCase() || '?'}
@@ -238,7 +238,7 @@ const DiscoveryScreen = () => {
       <View style={styles.cardArea}>
         {!currentProfile ? (
           <View style={styles.emptyState}>
-            <Text style={styles.emptyEmoji}>🔍</Text>
+            <Text style={styles.emptyEmoji}>🧭</Text>
             <Text style={[styles.emptyTitle, { color: colors.textPrimary }]}>{t('playpals.noMore')}</Text>
             <Text style={[styles.emptySubtitle, { color: colors.textSecondary }]}>{t('playpals.checkBack')}</Text>
             <TouchableOpacity
@@ -275,10 +275,10 @@ const DiscoveryScreen = () => {
             >
               {/* Like / Pass overlay labels */}
               <Animated.View style={[styles.stampContainer, styles.stampLike, { borderColor: colors.accentGreen, opacity: likeOpacity }]}>
-                <Text style={[styles.stampLikeText, { color: colors.accentGreen }]}>LIKE ❤️</Text>
+                <Text style={[styles.stampLikeText, { color: colors.accentGreen }]}>LIKE 👍</Text>
               </Animated.View>
               <Animated.View style={[styles.stampContainer, styles.stampPass, { borderColor: colors.accentRed, opacity: passOpacity }]}>
-                <Text style={[styles.stampPassText, { color: colors.accentRed }]}>PASS ✋</Text>
+                <Text style={[styles.stampPassText, { color: colors.accentRed }]}>PASS 👎</Text>
               </Animated.View>
 
               <CardContent
@@ -301,14 +301,14 @@ const DiscoveryScreen = () => {
             onPress={() => swipeCard('left')}
             activeOpacity={0.7}
           >
-            <Text style={[styles.actionPassText, { color: colors.accentRed }]}>✕</Text>
+            <Text style={[styles.actionPassText, { color: colors.accentRed }]}>⛔</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.actionButton, { backgroundColor: colors.primary }]}
             onPress={() => swipeCard('right')}
             activeOpacity={0.7}
           >
-            <Text style={[styles.actionLikeText, { color: colors.textInverse }]}>♥</Text>
+            <Text style={[styles.actionLikeText, { color: colors.textInverse }]}>💚</Text>
           </TouchableOpacity>
         </View>
       )}
@@ -360,7 +360,7 @@ const CardContent = ({
       {/* Name + location */}
       <Text style={[styles.cardName, { color: colors.textPrimary }]}>{profile.name}</Text>
       {profile.city && (
-        <Text style={[styles.cardLocation, { color: colors.textSecondary }]}>📍 {profile.city}{profile.country ? `, ${profile.country}` : ''}</Text>
+        <Text style={[styles.cardLocation, { color: colors.textSecondary }]}>📌 {profile.city}{profile.country ? `, ${profile.country}` : ''}</Text>
       )}
 
       {/* Bio */}
@@ -442,6 +442,7 @@ const styles = StyleSheet.create({
     fontSize: fontSize.title,
     fontWeight: fontWeight.bold,
     letterSpacing: -0.3,
+    textTransform: 'capitalize',
   },
   center: {
     flex: 1,

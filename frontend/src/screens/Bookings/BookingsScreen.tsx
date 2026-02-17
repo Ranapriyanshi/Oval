@@ -8,16 +8,20 @@ import {
   ActivityIndicator,
   RefreshControl,
   Alert,
+  Image,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { useNavigation } from '@react-navigation/native';
 import { bookingsApi, BookingItem } from '../../services/bookings';
 import { formatCurrency } from '../../utils/formatting';
 import { useTheme } from '../../context/ThemeContext';
 import { spacing, borderRadius, fontSize, fontWeight } from '../../theme';
+import { bookingsEmptyIllustration } from '../../assets/illustrations';
 
 const BookingsScreen = () => {
   const { t } = useTranslation();
   const { colors } = useTheme();
+  const navigation = useNavigation<any>();
   const [bookings, setBookings] = useState<BookingItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -137,7 +141,16 @@ const BookingsScreen = () => {
   return (
     <View style={[styles.container, { backgroundColor: colors.backgroundSecondary }]}>
       <View style={[styles.header, { backgroundColor: colors.background, borderBottomColor: colors.borderLight }]}>
-        <Text style={[styles.title, { color: colors.textPrimary }]}>{t('bookings.title')}</Text>
+        <View style={styles.headerTopRow}>
+          <TouchableOpacity
+            style={styles.backButton}
+            onPress={() => navigation.goBack()}
+            activeOpacity={0.7}
+          >
+            <Text style={[styles.backText, { color: colors.primary }]}>← Back</Text>
+          </TouchableOpacity>
+          <Text style={[styles.title, { color: colors.textPrimary }]}>{t('bookings.title')}</Text>
+        </View>
         <View style={styles.toggleRow}>
           <TouchableOpacity
             style={[styles.toggle, { backgroundColor: colors.chipBackground }, upcomingOnly && { backgroundColor: colors.chipSelectedBackground }]}
@@ -179,7 +192,7 @@ const BookingsScreen = () => {
           }
           ListEmptyComponent={
             <View style={styles.centered}>
-              <Text style={styles.emptyIcon}>📋</Text>
+              <Image source={bookingsEmptyIllustration} style={styles.emptyIllustration} resizeMode="contain" />
               <Text style={[styles.emptyText, { color: colors.textTertiary }]}>{t('bookings.noBookings')}</Text>
             </View>
           }
@@ -197,11 +210,25 @@ const styles = StyleSheet.create({
     paddingBottom: spacing.md,
     borderBottomWidth: 1,
   },
+  headerTopRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: spacing.md,
+  },
+  backButton: {
+    paddingVertical: spacing.xs,
+    paddingRight: spacing.sm,
+  },
+  backText: {
+    fontSize: fontSize.lg,
+    fontWeight: fontWeight.medium,
+  },
   title: {
     fontSize: fontSize.title,
     fontWeight: fontWeight.bold,
-    marginBottom: spacing.md,
     letterSpacing: -0.3,
+    textTransform: 'capitalize',
   },
   toggleRow: { flexDirection: 'row', gap: spacing.sm },
   toggle: {
@@ -291,7 +318,7 @@ const styles = StyleSheet.create({
     fontWeight: fontWeight.medium,
   },
   centered: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: spacing.xxxl },
-  emptyIcon: { fontSize: 40, marginBottom: spacing.md },
+  emptyIllustration: { width: 180, height: 180, marginBottom: spacing.md },
   emptyText: { fontSize: fontSize.lg },
 });
 

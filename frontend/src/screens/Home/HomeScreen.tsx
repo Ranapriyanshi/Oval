@@ -27,12 +27,12 @@ const HomeScreen = () => {
   }, [country, user?.city]);
 
   const quickActions = [
-    { icon: '🏋️', label: 'Coaching', key: 'coaching', screen: 'Coaches' },
-    { icon: '📋', label: 'Bookings', key: 'bookings', screen: 'Bookings' },
-    { icon: '🤝', label: 'Matches', key: 'matches', screen: 'MatchesList' },
-    { icon: '📅', label: 'Sessions', key: 'sessions', screen: 'MySessions' },
-    { icon: '📊', label: 'Stats', key: 'stats', screen: 'Stats' },
-    { icon: '🏆', label: 'Events', key: 'events', screen: 'Events' },
+    { icon: '💪', label: 'Coaching', key: 'coaching', screen: 'Coaches' },
+    { icon: '🗓️', label: 'Bookings', key: 'bookings', screen: 'Bookings' },
+    { icon: '👥', label: 'Matches', key: 'matches', screen: 'MatchesList' },
+    { icon: '🕒', label: 'Sessions', key: 'sessions', screen: 'MySessions' },
+    { icon: '📈', label: 'Stats', key: 'stats', screen: 'Stats' },
+    { icon: '🎉', label: 'Events', key: 'events', screen: 'Events' },
   ];
 
   return (
@@ -41,7 +41,7 @@ const HomeScreen = () => {
       <View style={[styles.header, { backgroundColor: colors.background, borderBottomColor: colors.borderLight }]}>
         <View>
           <Text style={[styles.greeting, { color: colors.textPrimary }]}>
-            Hello, {user?.name?.split(' ')[0] || 'Player'} 👋
+            Hello, {user?.name?.split(' ')[0] || 'Player'} 🙂
           </Text>
           <Text style={[styles.subtitle, { color: colors.textSecondary }]}>Ready to play?</Text>
         </View>
@@ -82,7 +82,7 @@ const HomeScreen = () => {
             <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>Weather</Text>
             <View style={[styles.weatherCard, { backgroundColor: colors.surface }, shadow.sm]}>
               <View style={styles.weatherRow}>
-                <Text style={styles.weatherEmoji}>🌤️</Text>
+                <Text style={styles.weatherEmoji}>☀️</Text>
                 <View>
                   <Text style={[styles.weatherTemp, { color: colors.textPrimary }]}>{weather.temp}°</Text>
                   <Text style={[styles.weatherCity, { color: colors.textSecondary }]}>{weather.city} · {weather.condition}</Text>
@@ -118,7 +118,7 @@ const HomeScreen = () => {
         <View style={styles.section}>
           <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>Recent Activity</Text>
           <View style={[styles.emptyCard, { backgroundColor: colors.surface }, shadow.sm]}>
-            <Text style={styles.emptyIcon}>📊</Text>
+            <Text style={styles.emptyIcon}>📈</Text>
             <Text style={[styles.emptyText, { color: colors.textTertiary }]}>Your recent sports activity will appear here</Text>
           </View>
         </View>

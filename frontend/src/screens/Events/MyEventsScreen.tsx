@@ -74,7 +74,7 @@ const styles = StyleSheet.create({
   centered: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   list: { padding: spacing.lg },
   card: { padding: spacing.lg, borderRadius: borderRadius.md, borderWidth: 1, marginBottom: spacing.md },
-  title: { fontSize: fontSize.lg, fontWeight: fontWeight.semibold },
+  title: { fontSize: fontSize.lg, fontWeight: fontWeight.semibold, textTransform: 'capitalize' },
   sport: { fontSize: fontSize.sm, marginTop: spacing.xs },
   date: { fontSize: fontSize.sm, marginTop: spacing.xs },
   empty: { textAlign: 'center', padding: spacing.xl },
