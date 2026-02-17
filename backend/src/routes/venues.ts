@@ -10,6 +10,7 @@ import {
   Booking,
 } from '../models';
 import { authenticate, AuthRequest } from '../middleware/auth';
+import { geocodeAddress, haversineDistanceKm } from '../services/locationService';
 
 const router = express.Router();
 
@@ -82,6 +83,112 @@ router.get(
     } catch (error: any) {
       console.error('List venues error:', error);
       res.status(500).json({ message: 'Failed to list venues', error: error.message });
+    }
+  }
+);
+
+// Nearby venues using coordinates
+router.get(
+  '/nearby',
+  [
+    query('lat').isFloat({ min: -90, max: 90 }),
+    query('lng').isFloat({ min: -180, max: 180 }),
+    query('radius_km').optional().isFloat({ min: 0.1, max: 100 }).toFloat(),
+    query('sport').optional().trim(),
+    query('country').optional().isLength({ min: 2, max: 2 }).trim(),
+  ],
+  async (req: Request, res: Response) => {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+      }
+
+      const { lat, lng, radius_km, sport, country } = req.query as Record<string, string>;
+
+      const userLat = parseFloat(lat);
+      const userLng = parseFloat(lng);
+      const radiusKm = radius_km ? parseFloat(radius_km) : 10; // default 10km
+
+      const where: Record<string, unknown> = {
+        latitude: { [Op.ne]: null },
+        longitude: { [Op.ne]: null },
+      };
+
+      if (country) {
+        (where as any).country_code = country;
+      }
+
+      const include: any[] = [
+        { model: VenueSport, as: 'VenueSports', attributes: ['sport_name', 'hourly_rate_cents'] },
+        { model: VenueImage, as: 'VenueImages', attributes: ['url', 'sort_order'] },
+      ];
+
+      if (sport) {
+        include[0] = {
+          ...include[0],
+          where: { sport_name: { [Op.iLike]: sport } },
+          required: true,
+        };
+      }
+
+      const venues = await Venue.findAll({
+        where,
+        include,
+        order: [['name', 'ASC']],
+      });
+
+      const results = venues
+        .map((venue) => {
+          const json = venue.toJSON() as any;
+
+          if (!json.latitude || !json.longitude) {
+            return null;
+          }
+
+          const distanceKm = haversineDistanceKm(
+            parseFloat(json.latitude),
+            parseFloat(json.longitude),
+            userLat,
+            userLng
+          );
+
+          json.distance_km = Number(distanceKm.toFixed(2));
+
+          return json;
+        })
+        .filter((v): v is any => v !== null && v.distance_km <= radiusKm)
+        .sort((a: any, b: any) => a.distance_km - b.distance_km);
+
+      res.json({ venues: results });
+    } catch (error: any) {
+      console.error('Nearby venues error:', error);
+      res.status(500).json({ message: 'Failed to find nearby venues', error: error.message });
+    }
+  }
+);
+
+// Geocode an address to coordinates (helper endpoint)
+router.get(
+  '/geocode',
+  [query('address').isString().notEmpty().trim()],
+  async (req: Request, res: Response) => {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+      }
+
+      const { address } = req.query as Record<string, string>;
+
+      const coords = await geocodeAddress(address);
+
+      res.json(coords);
+    } catch (error: any) {
+      console.error('Geocode address error:', error);
+      res
+        .status(500)
+        .json({ message: 'Failed to geocode address', error: error.message || 'Unknown error' });
     }
   }
 );
