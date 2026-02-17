@@ -1,12 +1,11 @@
 /**
  * Oval App Design System
- * Based on modern UI reference with blue/orange accents
+ * Bold sports-inspired palette
  *
- * Color palette:
- * - Primary Dark/Text: #010100
- * - Accent Blue: #485ff0 (primary interactive)
- * - Accent Orange: #fe9820 (secondary accent)
- * - Primary Light: #ffffff
+ * Core brand colors:
+ * - Oval Green:  #71d722   (primary interactive)
+ * - Oval Blue:   #2959ab   (bold accent)
+ * - Oval Crimson: #87100d  (warning / highlight)
  *
  * Key principles:
  * - White/dark backgrounds, clean typography
@@ -14,13 +13,17 @@
  * - Pill-shaped tags and chips
  */
 
+const OVAL_BLUE = '#2959ab';
+const OVAL_CRIMSON = '#8c342b';
+const OVAL_GREEN = '#71d722';
+
 export type ThemeColors = typeof lightColors;
 
 export const lightColors = {
-  // Primary accent (blue)
-  primary: '#485ff0',
-  primaryLight: '#E8EBFC',
-  primaryDark: '#3A4FDB',
+  // Primary accent (oval green)
+  primary: OVAL_GREEN,
+  primaryLight: '#E8F9D9',
+  primaryDark: '#4DA010',
 
   // Backgrounds
   background: '#FFFFFF',
@@ -34,9 +37,9 @@ export const lightColors = {
   textInverse: '#FFFFFF',
 
   // Accents
-  accent: '#fe9820',       // Orange - stars, highlights, secondary accent
-  accentGreen: '#34C759',  // Success states
-  accentRed: '#E53935',    // Destructive actions, errors
+  accent: OVAL_BLUE,        // Bold blue accent
+  accentGreen: '#34C759',   // Success states
+  accentRed: '#E53935',     // Destructive actions, errors
 
   // Borders & Separators
   border: '#E0E0E0',
@@ -45,29 +48,29 @@ export const lightColors = {
 
   // Tab bar
   tabInactive: '#9E9EB0',
-  tabActive: '#485ff0',
+  tabActive: OVAL_GREEN,
 
   // Status
   success: '#34C759',
-  warning: '#fe9820',
+  warning: OVAL_CRIMSON,
   error: '#E53935',
-  info: '#485ff0',
+  info: OVAL_GREEN,
 
   // Chips
   chipBackground: '#F0F0F5',
-  chipSelectedBackground: '#485ff0',
+  chipSelectedBackground: OVAL_GREEN,
   chipText: '#666666',
   chipSelectedText: '#FFFFFF',
 
   // Cards
   cardBackground: '#FFFFFF',
   cardBorder: '#EBEBF0',
-  /** Alternate card (blue-tinted) for list alternating pattern */
-  cardAltBackground: '#E8EBFC',
-  cardAltBorder: '#D0D6F8',
+  /** Alternate card (tinted) for list alternating pattern */
+  cardAltBackground: '#D9E6F5',
+  cardAltBorder: '#A8C4E0',
   cardAltTextPrimary: '#010100',
   cardAltTextSecondary: '#666666',
-  cardAltChipBackground: 'rgba(72,95,240,0.15)',
+  cardAltChipBackground: 'rgba(41,89,171,0.15)',
   cardAltChipText: '#333333',
 
   // Slots
@@ -76,10 +79,10 @@ export const lightColors = {
 };
 
 export const darkColors: ThemeColors = {
-  // Primary accent (blue)
-  primary: '#5C72F5',
-  primaryLight: '#252A50',
-  primaryDark: '#485ff0',
+  // Primary accent (oval green – brighter for dark bg)
+  primary: '#8FE64A',
+  primaryLight: '#1A3A12',
+  primaryDark: OVAL_GREEN,
 
   // Backgrounds
   background: '#121212',
@@ -93,7 +96,7 @@ export const darkColors: ThemeColors = {
   textInverse: '#010100',
 
   // Accents
-  accent: '#fe9820',
+  accent: OVAL_BLUE,
   accentGreen: '#34C759',
   accentRed: '#FF6B6B',
 
@@ -104,17 +107,17 @@ export const darkColors: ThemeColors = {
 
   // Tab bar
   tabInactive: '#6E6E82',
-  tabActive: '#5C72F5',
+  tabActive: '#8FE64A',
 
   // Status
   success: '#34C759',
-  warning: '#fe9820',
+  warning: OVAL_CRIMSON,
   error: '#FF6B6B',
-  info: '#5C72F5',
+  info: '#8FE64A',
 
   // Chips
   chipBackground: '#333333',
-  chipSelectedBackground: '#485ff0',
+  chipSelectedBackground: '#1A3A12',
   chipText: '#B0B0B0',
   chipSelectedText: '#FFFFFF',
 
@@ -122,8 +125,8 @@ export const darkColors: ThemeColors = {
   cardBackground: '#282828',
   cardBorder: '#333333',
   /** Alternate card (solid blue) for list alternating pattern */
-  cardAltBackground: '#485ff0',
-  cardAltBorder: '#5C72F5',
+  cardAltBackground: OVAL_BLUE,
+  cardAltBorder: '#4A7AC4',
   cardAltTextPrimary: '#FFFFFF',
   cardAltTextSecondary: 'rgba(255,255,255,0.85)',
   cardAltChipBackground: 'rgba(255,255,255,0.2)',
@@ -172,6 +175,12 @@ export const fontWeight = {
   medium: '500' as const,
   semibold: '600' as const,
   bold: '700' as const,
+};
+
+export const fontFamily = {
+  roundedRegular: 'Nunito_400Regular',
+  roundedSemibold: 'Nunito_600SemiBold',
+  roundedBold: 'Nunito_800ExtraBold',
 };
 
 export const shadow = {
