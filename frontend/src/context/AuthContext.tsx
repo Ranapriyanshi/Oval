@@ -10,6 +10,8 @@ interface User {
   country: string;
   timezone: string;
   sportsPreferences?: string[];
+  mobile?: string;
+  avatarChoice?: 'boy' | 'girl';
 }
 
 interface AuthContextType {

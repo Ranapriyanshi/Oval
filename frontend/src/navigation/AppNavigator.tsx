@@ -1,13 +1,20 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, Image, StyleSheet, ImageSourcePropType } from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
-import { fontSize, fontWeight } from '../theme';
+import { fontSize, fontWeight, borderRadius } from '../theme';
+
+import TabHomeIcon from '../assets/Minimalist House Icon.png';
+import TabDiscoverIcon from '../assets/3D Colorful Compass.png';
+import TabChatIcon from '../assets/Social Media Like Icon.png';
+import TabGametimeIcon from '../assets/Modern Wooden Hourglass.png';
+import TabVenuesIcon from '../assets/Stylized Paper Art Landscape with Location Marker.png';
 import LoginScreen from '../screens/Auth/LoginScreen';
 import RegisterScreen from '../screens/Auth/RegisterScreen';
+import AccountSetupScreen from '../screens/Auth/AccountSetupScreen';
 import OnboardingScreen from '../screens/Onboarding/OnboardingScreen';
 import HomeScreen from '../screens/Home/HomeScreen';
 import ProfileScreen from '../screens/Profile/ProfileScreen';
@@ -37,30 +44,45 @@ import AdminScreen from '../screens/Admin/AdminScreen';
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
-// Simple text-based tab icon (no external icon library needed)
-const TabIcon = ({ label, focused }: { label: string; focused: boolean }) => {
-  const iconMap: Record<string, string> = {
-    Home: '🏟️',
-    Discover: '🧭',
-    Chat: '💭',
-    Gametime: '🎯',
-    Coaching: '💪',
-    Venues: '📍',
-    Profile: '🙂',
-  };
+const TAB_ICON_SIZE = 44;
+
+const iconMap: Record<string, ImageSourcePropType> = {
+  Home: TabHomeIcon,
+  Discover: TabDiscoverIcon,
+  Chat: TabChatIcon,
+  Gametime: TabGametimeIcon,
+  Venues: TabVenuesIcon,
+};
+
+const TabIcon = ({ label, focused, activeColor }: { label: string; focused: boolean; activeColor: string }) => {
   return (
-    <View style={tabIconStyles.container}>
-      <Text style={[tabIconStyles.icon, focused && tabIconStyles.iconFocused]}>
-        {iconMap[label] || '●'}
-      </Text>
+    <View style={[tabIconStyles.wrapper, focused && { borderColor: activeColor, ...tabIconStyles.wrapperFocused }]}>
+      <Image
+        source={iconMap[label]}
+        style={tabIconStyles.icon}
+        resizeMode="contain"
+      />
     </View>
   );
 };
 
 const tabIconStyles = StyleSheet.create({
-  container: { alignItems: 'center', justifyContent: 'center' },
-  icon: { fontSize: 20, opacity: 0.5 },
-  iconFocused: { opacity: 1 },
+  wrapper: {
+    width: 56,
+    height: 56,
+    borderRadius: borderRadius.lg,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: 'transparent',
+  },
+  wrapperFocused: {
+    borderWidth: 2,
+  },
+  icon: {
+    width: TAB_ICON_SIZE,
+    height: TAB_ICON_SIZE,
+  },
 });
 
 const MainTabs = () => {
@@ -69,20 +91,29 @@ const MainTabs = () => {
     <Tab.Navigator
       screenOptions={{
         headerShown: false,
+        tabBarShowLabel: false,
         tabBarStyle: {
-          backgroundColor: colors.background,
-          borderTopColor: colors.borderLight,
-          borderTopWidth: 1,
-          height: 60,
-          paddingBottom: 8,
-          paddingTop: 8,
+          position: 'absolute',
+          left: 16,
+          right: 16,
+          bottom: 20,
+          height: 72,
+          borderRadius: 999,
+          // Whitish in light mode, greyish in dark mode
+          backgroundColor: isDark ? 'rgba(255,255,255,0.96)' : 'rgba(64, 61, 61, 0.96)',
+          borderWidth: 1,
+          borderColor: isDark ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.06)',
+          paddingBottom: 6,
+          paddingTop: 6,
+          paddingHorizontal: 12,
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: 6 },
+          shadowOpacity: 0.25,
+          shadowRadius: 10,
+          elevation: 10,
         },
-        tabBarActiveTintColor: colors.tabActive,
-        tabBarInactiveTintColor: colors.tabInactive,
-        tabBarLabelStyle: {
-          fontSize: fontSize.xs,
-          fontWeight: fontWeight.medium,
-          marginTop: 2,
+        tabBarItemStyle: {
+          paddingHorizontal: 4,
         },
       }}
     >
@@ -90,48 +121,35 @@ const MainTabs = () => {
         name="Home"
         component={HomeScreen}
         options={{
-          tabBarLabel: 'Home',
-          tabBarIcon: ({ focused }) => <TabIcon label="Home" focused={focused} />,
+          tabBarIcon: ({ focused }) => <TabIcon label="Home" focused={focused} activeColor={colors.primary} />,
         }}
       />
       <Tab.Screen
         name="Discover"
         component={DiscoveryScreen}
         options={{
-          tabBarLabel: 'Discover',
-          tabBarIcon: ({ focused }) => <TabIcon label="Discover" focused={focused} />,
+          tabBarIcon: ({ focused }) => <TabIcon label="Discover" focused={focused} activeColor={colors.primary} />,
         }}
       />
       <Tab.Screen
         name="Chat"
         component={ConversationsScreen}
         options={{
-          tabBarLabel: 'Chat',
-          tabBarIcon: ({ focused }) => <TabIcon label="Chat" focused={focused} />,
+          tabBarIcon: ({ focused }) => <TabIcon label="Chat" focused={focused} activeColor={colors.primary} />,
         }}
       />
       <Tab.Screen
         name="Gametime"
         component={GametimeScreen}
         options={{
-          tabBarLabel: 'Gametime',
-          tabBarIcon: ({ focused }) => <TabIcon label="Gametime" focused={focused} />,
+          tabBarIcon: ({ focused }) => <TabIcon label="Gametime" focused={focused} activeColor={colors.primary} />,
         }}
       />
       <Tab.Screen
         name="Venues"
         component={VenuesScreen}
         options={{
-          tabBarLabel: 'Venues',
-          tabBarIcon: ({ focused }) => <TabIcon label="Venues" focused={focused} />,
-        }}
-      />
-      <Tab.Screen
-        name="Profile"
-        component={ProfileScreen}
-        options={{
-          tabBarLabel: 'Profile',
-          tabBarIcon: ({ focused }) => <TabIcon label="Profile" focused={focused} />,
+          tabBarIcon: ({ focused }) => <TabIcon label="Venues" focused={focused} activeColor={colors.primary} />,
         }}
       />
     </Tab.Navigator>
@@ -143,6 +161,7 @@ const AppNavigator = () => {
   const { colors, isDark } = useTheme();
 
   const [hasSeenOnboarding, setHasSeenOnboarding] = useState<boolean | null>(null);
+  const [hasCompletedAccountSetup, setHasCompletedAccountSetup] = useState<boolean | null>(null);
 
   useEffect(() => {
     const loadOnboardingFlag = async () => {
@@ -157,6 +176,19 @@ const AppNavigator = () => {
     loadOnboardingFlag();
   }, []);
 
+  useEffect(() => {
+    const loadAccountSetupFlag = async () => {
+      try {
+        const value = await AsyncStorage.getItem('oval_has_completed_account_setup');
+        setHasCompletedAccountSetup(value === 'true');
+      } catch (err) {
+        console.error('Failed to load account setup flag', err);
+        setHasCompletedAccountSetup(false);
+      }
+    };
+    loadAccountSetupFlag();
+  }, []);
+
   const handleOnboardingDone = async () => {
     try {
       await AsyncStorage.setItem('oval_has_seen_onboarding', 'true');
@@ -166,7 +198,7 @@ const AppNavigator = () => {
     }
   };
 
-  if (loading || hasSeenOnboarding === null) {
+  if (loading || hasSeenOnboarding === null || hasCompletedAccountSetup === null) {
     return null;
   }
 
@@ -180,7 +212,15 @@ const AppNavigator = () => {
     <Stack.Navigator screenOptions={{ headerShown: false, ...stackHeaderStyle }}>
       {user ? (
         <>
+          {!hasCompletedAccountSetup && (
+            <Stack.Screen name="AccountSetup" component={AccountSetupScreen} />
+          )}
           <Stack.Screen name="Main" component={MainTabs} />
+          <Stack.Screen
+            name="Profile"
+            component={ProfileScreen}
+            options={{ headerShown: true, headerTitle: 'Profile', ...stackHeaderStyle }}
+          />
           <Stack.Screen name="VenueDetail" component={VenueDetailScreen} />
           <Stack.Screen name="PlaypalProfile" component={PlaypalProfileScreen} />
           <Stack.Screen name="GametimeDetail" component={GametimeDetailScreen} />
