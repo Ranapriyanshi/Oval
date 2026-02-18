@@ -12,7 +12,7 @@ import { useNavigation } from '@react-navigation/native';
 import { useAuth } from '../../context/AuthContext';
 import { useLocale } from '../../context/LocaleContext';
 import { useTheme } from '../../context/ThemeContext';
-import { spacing, borderRadius, fontSize, fontWeight } from '../../theme';
+import { spacing, borderRadius, fontSize, fontWeight, fontFamily } from '../../theme';
 
 const ProfileScreen = () => {
   const { t } = useTranslation();
@@ -25,7 +25,7 @@ const ProfileScreen = () => {
     <View style={[styles.container, { backgroundColor: colors.backgroundSecondary }]}>
       {/* Header */}
       <View style={[styles.header, { backgroundColor: colors.background, borderBottomColor: colors.borderLight }]}>
-        <Text style={[styles.title, { color: colors.textPrimary }]}>{t('profile.title')}</Text>
+        <Text style={[styles.title, { color: colors.textPrimary }]}>{t('profile.title').toUpperCase()}</Text>
       </View>
 
       <ScrollView
@@ -48,7 +48,7 @@ const ProfileScreen = () => {
 
         {/* Appearance Card */}
         <View style={[styles.card, { backgroundColor: colors.background, borderColor: colors.cardBorder }]}>
-          <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>Appearance</Text>
+          <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>APPEARANCE</Text>
 
           {/* Dark mode toggle */}
           <View style={styles.infoRow}>
@@ -100,7 +100,7 @@ const ProfileScreen = () => {
 
         {/* Info Card */}
         <View style={[styles.card, { backgroundColor: colors.background, borderColor: colors.cardBorder }]}>
-          <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>Account Details</Text>
+          <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>ACCOUNT DETAILS</Text>
           <View style={styles.infoRow}>
             <Text style={[styles.infoLabel, { color: colors.textSecondary }]}>Country</Text>
             <Text style={[styles.infoValue, { color: colors.textPrimary }]}>
@@ -116,7 +116,7 @@ const ProfileScreen = () => {
 
         {/* Stats & Leaderboards */}
         <View style={[styles.card, { backgroundColor: colors.background, borderColor: colors.cardBorder }]}>
-          <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>Stats & leaderboards</Text>
+          <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>STATS & LEADERBOARDS</Text>
           <TouchableOpacity
             style={styles.linkRow}
             onPress={() => navigation.navigate('Stats')}
@@ -160,7 +160,7 @@ const ProfileScreen = () => {
 
         {/* Country Switch */}
         <View style={[styles.card, { backgroundColor: colors.background, borderColor: colors.cardBorder }]}>
-          <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>Region</Text>
+          <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>REGION</Text>
           <View style={styles.countryRow}>
             <TouchableOpacity
               style={[
@@ -214,7 +214,13 @@ const styles = StyleSheet.create({
     paddingBottom: spacing.lg,
     borderBottomWidth: 1,
   },
-  title: { fontSize: fontSize.title, fontWeight: fontWeight.bold, letterSpacing: -0.3, textTransform: 'capitalize' },
+  title: {
+    fontFamily: fontFamily.roundedBold,
+    fontSize: fontSize.title,
+    fontWeight: fontWeight.bold,
+    letterSpacing: 0.5,
+    textTransform: 'uppercase',
+  },
   scrollView: { flex: 1 },
   scrollContent: {
     paddingHorizontal: spacing.xl,
@@ -233,7 +239,14 @@ const styles = StyleSheet.create({
     borderRadius: borderRadius.md, padding: spacing.lg,
     marginBottom: spacing.lg, borderWidth: 1,
   },
-  sectionTitle: { fontSize: fontSize.lg, fontWeight: fontWeight.semibold, marginBottom: spacing.lg },
+  sectionTitle: {
+    fontFamily: fontFamily.roundedBold,
+    fontSize: fontSize.title,
+    fontWeight: fontWeight.bold,
+    marginBottom: spacing.lg,
+    letterSpacing: 0.5,
+    textTransform: 'uppercase',
+  },
   infoRow: {
     flexDirection: 'row', justifyContent: 'space-between',
     alignItems: 'center', paddingVertical: spacing.md,

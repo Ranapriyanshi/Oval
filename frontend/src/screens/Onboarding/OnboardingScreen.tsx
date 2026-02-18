@@ -454,7 +454,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: spacing.sm,
     borderWidth: 2,
-    borderColor: 'rgba(0,0,0,0.16)', // subtle darker outline like reference
+    // borderColor: 'rgba(0,0,0,0.16)', // subtle darker outline like reference
     // Strong shadow for elevated CTA
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 6 },
