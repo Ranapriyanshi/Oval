@@ -5,6 +5,15 @@ import { authenticate, AuthRequest } from '../middleware/auth';
 
 const router = express.Router();
 
+// Helper function to convert user data from snake_case to camelCase for frontend
+const formatUserResponse = (userData: any) => {
+  const { password_hash, avatar_choice, ...rest } = userData;
+  return {
+    ...rest,
+    ...(avatar_choice !== undefined && { avatarChoice: avatar_choice }),
+  };
+};
+
 // Get user profile
 router.get('/profile', authenticate, async (req: AuthRequest, res: Response) => {
   try {
@@ -14,8 +23,7 @@ router.get('/profile', authenticate, async (req: AuthRequest, res: Response) => 
     }
 
     const userData = user.toJSON();
-    const { password_hash, ...userWithoutPassword } = userData;
-    res.json(userWithoutPassword);
+    res.json(formatUserResponse(userData));
   } catch (error: any) {
     console.error('Get profile error:', error);
     res.status(500).json({ message: 'Failed to get profile', error: error.message });
@@ -32,6 +40,9 @@ router.put(
     body('timezone').optional().trim().notEmpty(),
     body('currency').optional().isLength({ min: 3, max: 3 }),
     body('sports_preferences').optional().isArray(),
+    body('avatar_choice').optional().isIn(['boy', 'girl']).withMessage('avatar_choice must be either "boy" or "girl"'),
+    body('avatarChoice').optional().isIn(['boy', 'girl']).withMessage('avatarChoice must be either "boy" or "girl"'),
+    body('mobile').optional().trim().isLength({ min: 0, max: 20 }).withMessage('mobile must be at most 20 characters'),
   ],
   async (req: AuthRequest, res: Response) => {
     try {
@@ -57,12 +68,17 @@ router.put(
         delete updates.password;
       }
 
+      // Normalize avatar_choice: convert to snake_case if camelCase provided
+      if (updates.avatarChoice !== undefined) {
+        updates.avatar_choice = updates.avatarChoice;
+        delete updates.avatarChoice;
+      }
+
       await user.update(updates);
       await user.reload();
 
       const userData = user.toJSON();
-      const { password_hash, ...userWithoutPassword } = userData;
-      res.json(userWithoutPassword);
+      res.json(formatUserResponse(userData));
     } catch (error: any) {
       console.error('Update profile error:', error);
       res.status(500).json({ message: 'Failed to update profile', error: error.message });

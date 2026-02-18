@@ -7,6 +7,15 @@ import { authenticate, AuthRequest } from '../middleware/auth';
 
 const router = express.Router();
 
+// Helper function to convert user data from snake_case to camelCase for frontend
+const formatUserResponse = (userData: any) => {
+  const { password_hash, avatar_choice, ...rest } = userData;
+  return {
+    ...rest,
+    ...(avatar_choice !== undefined && { avatarChoice: avatar_choice }),
+  };
+};
+
 // Register
 router.post(
   '/register',
@@ -57,11 +66,9 @@ router.post(
 
       // Return user data (without password)
       const userData = user.toJSON();
-      const { password_hash, ...userWithoutPassword } = userData;
-
       res.status(201).json({
         token,
-        user: userWithoutPassword,
+        user: formatUserResponse(userData),
       });
     } catch (error: any) {
       console.error('Registration error:', error);
@@ -105,11 +112,9 @@ router.post(
 
       // Return user data (without password)
       const userData = user.toJSON();
-      const { password_hash, ...userWithoutPassword } = userData;
-
       res.json({
         token,
-        user: userWithoutPassword,
+        user: formatUserResponse(userData),
       });
     } catch (error: any) {
       console.error('Login error:', error);
@@ -127,8 +132,7 @@ router.get('/me', authenticate, async (req: AuthRequest, res: Response) => {
     }
 
     const userData = user.toJSON();
-    const { password_hash, ...userWithoutPassword } = userData;
-    res.json(userWithoutPassword);
+    res.json(formatUserResponse(userData));
   } catch (error: any) {
     console.error('Get user error:', error);
     res.status(500).json({ message: 'Failed to get user', error: error.message });
