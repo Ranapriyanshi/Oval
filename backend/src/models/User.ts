@@ -17,6 +17,8 @@ interface UserAttributes {
   city?: string | null;
   bio?: string | null;
   is_admin?: boolean;
+  avatar_choice?: 'boy' | 'girl' | null;
+  mobile?: string | null;
   created_at: Date;
   updated_at: Date;
 }
@@ -40,6 +42,8 @@ class User extends Model<UserAttributes, UserCreationAttributes> implements User
   public city!: string | null;
   public bio!: string | null;
   public is_admin!: boolean;
+  public avatar_choice!: 'boy' | 'girl' | null;
+  public mobile!: string | null;
   public created_at!: Date;
   public updated_at!: Date;
 
@@ -127,6 +131,17 @@ User.init(
     bio: {
       type: DataTypes.TEXT,
       allowNull: true,
+    },
+    avatar_choice: {
+      type: DataTypes.ENUM('boy', 'girl'),
+      allowNull: true,
+    },
+    mobile: {
+      type: DataTypes.STRING(20),
+      allowNull: true,
+      validate: {
+        len: [0, 20],
+      },
     },
     created_at: {
       type: DataTypes.DATE,
