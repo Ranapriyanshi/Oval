@@ -10,12 +10,16 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  Image,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigation } from '@react-navigation/native';
 import { useTheme } from '../../context/ThemeContext';
 import { spacing, borderRadius, fontSize, fontWeight, fontFamily } from '../../theme';
+import GoogleLogo from '../../assets/google-symbol.png';
+import AppleLogo from '../../assets/apple.png';
+import FacebookLogo from '../../assets/facebook.png';
 
 const LoginScreen = () => {
   const { t } = useTranslation();
@@ -136,22 +140,16 @@ const LoginScreen = () => {
             <View style={[styles.dividerLine, { backgroundColor: colors.border }]} />
           </View>
 
-          {/* Social buttons */}
+          {/* Social login icons */}
           <View style={styles.socialRow}>
-            <TouchableOpacity
-              style={[styles.socialButton, { borderColor: colors.border }]}
-              activeOpacity={0.7}
-            >
-              <Text style={styles.socialIcon}>G</Text>
-              <Text style={[styles.socialLabel, { color: colors.primary }]}>GOOGLE</Text>
+            <TouchableOpacity style={styles.socialCircle} activeOpacity={0.7}>
+              <Image source={AppleLogo} style={styles.socialImage} />
             </TouchableOpacity>
-            <View style={{ width: spacing.md }} />
-            <TouchableOpacity
-              style={[styles.socialButton, { borderColor: colors.border }]}
-              activeOpacity={0.7}
-            >
-              <Text style={[styles.socialIcon, { color: colors.accent }]}>f</Text>
-              <Text style={[styles.socialLabel, { color: colors.accent }]}>FACEBOOK</Text>
+            <TouchableOpacity style={styles.socialCircle} activeOpacity={0.7}>
+              <Image source={FacebookLogo} style={styles.socialImage} />
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.socialCircle} activeOpacity={0.7}>
+              <Image source={GoogleLogo} style={styles.socialImage} />
             </TouchableOpacity>
           </View>
 
@@ -168,12 +166,6 @@ const LoginScreen = () => {
             </Text>
           </TouchableOpacity>
 
-          {/* Footer terms */}
-          <Text style={[styles.footerText, { color: colors.textTertiary }]}>
-            By signing in to Oval, you agree to our{' '}
-            <Text style={[styles.footerLink, { color: colors.primary }]}>Terms</Text> and{' '}
-            <Text style={[styles.footerLink, { color: colors.primary }]}>Privacy Policy</Text>.
-          </Text>
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
@@ -286,6 +278,7 @@ const styles = StyleSheet.create({
   /* Social buttons */
   socialRow: {
     flexDirection: 'row',
+    justifyContent: 'center',
     marginBottom: spacing.xxl,
   },
   socialButton: {
@@ -296,6 +289,23 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderRadius: borderRadius.lg,
     paddingVertical: spacing.md + 2,
+  },
+  socialCircle: {
+    width: 58,
+    height: 58,
+    borderRadius: 32,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 2,
+    borderStyle: 'dashed',
+    borderColor: '#39FF14', // neon green style outline
+    marginHorizontal: spacing.lg,
+    backgroundColor: 'transparent',
+  },
+  socialImage: {
+    width: 32,
+    height: 32,
+    resizeMode: 'contain',
   },
   socialIcon: {
     fontFamily: fontFamily.roundedBold,
