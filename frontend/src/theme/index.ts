@@ -3,7 +3,7 @@
  * Bold sports-inspired palette
  *
  * Core brand colors:
- * - Oval Green:  #71d722   (primary interactive)
+ * - Oval Purple: #8C07DD   (primary interactive)
  * - Oval Blue:   #2959ab   (bold accent)
  * - Oval Crimson: #87100d  (warning / highlight)
  *
@@ -15,15 +15,15 @@
 
 const OVAL_BLUE = '#2959ab';
 const OVAL_CRIMSON = '#8c342b';
-const OVAL_GREEN = '#71d722';
+const OVAL_PURPLE = '#8C07DD';
 
 export type ThemeColors = typeof lightColors;
 
 export const lightColors = {
-  // Primary accent (oval green)
-  primary: OVAL_GREEN,
-  primaryLight: '#E8F9D9',
-  primaryDark: '#4DA010',
+  // Primary accent (oval purple)
+  primary: OVAL_PURPLE,
+  primaryLight: '#F3E0FF',
+  primaryDark: '#6B05A8',
 
   // Backgrounds
   background: '#FFFFFF',
@@ -48,17 +48,17 @@ export const lightColors = {
 
   // Tab bar
   tabInactive: '#9E9EB0',
-  tabActive: OVAL_GREEN,
+  tabActive: OVAL_PURPLE,
 
   // Status
   success: '#34C759',
   warning: OVAL_CRIMSON,
   error: '#E53935',
-  info: OVAL_GREEN,
+  info: OVAL_PURPLE,
 
   // Chips
   chipBackground: '#F0F0F5',
-  chipSelectedBackground: OVAL_GREEN,
+  chipSelectedBackground: OVAL_PURPLE,
   chipText: '#666666',
   chipSelectedText: '#FFFFFF',
 
@@ -79,10 +79,10 @@ export const lightColors = {
 };
 
 export const darkColors: ThemeColors = {
-  // Primary accent (oval green – brighter for dark bg)
-  primary: '#8FE64A',
-  primaryLight: '#1A3A12',
-  primaryDark: OVAL_GREEN,
+  // Primary accent (oval purple – brighter for dark bg)
+  primary: '#B44DFF',
+  primaryLight: '#2A0D3D',
+  primaryDark: OVAL_PURPLE,
 
   // Backgrounds
   background: '#121212',
@@ -107,17 +107,17 @@ export const darkColors: ThemeColors = {
 
   // Tab bar
   tabInactive: '#6E6E82',
-  tabActive: '#8FE64A',
+  tabActive: '#B44DFF',
 
   // Status
   success: '#34C759',
   warning: OVAL_CRIMSON,
   error: '#FF6B6B',
-  info: '#8FE64A',
+  info: '#B44DFF',
 
   // Chips
   chipBackground: '#333333',
-  chipSelectedBackground: '#1A3A12',
+  chipSelectedBackground: '#2A0D3D',
   chipText: '#B0B0B0',
   chipSelectedText: '#FFFFFF',
 

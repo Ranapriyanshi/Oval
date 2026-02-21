@@ -6,485 +6,828 @@ import {
   TouchableOpacity,
   SafeAreaView,
   Image,
-  ImageSourcePropType,
   Animated,
   Easing,
   Dimensions,
+  ScrollView,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useTheme } from '../../context/ThemeContext';
 import { spacing, borderRadius, fontSize, fontWeight, fontFamily } from '../../theme';
-import {
-  onboardingWelcomeIllustration,
-  onboardingPlaypalsIllustration,
-  onboardingGametimeIllustration,
-} from '../../assets/illustrations';
-import TennisBallPng from '../../assets/Pristine Yellow Tennis Ball.png';
+
+const parrotImage = require('../../assets/Stylized 3D Parrot Illustration.png');
+const mascotImage = require('../../assets/Colorful Clay Bird.png');
+const basketballImage = require('../../assets/Stylized Yellow Basketball.png');
+const soccerBallImage = require('../../assets/Classic Soccer Ball.png');
+const tennisImage = require('../../assets/Red Tennis Racket on Turquoise Background.png');
+const skateboardImage = require('../../assets/Retro Cruiser Skateboard in Vibrant Blue and Red.png');
+const snowboardImage = require('../../assets/Dynamic Snowboarder.png');
+const swimImage = require('../../assets/Diver in Turquoise Gear.png');
+const compassImage = require('../../assets/3D Colorful Compass.png');
+const trophyImage = require('../../assets/Minimalist Yellow Trophy.png');
+const starImage = require('../../assets/Star Object Design.png');
 
 type OnboardingScreenProps = {
   onDone?: () => void;
 };
 
-type Slide = {
-  key: string;
-  title: string;
-  subtitle: string;
-  image: ImageSourcePropType;
+type Phase = 'splash' | 'welcome' | 'quiz';
+
+type OptionItem = {
+  id: string;
+  label: string;
+  icon?: any;
+  description?: string;
 };
 
-const { height: SCREEN_HEIGHT, width: SCREEN_WIDTH } = Dimensions.get('window');
-const BALL_SIZE = 110;
-const LAUNCH_LETTERS = ['O', 'V', 'A', 'L'] as const;
+type OnboardingStep = {
+  key: string;
+  mascotMessage: string;
+  question?: string;
+  options: OptionItem[];
+  multiSelect?: boolean;
+};
 
-// Each letter is ~38px wide at fontSize 52, with 6px gap between letters.
-// Word total width ≈ 4*38 + 3*6 = 170px. Half = 85px.
-// Letter-center offsets from row center: -63.5, -21.5, +21.5, +63.5
-// We round for cleanliness.
-// To start each letter at the center (behind ball), the initial translateX
-// must be the negation of its natural offset from center, so all start stacked.
-const LETTER_START_X = [64, 22, -22, -64]; // initial offsets → all at center
-// Final translateX = 0 for every letter (natural flex-row position, centered).
+const SIGNAL_LEVELS = [1, 2, 3, 4, 5];
 
-const SLIDES: Slide[] = [
+const STEPS: OnboardingStep[] = [
   {
-    key: 'welcome',
-    title: 'Welcome to Oval',
-    subtitle: 'Find venues, teammates and games around your city in just a few taps.',
-    image: onboardingWelcomeIllustration,
+    key: 'sports',
+    mascotMessage: "Hey there! Let's find your game!",
+    question: 'What sports do you play?',
+    multiSelect: true,
+    options: [
+      { id: 'football', label: 'Football / Soccer', icon: soccerBallImage },
+      { id: 'basketball', label: 'Basketball', icon: basketballImage },
+      { id: 'tennis', label: 'Tennis / Badminton', icon: tennisImage },
+      { id: 'skateboarding', label: 'Skateboarding', icon: skateboardImage },
+      { id: 'snowboarding', label: 'Snowboarding', icon: snowboardImage },
+      { id: 'swimming', label: 'Swimming / Diving', icon: swimImage },
+    ],
   },
   {
-    key: 'playpals',
-    title: 'Find Your Playpals',
-    subtitle: 'Match with players at your level, chat instantly and organise games that stick.',
-    image: onboardingPlaypalsIllustration,
+    key: 'level',
+    mascotMessage: "Nice picks! Now let's see your level.",
+    question: "What's your skill level?",
+    multiSelect: false,
+    options: [
+      { id: 'beginner', label: "I'm brand new" },
+      { id: 'casual', label: 'I play casually' },
+      { id: 'intermediate', label: 'I can hold my own' },
+      { id: 'competitive', label: "I'm pretty competitive" },
+      { id: 'advanced', label: 'I play at a high level' },
+    ],
   },
   {
-    key: 'gametime',
-    title: 'Join or Host Gametime',
-    subtitle: 'Browse pickup games, tournaments and coaching sessions – or create your own.',
-    image: onboardingGametimeIllustration,
+    key: 'goal',
+    mascotMessage: "Awesome! Now let's find your starting point.",
+    question: 'What are you looking for?',
+    multiSelect: false,
+    options: [
+      {
+        id: 'find_games',
+        label: 'Find pickup games',
+        description: 'Browse and join games happening near you',
+        icon: compassImage,
+      },
+      {
+        id: 'find_teammates',
+        label: 'Meet new teammates',
+        description: 'Connect with players at your skill level',
+        icon: starImage,
+      },
+      {
+        id: 'compete',
+        label: 'Compete & improve',
+        description: 'Join tournaments and track your progress',
+        icon: trophyImage,
+      },
+    ],
   },
 ];
 
+const { height: SCREEN_HEIGHT } = Dimensions.get('window');
+const TRANSITION_DURATION = 350;
+
+/* ─── Signal Bars (skill level indicator) ─── */
+const SignalBars: React.FC<{ level: number; active: boolean; activeColor: string }> = ({
+  level,
+  active,
+  activeColor,
+}) => (
+  <View style={signalStyles.container}>
+    {SIGNAL_LEVELS.map((bar) => (
+      <View
+        key={bar}
+        style={[
+          signalStyles.bar,
+          {
+            height: 6 + bar * 4,
+            backgroundColor:
+              bar <= level
+                ? active
+                  ? '#FFFFFF'
+                  : activeColor
+                : active
+                  ? 'rgba(255,255,255,0.3)'
+                  : 'rgba(255,255,255,0.15)',
+          },
+        ]}
+      />
+    ))}
+  </View>
+);
+
+const signalStyles = StyleSheet.create({
+  container: { flexDirection: 'row', alignItems: 'flex-end', gap: 3, marginRight: spacing.sm },
+  bar: { width: 5, borderRadius: 2 },
+});
+
+/* ═══════════════════════════════════════════════
+   Main component
+   ═══════════════════════════════════════════════ */
 const OnboardingScreen: React.FC<OnboardingScreenProps> = ({ onDone }) => {
   const { colors } = useTheme();
   const navigation = useNavigation<any>();
-  const [index, setIndex] = useState(0);
-  const [showLaunch, setShowLaunch] = useState(true);
 
-  const sheetTranslateY = useRef(new Animated.Value(0)).current;
+  const [phase, setPhase] = useState<Phase>('splash');
+  const [stepIndex, setStepIndex] = useState(0);
+  const [selections, setSelections] = useState<Record<string, string[]>>({});
 
-  // Ball starts centered, then rolls off to the left while letters emerge
-  const ballTranslateX = useRef(new Animated.Value(0)).current;
-  const ballRotation = useRef(new Animated.Value(0)).current;
+  // Splash animations
+  const splashOpacity = useRef(new Animated.Value(1)).current;
+  const splashScale = useRef(new Animated.Value(0.8)).current;
 
-  // Letters start stacked behind the ball (translateX = LETTER_START_X[i])
-  // and animate to 0 (their natural centered-row position).
-  const letterOpacities = useRef(LAUNCH_LETTERS.map(() => new Animated.Value(0))).current;
-  const letterTranslateXs = useRef(
-    LAUNCH_LETTERS.map((_, idx) => new Animated.Value(LETTER_START_X[idx]))
-  ).current;
-  const letterScales = useRef(LAUNCH_LETTERS.map(() => new Animated.Value(0.6))).current;
-  const letterRotations = useRef(LAUNCH_LETTERS.map(() => new Animated.Value(0))).current;
+  // Welcome screen animations
+  const welcomeOpacity = useRef(new Animated.Value(0)).current;
+  const parrotScale = useRef(new Animated.Value(0.6)).current;
+  const welcomeTextTranslate = useRef(new Animated.Value(30)).current;
+  const welcomeButtonsTranslate = useRef(new Animated.Value(60)).current;
+  const welcomeButtonsOpacity = useRef(new Animated.Value(0)).current;
 
-  const slide = SLIDES[index];
-  const isLast = index === SLIDES.length - 1;
-  const accentColor = index === 0 ? colors.primary : index === 1 ? colors.accent : colors.warning;
+  // Quiz animations
+  const progressAnim = useRef(new Animated.Value(1 / STEPS.length)).current;
+  const contentOpacity = useRef(new Animated.Value(1)).current;
+  const mascotSlide = useRef(new Animated.Value(-100)).current;
+  const bubbleScale = useRef(new Animated.Value(0)).current;
+  const optionsTranslateY = useRef(new Animated.Value(40)).current;
+  const optionsOpacity = useRef(new Animated.Value(0)).current;
+  const isTransitioning = useRef(false);
 
+  const step = STEPS[stepIndex];
+  const currentSelections = selections[step?.key] || [];
+
+  /* ─── Phase 1: Splash → Welcome ─── */
   useEffect(() => {
-    // -- Phase 1: Ball sits centered for a dramatic pause --
-    const initialPause = Animated.delay(1000);
-
-    // -- Phase 2: Ball rolls off to the left --
-    const BALL_ROLL_DURATION = 1400;
-    const ballRollLeft = Animated.parallel([
-      Animated.timing(ballTranslateX, {
-        toValue: -(SCREEN_WIDTH / 2 + BALL_SIZE),
-        duration: BALL_ROLL_DURATION,
-        easing: Easing.inOut(Easing.cubic),
-        useNativeDriver: true,
-      }),
-      Animated.timing(ballRotation, {
-        toValue: -720,
-        duration: BALL_ROLL_DURATION,
-        easing: Easing.inOut(Easing.cubic),
-        useNativeDriver: true,
-      }),
-    ]);
-
-    // -- Phase 3: Letters emerge one-by-one AFTER the ball has left --
-    // Each letter: opacity 0→1, translateX from LETTER_START_X→0,
-    // rotation (rolling), scale 0.6→1 with bounce.
-    const STAGGER_DELAY = 280; // ms between each letter start
-    const LETTER_DURATION = 850; // how long each letter takes to settle
-
-    const letterAnims = LAUNCH_LETTERS.map((_, idx) => {
-      const rotationTarget = LETTER_START_X[idx] > 0 ? -360 : 360;
-
-      return Animated.parallel([
-        // Fade in
-        Animated.timing(letterOpacities[idx], {
-          toValue: 1,
-          duration: LETTER_DURATION * 0.5,
-          easing: Easing.out(Easing.cubic),
-          useNativeDriver: true,
-        }),
-        // Slide to final position
-        Animated.timing(letterTranslateXs[idx], {
-          toValue: 0,
-          duration: LETTER_DURATION,
-          easing: Easing.out(Easing.back(1.4)),
-          useNativeDriver: true,
-        }),
-        // Scale up with bounce
-        Animated.timing(letterScales[idx], {
-          toValue: 1,
-          duration: LETTER_DURATION,
-          easing: Easing.out(Easing.back(2)),
-          useNativeDriver: true,
-        }),
-        // Rolling rotation
-        Animated.timing(letterRotations[idx], {
-          toValue: rotationTarget,
-          duration: LETTER_DURATION,
-          easing: Easing.out(Easing.cubic),
-          useNativeDriver: true,
-        }),
-      ]);
-    });
-
-    // -- Phase 4: Hold the centered wordmark --
-    const holdWordmark = Animated.delay(2200);
-
-    // -- Phase 5: Curtain-drop reveal (sheet slides down) --
-    const curtainDrop = Animated.timing(sheetTranslateY, {
-      toValue: SCREEN_HEIGHT,
-      duration: 1000,
-      easing: Easing.inOut(Easing.cubic),
+    Animated.spring(splashScale, {
+      toValue: 1,
+      tension: 40,
+      friction: 6,
       useNativeDriver: true,
-    });
+    }).start();
 
-    Animated.sequence([
-      initialPause,
-      // First the ball rolls off to the left
-      ballRollLeft,
-      // Small pause before letters start appearing
-      Animated.delay(300),
-      // Then letters emerge one by one
-      Animated.stagger(STAGGER_DELAY, letterAnims),
-      holdWordmark,
-      curtainDrop,
-    ]).start(() => setShowLaunch(false));
+    const timer = setTimeout(() => {
+      Animated.timing(splashOpacity, {
+        toValue: 0,
+        duration: 500,
+        easing: Easing.out(Easing.cubic),
+        useNativeDriver: true,
+      }).start(() => {
+        setPhase('welcome');
+        animateWelcomeIn();
+      });
+    }, 2000);
+
+    return () => clearTimeout(timer);
   }, []);
 
-  const finish = () => {
-    if (onDone) {
-      onDone();
-    }
+  /* ─── Welcome entrance animations ─── */
+  const animateWelcomeIn = () => {
+    welcomeOpacity.setValue(0);
+    parrotScale.setValue(0.6);
+    welcomeTextTranslate.setValue(30);
+    welcomeButtonsTranslate.setValue(60);
+    welcomeButtonsOpacity.setValue(0);
+
+    Animated.sequence([
+      Animated.parallel([
+        Animated.timing(welcomeOpacity, {
+          toValue: 1,
+          duration: 400,
+          useNativeDriver: true,
+        }),
+        Animated.spring(parrotScale, {
+          toValue: 1,
+          tension: 50,
+          friction: 7,
+          useNativeDriver: true,
+        }),
+      ]),
+      Animated.parallel([
+        Animated.spring(welcomeTextTranslate, {
+          toValue: 0,
+          tension: 50,
+          friction: 8,
+          useNativeDriver: true,
+        }),
+        Animated.timing(welcomeButtonsOpacity, {
+          toValue: 1,
+          duration: 350,
+          useNativeDriver: true,
+        }),
+        Animated.spring(welcomeButtonsTranslate, {
+          toValue: 0,
+          tension: 40,
+          friction: 8,
+          useNativeDriver: true,
+        }),
+      ]),
+    ]).start();
+  };
+
+  /* ─── Quiz step entrance animations ─── */
+  const animateStepIn = () => {
+    mascotSlide.setValue(-100);
+    bubbleScale.setValue(0);
+    optionsTranslateY.setValue(40);
+    optionsOpacity.setValue(0);
+
+    Animated.sequence([
+      Animated.spring(mascotSlide, {
+        toValue: 0,
+        tension: 50,
+        friction: 8,
+        useNativeDriver: true,
+      }),
+      Animated.spring(bubbleScale, {
+        toValue: 1,
+        tension: 60,
+        friction: 7,
+        useNativeDriver: true,
+      }),
+      Animated.parallel([
+        Animated.timing(optionsOpacity, {
+          toValue: 1,
+          duration: 300,
+          useNativeDriver: true,
+        }),
+        Animated.spring(optionsTranslateY, {
+          toValue: 0,
+          tension: 50,
+          friction: 8,
+          useNativeDriver: true,
+        }),
+      ]),
+    ]).start();
+  };
+
+  /* ─── Navigation helpers ─── */
+  const goToLogin = () => {
+    if (onDone) onDone();
     navigation.replace('Login');
   };
 
-  const handleNext = () => {
-    if (isLast) {
-      finish();
+  const startQuiz = () => {
+    setPhase('quiz');
+    setTimeout(() => animateStepIn(), 50);
+  };
+
+  const finishQuiz = () => {
+    if (onDone) onDone();
+    navigation.replace('Register');
+  };
+
+  /* ─── Quiz logic ─── */
+  const toggleSelection = (optionId: string) => {
+    const stepKey = step.key;
+    setSelections((prev) => {
+      const current = prev[stepKey] || [];
+      if (step.multiSelect) {
+        return {
+          ...prev,
+          [stepKey]: current.includes(optionId)
+            ? current.filter((id) => id !== optionId)
+            : [...current, optionId],
+        };
+      }
+      return { ...prev, [stepKey]: [optionId] };
+    });
+  };
+
+  const transitionToStep = (nextIndex: number) => {
+    if (isTransitioning.current) return;
+    isTransitioning.current = true;
+
+    const targetProgress = (nextIndex + 1) / STEPS.length;
+
+    Animated.parallel([
+      Animated.timing(contentOpacity, {
+        toValue: 0,
+        duration: TRANSITION_DURATION / 2,
+        easing: Easing.out(Easing.cubic),
+        useNativeDriver: true,
+      }),
+      Animated.timing(progressAnim, {
+        toValue: targetProgress,
+        duration: TRANSITION_DURATION,
+        easing: Easing.inOut(Easing.cubic),
+        useNativeDriver: false,
+      }),
+    ]).start(() => {
+      setStepIndex(nextIndex);
+      contentOpacity.setValue(1);
+      isTransitioning.current = false;
+      animateStepIn();
+    });
+  };
+
+  const handleContinue = () => {
+    if (stepIndex === STEPS.length - 1) {
+      finishQuiz();
     } else {
-      setIndex((prev) => Math.min(prev + 1, SLIDES.length - 1));
+      transitionToStep(stepIndex + 1);
     }
   };
 
-  const handleSkip = () => {
-    finish();
-  };
+  const handleSkip = () => finishQuiz();
 
-  return (
-    <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.backgroundSecondary }]}>
-      <View style={[styles.container, { backgroundColor: colors.backgroundSecondary }]}>
-        {/* Top bar with pagination dots (left) and Skip action (right) */}
-        <View style={styles.topBar}>
-          <View style={styles.topDotsRow}>
-            {SLIDES.map((s, i) => {
-              const active = i === index;
-              return (
-                <View
-                  key={s.key}
-                  style={[
-                    styles.dot,
-                    {
-                      backgroundColor: accentColor,
-                      width: active ? 38 : 8,
-                      opacity: active ? 1 : 0.3,
-                    },
-                  ]}
-                />
-              );
-            })}
-          </View>
-          <TouchableOpacity
-            onPress={handleSkip}
-            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-            activeOpacity={0.7}
-          >
-            <Text style={[styles.skipTopText, { color: colors.textSecondary }]}>
-              {isLast ? 'Skip to Login >' : 'Skip >'}
-            </Text>
-          </TouchableOpacity>
-        </View>
+  const progressWidth = progressAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['0%', '100%'],
+  });
 
-        {/* Large illustration background */}
-        <View style={styles.heroContainer}>
-          <Image source={slide.image} style={styles.heroImage} resizeMode="contain" />
-        </View>
+  const isSelected = (optionId: string) => currentSelections.includes(optionId);
+  const canContinue = currentSelections.length > 0;
 
-        
+  /* ═══════════════════════════════════════════════
+     RENDER — Splash
+     ═══════════════════════════════════════════════ */
+  if (phase === 'splash') {
+    return (
+      <Animated.View
+        style={[
+          styles.splashContainer,
+          { backgroundColor: colors.primary, opacity: splashOpacity },
+        ]}
+      >
+        <Animated.Text
+          style={[styles.splashLogo, { transform: [{ scale: splashScale }] }]}
+        >
+          OVAL
+        </Animated.Text>
+      </Animated.View>
+    );
+  }
 
-        {/* Bottom panel with solid per-slide accent color */}
-        <View style={[styles.actionsContainer, { backgroundColor: accentColor }]}>
-          <View style={styles.textBlock}>
-            <Text style={[styles.title, { color: '#FFFFFF' }]}>{slide.title}</Text>
-            <Text style={[styles.subtitle, { color: '#FFFFFF' }]}>{slide.subtitle}</Text>
+  /* ═══════════════════════════════════════════════
+     RENDER — Welcome (Get Started / I have an account)
+     ═══════════════════════════════════════════════ */
+  if (phase === 'welcome') {
+    return (
+      <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
+        <Animated.View style={[styles.welcomeContainer, { opacity: welcomeOpacity }]}>
+          {/* Parrot illustration */}
+          <View style={styles.welcomeHeroArea}>
+            <Animated.Image
+              source={parrotImage}
+              style={[
+                styles.parrotImage,
+                { transform: [{ scale: parrotScale }] },
+              ]}
+              resizeMode="contain"
+            />
           </View>
 
-          <View style={styles.actions}>
-            <TouchableOpacity
-              style={[styles.primaryButton, { backgroundColor: accentColor }]}
-              onPress={handleNext}
-              activeOpacity={0.8}
-            >
-              <Text style={[styles.primaryButtonText, { color: '#FFFFFF' }]}>
-                {isLast ? 'Get Started' : 'Next'}
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-
-        {showLaunch && (
+          {/* Tagline */}
           <Animated.View
             style={[
-              StyleSheet.absoluteFillObject,
-              styles.launchSheet,
+              styles.welcomeTextBlock,
+              { transform: [{ translateY: welcomeTextTranslate }] },
+            ]}
+          >
+            <Text style={[styles.welcomeTitle, { color: colors.textPrimary }]}>
+              The fun, social way{'\n'}to find your next game!
+            </Text>
+          </Animated.View>
+
+          {/* Buttons */}
+          <Animated.View
+            style={[
+              styles.welcomeActions,
               {
-                backgroundColor: colors.warning,
-                transform: [{ translateY: sheetTranslateY }],
+                opacity: welcomeButtonsOpacity,
+                transform: [{ translateY: welcomeButtonsTranslate }],
               },
             ]}
           >
-            <View style={styles.launchContent}>
-              {/* Letters layer – sits BEHIND the ball (lower zIndex) */}
-              <View style={styles.launchWordRow}>
-                {LAUNCH_LETTERS.map((letter, idx) => (
-                  <Animated.Text
-                    key={letter}
-                    style={[
-                      styles.launchLetter,
-                      {
-                        color: colors.textPrimary,
-                        opacity: letterOpacities[idx],
-                        transform: [
-                          { translateX: letterTranslateXs[idx] },
-                          { scale: letterScales[idx] },
-                          {
-                            rotate: letterRotations[idx].interpolate({
-                              inputRange: [-360, 0, 360],
-                              outputRange: ['-360deg', '0deg', '360deg'],
-                            }),
-                          },
-                        ],
-                      },
-                    ]}
-                  >
-                    {letter}
-                  </Animated.Text>
-                ))}
-              </View>
+            <TouchableOpacity
+              style={[styles.getStartedBtn, { backgroundColor: colors.primary }]}
+              onPress={startQuiz}
+              activeOpacity={0.8}
+            >
+              <Text style={styles.getStartedText}>GET STARTED</Text>
+            </TouchableOpacity>
 
-              {/* Ball layer – sits IN FRONT of letters (higher zIndex), rolls left */}
-              <Animated.View
-                style={[
-                  styles.launchBallWrapper,
-                  {
-                    transform: [
-                      { translateX: ballTranslateX },
-                      {
-                        rotate: ballRotation.interpolate({
-                          inputRange: [-720, 0],
-                          outputRange: ['-720deg', '0deg'],
-                        }),
-                      },
-                    ],
-                  },
-                ]}
-              >
-                <Image
-                  source={TennisBallPng}
-                  resizeMode="contain"
-                  style={styles.launchBallImage}
-                />
-              </Animated.View>
-            </View>
+            <TouchableOpacity
+              style={[styles.haveAccountBtn, { borderColor: colors.primary }]}
+              onPress={goToLogin}
+              activeOpacity={0.8}
+            >
+              <Text style={[styles.haveAccountText, { color: colors.primary }]}>
+                I ALREADY HAVE AN ACCOUNT
+              </Text>
+            </TouchableOpacity>
           </Animated.View>
-        )}
+        </Animated.View>
+      </SafeAreaView>
+    );
+  }
+
+  /* ═══════════════════════════════════════════════
+     RENDER — Quiz questionnaire
+     ═══════════════════════════════════════════════ */
+  return (
+    <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.backgroundSecondary }]}>
+      <View style={[styles.quizContainer, { backgroundColor: colors.backgroundSecondary }]}>
+        {/* Progress bar */}
+        <View style={styles.topBar}>
+          <View style={[styles.progressTrack, { backgroundColor: colors.border }]}>
+            <Animated.View
+              style={[
+                styles.progressFill,
+                { backgroundColor: colors.primary, width: progressWidth },
+              ]}
+            />
+          </View>
+        </View>
+
+        <ScrollView
+          style={styles.scrollArea}
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+          bounces={false}
+        >
+          {/* Mascot + Speech bubble */}
+          <Animated.View
+            style={[
+              styles.mascotRow,
+              { opacity: contentOpacity, transform: [{ translateX: mascotSlide }] },
+            ]}
+          >
+            <Image source={mascotImage} style={styles.mascotImage} resizeMode="contain" />
+            <Animated.View
+              style={[
+                styles.speechBubble,
+                {
+                  backgroundColor: colors.surface,
+                  transform: [{ scale: bubbleScale }],
+                },
+              ]}
+            >
+              <Text style={[styles.speechText, { color: colors.textPrimary }]}>
+                {step.mascotMessage}
+              </Text>
+              <View style={[styles.speechTail, { borderRightColor: colors.surface }]} />
+            </Animated.View>
+          </Animated.View>
+
+          {/* Question title */}
+          {step.question && (
+            <Animated.View style={{ opacity: contentOpacity }}>
+              <Text style={[styles.questionTitle, { color: colors.textPrimary }]}>
+                {step.question}
+              </Text>
+              {step.multiSelect && (
+                <Text style={[styles.multiHint, { color: colors.textSecondary }]}>
+                  Select all that apply
+                </Text>
+              )}
+            </Animated.View>
+          )}
+
+          {/* Option cards */}
+          <Animated.View
+            style={[
+              styles.optionsContainer,
+              {
+                opacity: optionsOpacity,
+                transform: [{ translateY: optionsTranslateY }],
+              },
+            ]}
+          >
+            {step.options.map((option, idx) => {
+              const selected = isSelected(option.id);
+              const isLevelStep = step.key === 'level';
+              const levelIndex = idx + 1;
+
+              return (
+                <TouchableOpacity
+                  key={option.id}
+                  style={[
+                    styles.optionCard,
+                    {
+                      backgroundColor: selected ? colors.primary : colors.surface,
+                      borderColor: selected ? colors.primary : colors.border,
+                    },
+                  ]}
+                  onPress={() => toggleSelection(option.id)}
+                  activeOpacity={0.7}
+                >
+                  {isLevelStep && (
+                    <SignalBars level={levelIndex} active={selected} activeColor={colors.primary} />
+                  )}
+                  {option.icon && !isLevelStep && (
+                    <Image
+                      source={option.icon}
+                      style={option.description ? styles.optionIconLarge : styles.optionIcon}
+                      resizeMode="contain"
+                    />
+                  )}
+                  <View style={option.description ? styles.optionTextBlock : styles.optionLabelWrap}>
+                    <Text
+                      style={[
+                        styles.optionLabel,
+                        {
+                          color: selected ? '#FFFFFF' : colors.textPrimary,
+                          fontWeight: option.description ? fontWeight.bold : fontWeight.semibold,
+                        },
+                      ]}
+                    >
+                      {option.label}
+                    </Text>
+                    {option.description && (
+                      <Text
+                        style={[
+                          styles.optionDescription,
+                          { color: selected ? 'rgba(255,255,255,0.8)' : colors.textSecondary },
+                        ]}
+                      >
+                        {option.description}
+                      </Text>
+                    )}
+                  </View>
+                </TouchableOpacity>
+              );
+            })}
+          </Animated.View>
+        </ScrollView>
+
+        {/* Bottom actions */}
+        <View style={styles.bottomActions}>
+          <TouchableOpacity
+            style={[
+              styles.continueButton,
+              { backgroundColor: canContinue ? colors.primary : colors.border },
+            ]}
+            onPress={handleContinue}
+            activeOpacity={0.8}
+            disabled={!canContinue}
+          >
+            <Text
+              style={[
+                styles.continueButtonText,
+                { color: canContinue ? '#FFFFFF' : colors.textTertiary },
+              ]}
+            >
+              {stepIndex === STEPS.length - 1 ? "LET'S GO!" : 'CONTINUE'}
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={handleSkip} activeOpacity={0.7} style={styles.skipBtn}>
+            <Text style={[styles.skipBtnText, { color: colors.textTertiary }]}>Skip for now</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </SafeAreaView>
   );
 };
 
+/* ═══════════════════════════════════════════════
+   Styles
+   ═══════════════════════════════════════════════ */
 const styles = StyleSheet.create({
-  safeArea: {
+  safeArea: { flex: 1 },
+
+  /* ── Splash ── */
+  splashContainer: {
     flex: 1,
-  },
-  container: {
-    flex: 1,
-    paddingHorizontal: spacing.xl,
-    paddingBottom: spacing.xxl,
-    justifyContent: 'flex-end',
-  },
-  topBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingTop: spacing.lg,
-    marginBottom: spacing.sm,
-  },
-  heroContainer: {
-    flex: 1.8,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  heroImage: {
-    width: '100%',
-    height: '100%',
-  },
-  cardWrapper: {
-    marginTop: -spacing.xl,
-  },
-  card: {
-    borderRadius: 28,
-    padding: spacing.xl,
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 4,
-  },
-  textBlock: {
-    alignItems: 'center',
-    paddingHorizontal: spacing.lg,
-  },
-  title: {
-    fontFamily: fontFamily.roundedSemibold,
-    fontSize: fontSize.xl,
-    fontWeight: fontWeight.semibold,
-    textAlign: 'center',
-    marginBottom: spacing.sm,
-    textTransform: 'uppercase',
-  },
-  subtitle: {
-    fontFamily: fontFamily.roundedRegular,
-    fontSize: fontSize.base,
-    textAlign: 'center',
-    lineHeight: 22,
-  },
-  dotsRow: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginTop: spacing.xl,
-    gap: spacing.sm,
-  },
-  topDotsRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.xs,
-  },
-  launchSheet: {
     justifyContent: 'center',
     alignItems: 'center',
   },
-  launchContent: {
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  launchBallWrapper: {
-    position: 'absolute',
-    zIndex: 2,
-  },
-  launchBallImage: {
-    width: BALL_SIZE,
-    height: BALL_SIZE,
-    borderRadius: BALL_SIZE / 2,
-  },
-  launchWordRow: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    zIndex: 1,
-  },
-  launchLetter: {
+  splashLogo: {
     fontFamily: fontFamily.roundedBold,
-    fontSize: 52,
-    letterSpacing: 3,
-    marginHorizontal: 3,
+    fontSize: 56,
+    letterSpacing: 8,
+    color: '#FFFFFF',
   },
-  dot: {
-    height: 8,
-    borderRadius: 4,
+
+  /* ── Welcome ── */
+  welcomeContainer: {
+    flex: 1,
+    justifyContent: 'space-between',
+    paddingBottom: spacing.xxl,
   },
-  actions: {
-    marginTop: spacing.sm,
-  },
-  actionsContainer: {
-    marginTop: spacing.lg,
-    // Full-bleed bottom panel (no side or bottom margin)
-    marginHorizontal: -spacing.xl,
-    marginBottom: -spacing.xxl,
-    borderTopLeftRadius: borderRadius.xl,
-    borderTopRightRadius: borderRadius.xl,
-    paddingHorizontal: spacing.xl,
-    paddingTop: spacing.lg,
-    paddingBottom: spacing.xl,
-  },
-  skipTopText: {
-    fontFamily: fontFamily.roundedSemibold,
-    fontSize: fontSize.sm,
-    fontWeight: fontWeight.medium,
-  },
-  primaryButton: {
-    borderRadius: borderRadius.md,
-    paddingVertical: spacing.md,
+  welcomeHeroArea: {
+    flex: 1,
     alignItems: 'center',
-    marginBottom: spacing.sm,
-    borderWidth: 2,
-    // borderColor: 'rgba(0,0,0,0.16)', // subtle darker outline like reference
-    // Strong shadow for elevated CTA
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.25,
-    shadowRadius: 10,
-    elevation: 6,
+    justifyContent: 'center',
+    paddingTop: spacing.xxxl,
   },
-  primaryButtonText: {
+  parrotImage: {
+    width: '100%',
+    height: 300,
+  },
+  welcomeTextBlock: {
+    paddingHorizontal: spacing.xxl,
+    marginBottom: spacing.xl,
+  },
+  welcomeTitle: {
+    fontFamily: fontFamily.roundedBold,
+    fontSize: fontSize.title,
+    textAlign: 'center',
+    lineHeight: 34,
+  },
+  welcomeActions: {
+    paddingHorizontal: spacing.xl,
+    gap: spacing.sm + 2,
+  },
+  getStartedBtn: {
+    borderRadius: borderRadius.md,
+    paddingVertical: spacing.md + 4,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+  getStartedText: {
     fontFamily: fontFamily.roundedBold,
     fontSize: fontSize.lg,
-    fontWeight: fontWeight.bold,
-    textTransform: 'uppercase',
+    color: '#FFFFFF',
+    letterSpacing: 1.2,
+  },
+  haveAccountBtn: {
+    borderRadius: borderRadius.md,
+    paddingVertical: spacing.md + 4,
+    alignItems: 'center',
+    borderWidth: 2.5,
+  },
+  haveAccountText: {
+    fontFamily: fontFamily.roundedBold,
+    fontSize: fontSize.base,
     letterSpacing: 0.5,
   },
-  secondaryButton: {
-    borderRadius: borderRadius.pill,
-    paddingVertical: spacing.md,
-    alignItems: 'center',
+
+  /* ── Quiz ── */
+  quizContainer: {
+    flex: 1,
+    paddingBottom: spacing.lg,
+  },
+  topBar: {
+    paddingTop: spacing.lg,
+    paddingHorizontal: spacing.xl,
     marginBottom: spacing.md,
   },
-  secondaryButtonText: {
-    fontSize: fontSize.base,
-    fontWeight: fontWeight.medium,
+  progressTrack: {
+    height: 14,
+    borderRadius: 7,
+    overflow: 'hidden',
   },
-  footerText: {
-    fontFamily: fontFamily.roundedRegular,
-    fontSize: fontSize.xs,
+  progressFill: {
+    height: '100%',
+    borderRadius: 7,
+  },
+  scrollArea: { flex: 1 },
+  scrollContent: {
+    paddingHorizontal: spacing.xl,
+    paddingBottom: spacing.lg,
+  },
+
+  mascotRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: spacing.lg,
+    marginTop: spacing.sm,
+  },
+  mascotImage: {
+    width: 72,
+    height: 72,
+    borderRadius: 36,
+  },
+  speechBubble: {
+    flex: 1,
+    marginLeft: spacing.sm,
+    borderRadius: borderRadius.lg,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm + 2,
+    position: 'relative',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 6,
+    elevation: 3,
+  },
+  speechTail: {
+    position: 'absolute',
+    left: -8,
+    top: 16,
+    width: 0,
+    height: 0,
+    borderTopWidth: 6,
+    borderBottomWidth: 6,
+    borderRightWidth: 10,
+    borderTopColor: 'transparent',
+    borderBottomColor: 'transparent',
+  },
+  speechText: {
+    fontFamily: fontFamily.roundedSemibold,
+    fontSize: fontSize.base,
+    lineHeight: 20,
+  },
+
+  questionTitle: {
+    fontFamily: fontFamily.roundedBold,
+    fontSize: fontSize.xxl,
     textAlign: 'center',
+    marginBottom: spacing.xs,
+  },
+  multiHint: {
+    fontFamily: fontFamily.roundedRegular,
+    fontSize: fontSize.sm,
+    textAlign: 'center',
+    marginBottom: spacing.md,
+  },
+
+  optionsContainer: {
+    gap: spacing.sm + 2,
+    marginTop: spacing.md,
+  },
+  optionCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderRadius: borderRadius.lg,
+    borderWidth: 2,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.md,
+    minHeight: 56,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  optionIcon: {
+    width: 36,
+    height: 36,
+    marginRight: spacing.sm,
+    borderRadius: 8,
+  },
+  optionIconLarge: {
+    width: 48,
+    height: 48,
+    marginRight: spacing.md,
+    borderRadius: 12,
+  },
+  optionLabelWrap: { flex: 1 },
+  optionTextBlock: { flex: 1 },
+  optionLabel: {
+    fontFamily: fontFamily.roundedSemibold,
+    fontSize: fontSize.base,
+  },
+  optionDescription: {
+    fontFamily: fontFamily.roundedRegular,
+    fontSize: fontSize.sm,
+    marginTop: 2,
+    lineHeight: 17,
+  },
+
+  bottomActions: {
+    paddingHorizontal: spacing.xl,
+    paddingTop: spacing.md,
+  },
+  continueButton: {
+    borderRadius: borderRadius.md,
+    paddingVertical: spacing.md + 2,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  continueButtonText: {
+    fontFamily: fontFamily.roundedBold,
+    fontSize: fontSize.lg,
+    letterSpacing: 1,
+  },
+  skipBtn: {
+    alignItems: 'center',
+    paddingVertical: spacing.sm,
+  },
+  skipBtnText: {
+    fontFamily: fontFamily.roundedSemibold,
+    fontSize: fontSize.md,
   },
 });
 
 export default OnboardingScreen;
-

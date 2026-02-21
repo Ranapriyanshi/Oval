@@ -21,6 +21,9 @@ import GoogleLogo from '../../assets/google-symbol.png';
 import AppleLogo from '../../assets/apple.png';
 import FacebookLogo from '../../assets/facebook.png';
 
+// Removes browser focus outline on web (RN types don't include 'none' for outlineStyle)
+const noFocusOutline = Platform.OS === 'web' ? ({ outlineStyle: 'none' } as unknown as React.ComponentProps<typeof TextInput>['style']) : {};
+
 const LoginScreen = () => {
   const { t } = useTranslation();
   const { login } = useAuth();
@@ -72,13 +75,14 @@ const LoginScreen = () => {
             ]}
           >
             <TextInput
-              style={[styles.input, { color: colors.textPrimary }]}
+              style={[styles.input, { color: colors.textPrimary }, noFocusOutline]}
               placeholder={t('auth.email')}
               placeholderTextColor={colors.textTertiary}
               value={email}
               onChangeText={setEmail}
               keyboardType="email-address"
               autoCapitalize="none"
+              underlineColorAndroid="transparent"
             />
           </View>
 
@@ -90,15 +94,16 @@ const LoginScreen = () => {
             ]}
           >
             <TextInput
-              style={[styles.input, styles.inputWithAction, { color: colors.textPrimary }]}
+              style={[styles.input, styles.inputWithAction, { color: colors.textPrimary }, noFocusOutline]}
               placeholder={t('auth.password')}
               placeholderTextColor={colors.textTertiary}
               value={password}
               onChangeText={setPassword}
               secureTextEntry
+              underlineColorAndroid="transparent"
             />
             <TouchableOpacity style={styles.forgotBtn} activeOpacity={0.6}>
-              <Text style={[styles.forgotText, { color: colors.textTertiary }]}>FORGOT?</Text>
+              <Text style={[styles.forgotText, { color: password ? colors.primary : colors.textTertiary }]}>FORGOT?</Text>
             </TouchableOpacity>
           </View>
 
@@ -211,6 +216,7 @@ const styles = StyleSheet.create({
     fontFamily: fontFamily.roundedSemibold,
     fontSize: fontSize.lg,
     paddingVertical: 0,
+    borderWidth: 0,
   },
   inputWithAction: {
     paddingRight: spacing.sm,
@@ -298,7 +304,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderWidth: 2,
     borderStyle: 'dashed',
-    borderColor: '#39FF14', // neon green style outline
+    borderColor: '#8C07DD',
     marginHorizontal: spacing.lg,
     backgroundColor: 'transparent',
   },

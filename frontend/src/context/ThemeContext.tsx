@@ -28,7 +28,7 @@ export const useTheme = () => useContext(ThemeContext);
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const systemScheme = useColorScheme();
   // Default to system theme until user chooses otherwise
-  const [mode, setModeState] = useState<ThemeMode>('system');
+  const [mode, setModeState] = useState<ThemeMode>('light');
   const [loaded, setLoaded] = useState(false);
 
   // Load saved preference
