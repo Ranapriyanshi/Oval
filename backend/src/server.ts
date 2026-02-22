@@ -20,6 +20,7 @@ import eventsRoutes from './routes/events';
 import achievementsRoutes from './routes/achievements';
 import weatherRoutes from './routes/weather';
 import adminRoutes from './routes/admin';
+import ovaloRoutes from './routes/ovalo';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 import { setupChatSocket } from './socket/chatHandler';
@@ -66,6 +67,7 @@ app.use('/api/events', eventsRoutes);
 app.use('/api/achievements', achievementsRoutes);
 app.use('/api/weather', weatherRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/ovalo', ovaloRoutes);
 
 // Health check
 app.get('/health', (req, res) => {
