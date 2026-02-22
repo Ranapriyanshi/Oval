@@ -9,6 +9,7 @@ import {
   GametimeParticipant,
 } from '../models';
 import { authenticate, AuthRequest } from '../middleware/auth';
+import { awardXP } from '../services/xpService';
 
 const router = express.Router();
 const KARMA_PER_RATING = 2;
@@ -133,7 +134,15 @@ router.post(
       });
       if (!created) await existing.update({ rating, sportsmanship });
       await User.increment({ karma_points: KARMA_PER_RATING }, { where: { id: rated_user_id } });
-      res.json({ message: 'Rating saved', karma_awarded: KARMA_PER_RATING });
+
+      let xpResult = null;
+      try {
+        xpResult = await awardXP(raterId, 'player_rated', gameId);
+      } catch (xpErr) {
+        console.error('XP award error (non-blocking):', xpErr);
+      }
+
+      res.json({ message: 'Rating saved', karma_awarded: KARMA_PER_RATING, xp: xpResult });
     } catch (error: any) {
       console.error('Rate player error:', error);
       res.status(500).json({ message: 'Failed to save rating', error: error.message });

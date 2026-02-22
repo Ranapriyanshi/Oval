@@ -3,6 +3,7 @@ import { param, body, query, validationResult } from 'express-validator';
 import { Op } from 'sequelize';
 import { Event, EventRegistration, User, Venue } from '../models';
 import { authenticate, AuthRequest } from '../middleware/auth';
+import { awardXP } from '../services/xpService';
 
 const router = express.Router();
 
@@ -177,7 +178,15 @@ router.post(
         defaults: { event_id: event.id, user_id: req.user!.id, status: 'registered' },
       });
       if (reg.status === 'cancelled') await reg.update({ status: 'registered' });
-      res.json({ message: 'Registered', registration: reg.toJSON() });
+
+      let xpResult = null;
+      try {
+        xpResult = await awardXP(req.user!.id, 'event_joined', event.id);
+      } catch (xpErr) {
+        console.error('XP award error (non-blocking):', xpErr);
+      }
+
+      res.json({ message: 'Registered', registration: reg.toJSON(), xp: xpResult });
     } catch (error: any) {
       console.error('Register event error:', error);
       res.status(500).json({ message: 'Failed to register', error: error.message });

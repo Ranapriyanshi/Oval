@@ -4,6 +4,7 @@ import { Op } from 'sequelize';
 import sequelize from '../config/sequelize';
 import { User, Gametime, GametimeParticipant } from '../models';
 import { authenticate, AuthRequest } from '../middleware/auth';
+import { awardXP } from '../services/xpService';
 
 const router = express.Router();
 
@@ -234,7 +235,14 @@ router.post(
         return newEvent;
       });
 
-      res.status(201).json(event.toJSON());
+      let xpResult = null;
+      try {
+        xpResult = await awardXP(req.user!.id, 'gametime_hosted', event.id);
+      } catch (xpErr) {
+        console.error('XP award error (non-blocking):', xpErr);
+      }
+
+      res.status(201).json({ ...event.toJSON(), xp: xpResult });
     } catch (error: any) {
       console.error('Create gametime error:', error);
       res.status(500).json({ message: 'Failed to create event', error: error.message });
@@ -300,7 +308,14 @@ router.post(
         );
       });
 
-      res.json({ message: 'Joined successfully', current_players: event.current_players + 1 });
+      let xpResult = null;
+      try {
+        xpResult = await awardXP(req.user!.id, 'gametime_attended', event.id);
+      } catch (xpErr) {
+        console.error('XP award error (non-blocking):', xpErr);
+      }
+
+      res.json({ message: 'Joined successfully', current_players: event.current_players + 1, xp: xpResult });
     } catch (error: any) {
       console.error('Join gametime error:', error);
       res.status(500).json({ message: 'Failed to join event', error: error.message });

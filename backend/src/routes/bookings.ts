@@ -3,6 +3,7 @@ import { param, body, query, validationResult } from 'express-validator';
 import { Booking, Venue, VenueSport } from '../models';
 import { authenticate, AuthRequest } from '../middleware/auth';
 import { Op } from 'sequelize';
+import { awardXP } from '../services/xpService';
 
 const router = express.Router();
 
@@ -115,7 +116,14 @@ router.post(
         include: [{ model: Venue, as: 'Venue', attributes: ['id', 'name', 'address', 'city', 'currency'] }],
       });
 
-      res.status(201).json(withVenue?.toJSON() ?? booking.toJSON());
+      let xpResult = null;
+      try {
+        xpResult = await awardXP(req.user!.id, 'booking_completed', booking.id);
+      } catch (xpErr) {
+        console.error('XP award error (non-blocking):', xpErr);
+      }
+
+      res.status(201).json({ ...(withVenue?.toJSON() ?? booking.toJSON()), xp: xpResult });
     } catch (error: any) {
       console.error('Create booking error:', error);
       res.status(500).json({ message: 'Failed to create booking', error: error.message });

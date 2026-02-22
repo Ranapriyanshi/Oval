@@ -3,6 +3,7 @@ import { param, body, query, validationResult } from 'express-validator';
 import { Op } from 'sequelize';
 import { User, Coach, CoachAvailability, CoachingSession, CoachRating } from '../models';
 import { authenticate, AuthRequest } from '../middleware/auth';
+import { awardXP } from '../services/xpService';
 
 const router = express.Router();
 
@@ -210,7 +211,14 @@ router.post(
         ],
       });
 
-      res.status(201).json(fullSession?.toJSON());
+      let xpResult = null;
+      try {
+        xpResult = await awardXP(req.user!.id, 'coaching_completed', session.id);
+      } catch (xpErr) {
+        console.error('XP award error (non-blocking):', xpErr);
+      }
+
+      res.status(201).json({ ...(fullSession?.toJSON() ?? {}), xp: xpResult });
     } catch (error: any) {
       console.error('Book session error:', error);
       res.status(500).json({ message: 'Failed to book session', error: error.message });
