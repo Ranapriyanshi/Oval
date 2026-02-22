@@ -12,6 +12,7 @@ import TabDiscoverIcon from '../assets/3D Colorful Compass.png';
 import TabChatIcon from '../assets/Social Media Like Icon.png';
 import TabGametimeIcon from '../assets/Modern Wooden Hourglass.png';
 import TabVenuesIcon from '../assets/Stylized Paper Art Landscape with Location Marker.png';
+import TabOvaloIcon from '../assets/Cartoon Blue Bird.png';
 import LoginScreen from '../screens/Auth/LoginScreen';
 import RegisterScreen from '../screens/Auth/RegisterScreen';
 import AccountSetupScreen from '../screens/Auth/AccountSetupScreen';
@@ -40,6 +41,7 @@ import EventDetailScreen from '../screens/Events/EventDetailScreen';
 import MyEventsScreen from '../screens/Events/MyEventsScreen';
 import AchievementsScreen from '../screens/Achievements/AchievementsScreen';
 import AdminScreen from '../screens/Admin/AdminScreen';
+import OvaloScreen from '../screens/Ovalo/OvaloScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -49,7 +51,7 @@ const TAB_ICON_SIZE = 44;
 const iconMap: Record<string, ImageSourcePropType> = {
   Home: TabHomeIcon,
   Discover: TabDiscoverIcon,
-  Chat: TabChatIcon,
+  Ovalo: TabOvaloIcon,
   Gametime: TabGametimeIcon,
   Venues: TabVenuesIcon,
 };
@@ -132,10 +134,10 @@ const MainTabs = () => {
         }}
       />
       <Tab.Screen
-        name="Chat"
-        component={ConversationsScreen}
+        name="Ovalo"
+        component={OvaloScreen}
         options={{
-          tabBarIcon: ({ focused }) => <TabIcon label="Chat" focused={focused} activeColor={colors.primary} />,
+          tabBarIcon: ({ focused }) => <TabIcon label="Ovalo" focused={focused} activeColor={colors.primary} />,
         }}
       />
       <Tab.Screen
@@ -286,6 +288,16 @@ const AppNavigator = () => {
             name="Admin"
             component={AdminScreen}
             options={{ headerShown: true, headerTitle: 'Admin', ...stackHeaderStyle }}
+          />
+          <Stack.Screen
+            name="OvaloProfile"
+            component={OvaloScreen}
+            options={{ headerShown: true, headerTitle: 'Your Ovalo', ...stackHeaderStyle }}
+          />
+          <Stack.Screen
+            name="ChatTab"
+            component={ConversationsScreen}
+            options={{ headerShown: true, headerTitle: 'Messages', ...stackHeaderStyle }}
           />
         </>
       ) : hasSeenOnboarding ? (

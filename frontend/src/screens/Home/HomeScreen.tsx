@@ -15,6 +15,8 @@ import { useLocale } from '../../context/LocaleContext';
 import { useTheme } from '../../context/ThemeContext';
 import { spacing, borderRadius, fontSize, fontWeight, shadow, fontFamily } from '../../theme';
 import { weatherApi, WeatherResponse } from '../../services/weather';
+import { ovaloApi, OvaloProfileResponse, TIER_LABELS } from '../../services/ovalo';
+import OvaloCharacter from '../../components/Ovalo/OvaloCharacter';
 import CoachingIcon from '../../assets/Black Kettlebell Display.png';
 import BookingIcon from '../../assets/Sealed Envelope Display.png';
 import MatchesIcon from '../../assets/Minimalist Yellow Trophy.png';
@@ -27,6 +29,8 @@ import GirlAvatar from '../../assets/3D Model of Young Woman with Curious Expres
 import HeartIcon from '../../assets/Modern Flame Icon.png';
 import EnvelopeIcon from '../../assets/Smiling Yellow Envelope.png';
 
+const CoinIcon = require('../../assets/gold-coin-icon-isolated-3d-render-illustration.png');
+
 const WEATHER_SHADOW_HEIGHT = 4;
 
 const HomeScreen = () => {
@@ -36,9 +40,11 @@ const HomeScreen = () => {
   const { country, currency, formatCurrency } = useLocale();
   const { colors } = useTheme();
   const [weather, setWeather] = useState<WeatherResponse | null>(null);
+  const [ovalo, setOvalo] = useState<OvaloProfileResponse | null>(null);
 
   useEffect(() => {
     weatherApi.get({ city: user?.city || (country === 'AU' ? 'Sydney' : 'New York') }).then(setWeather).catch(() => {});
+    ovaloApi.getProfile().then(setOvalo).catch(() => {});
   }, [country, user?.city]);
 
   const quickActions: {
@@ -332,15 +338,47 @@ const HomeScreen = () => {
           </View>
         </View>
 
-        {/* Recent Activity placeholder */}
+        {/* Ovalo Mascot Card */}
         <View style={styles.section}>
-          <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>RECENT ACTIVITY</Text>
-          <View style={[styles.emptyCard, { backgroundColor: colors.surface }, shadow.sm]}>
-            <Text style={styles.emptyIcon}>📈</Text>
-            <Text style={[styles.emptyText, { color: colors.textTertiary }]}>
-              Your recent sports activity will appear here
-            </Text>
-          </View>
+          <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>YOUR OVALO</Text>
+          <TouchableOpacity
+            activeOpacity={0.85}
+            onPress={() => navigation.navigate('OvaloProfile')}
+          >
+            <View style={styles.ovaloCardOuter}>
+              <View
+                style={[styles.ovaloCardShadow, { backgroundColor: '#5a05a8', borderRadius: borderRadius.lg }]}
+              />
+              <View style={[styles.ovaloCard, { backgroundColor: colors.primary }]}>
+                <View style={styles.ovaloCardRow}>
+                  {ovalo ? (
+                    <OvaloCharacter tier={ovalo.tier} featherLevel={ovalo.feather_level} size={80} showGlow={false} />
+                  ) : (
+                    <View style={styles.ovaloPlaceholder} />
+                  )}
+                  <View style={styles.ovaloCardTextBlock}>
+                    <Text style={styles.ovaloCardTier}>
+                      {ovalo ? ovalo.tier_label : 'Loading...'}
+                    </Text>
+                    <View style={styles.ovaloXPRow}>
+                      <Image source={CoinIcon} style={styles.ovaloCoinIcon} resizeMode="contain" />
+                      <Text style={styles.ovaloXPText}>
+                        {ovalo ? `${ovalo.total_xp.toLocaleString()} XP` : '— XP'}
+                      </Text>
+                    </View>
+                    {ovalo && ovalo.next_tier && (
+                      <View style={styles.ovaloProgressBar}>
+                        <View style={[styles.ovaloProgressFill, { width: `${ovalo.progress_pct}%` }]} />
+                      </View>
+                    )}
+                    {ovalo && ovalo.current_streak > 0 && (
+                      <Text style={styles.ovaloStreakText}>🔥 {ovalo.current_streak}-day streak</Text>
+                    )}
+                  </View>
+                </View>
+              </View>
+            </View>
+          </TouchableOpacity>
         </View>
 
         {/* FAQ tiles */}
@@ -559,6 +597,73 @@ const styles = StyleSheet.create({
     fontFamily: fontFamily.roundedRegular,
     fontSize: fontSize.base,
     textAlign: 'center',
+  },
+  ovaloCardOuter: {
+    position: 'relative',
+  },
+  ovaloCardShadow: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    height: '100%',
+  },
+  ovaloCard: {
+    borderRadius: borderRadius.lg,
+    padding: spacing.lg,
+    marginBottom: WEATHER_SHADOW_HEIGHT,
+    transform: [{ translateY: -WEATHER_SHADOW_HEIGHT }],
+  },
+  ovaloCardRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  ovaloPlaceholder: {
+    width: 80,
+    height: 80,
+  },
+  ovaloCardTextBlock: {
+    flex: 1,
+    marginLeft: spacing.lg,
+  },
+  ovaloCardTier: {
+    fontFamily: fontFamily.roundedBold,
+    fontSize: fontSize.lg,
+    fontWeight: fontWeight.bold,
+    color: '#FFFFFF',
+  },
+  ovaloXPRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: spacing.xs,
+    gap: spacing.xs,
+  },
+  ovaloCoinIcon: {
+    width: 20,
+    height: 20,
+  },
+  ovaloXPText: {
+    fontFamily: fontFamily.roundedSemibold,
+    fontSize: fontSize.base,
+    color: 'rgba(255,255,255,0.9)',
+  },
+  ovaloProgressBar: {
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: 'rgba(255,255,255,0.25)',
+    marginTop: spacing.sm,
+    overflow: 'hidden',
+  },
+  ovaloProgressFill: {
+    height: '100%',
+    borderRadius: 3,
+    backgroundColor: '#FACC15',
+  },
+  ovaloStreakText: {
+    fontFamily: fontFamily.roundedSemibold,
+    fontSize: fontSize.xs,
+    color: 'rgba(255,255,255,0.8)',
+    marginTop: spacing.xs,
   },
   faqTile: {
     flexDirection: 'row',
