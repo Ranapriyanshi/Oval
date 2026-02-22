@@ -26,6 +26,8 @@ import Event from './Event';
 import EventRegistration from './EventRegistration';
 import Achievement from './Achievement';
 import UserAchievement from './UserAchievement';
+import OvaloProfile from './OvaloProfile';
+import XPTransaction from './XPTransaction';
 
 // Venue associations
 Venue.hasMany(VenueSport, { foreignKey: 'venue_id' });
@@ -147,6 +149,12 @@ UserAchievement.belongsTo(Achievement, { foreignKey: 'achievement_id', as: 'Achi
 User.hasMany(UserAchievement, { foreignKey: 'user_id', as: 'Achievements' });
 UserAchievement.belongsTo(User, { foreignKey: 'user_id', as: 'User' });
 
+// Ovalo (mascot progression)
+User.hasOne(OvaloProfile, { foreignKey: 'user_id', as: 'OvaloProfile' });
+OvaloProfile.belongsTo(User, { foreignKey: 'user_id', as: 'User' });
+User.hasMany(XPTransaction, { foreignKey: 'user_id', as: 'XPTransactions' });
+XPTransaction.belongsTo(User, { foreignKey: 'user_id', as: 'User' });
+
 const models = {
   User,
   Venue,
@@ -175,6 +183,8 @@ const models = {
   EventRegistration,
   Achievement,
   UserAchievement,
+  OvaloProfile,
+  XPTransaction,
   sequelize,
 };
 
@@ -207,4 +217,6 @@ export {
   EventRegistration,
   Achievement,
   UserAchievement,
+  OvaloProfile,
+  XPTransaction,
 };
