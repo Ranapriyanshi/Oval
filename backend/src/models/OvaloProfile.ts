@@ -37,6 +37,7 @@ export interface OvaloProfileAttributes {
   last_active_date: string | null;
   feather_level: number;
   unlocked_embellishments: string[];
+  equipped_badge: string | null;
   created_at: Date;
   updated_at: Date;
 }
@@ -44,7 +45,7 @@ export interface OvaloProfileAttributes {
 export interface OvaloProfileCreationAttributes
   extends Optional<
     OvaloProfileAttributes,
-    'id' | 'total_xp' | 'tier' | 'current_streak' | 'longest_streak' | 'last_active_date' | 'feather_level' | 'unlocked_embellishments' | 'created_at' | 'updated_at'
+    'id' | 'total_xp' | 'tier' | 'current_streak' | 'longest_streak' | 'last_active_date' | 'feather_level' | 'unlocked_embellishments' | 'equipped_badge' | 'created_at' | 'updated_at'
   > {}
 
 class OvaloProfile extends Model<OvaloProfileAttributes, OvaloProfileCreationAttributes> implements OvaloProfileAttributes {
@@ -57,6 +58,7 @@ class OvaloProfile extends Model<OvaloProfileAttributes, OvaloProfileCreationAtt
   public last_active_date!: string | null;
   public feather_level!: number;
   public unlocked_embellishments!: string[];
+  public equipped_badge!: string | null;
   public created_at!: Date;
   public updated_at!: Date;
 }
@@ -85,6 +87,10 @@ OvaloProfile.init(
       type: DataTypes.JSONB,
       allowNull: false,
       defaultValue: [],
+    },
+    equipped_badge: {
+      type: DataTypes.STRING(64),
+      allowNull: true,
     },
     created_at: { type: DataTypes.DATE, allowNull: false, defaultValue: DataTypes.NOW },
     updated_at: { type: DataTypes.DATE, allowNull: false, defaultValue: DataTypes.NOW },
