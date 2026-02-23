@@ -89,24 +89,36 @@ export async function awardXP(
       { transaction: t }
     );
 
-    const newTotalXP = profile.total_xp + amount;
-    const newTier = calculateTier(newTotalXP);
-    const newFeatherLevel = calculateFeatherLevel(newTotalXP, newTier);
-
     let newStreak = profile.current_streak;
     let newLongestStreak = profile.longest_streak;
-    if (profile.last_active_date !== today) {
+    let streakBonusAwarded = 0;
+    const isNewDay = profile.last_active_date !== today;
+
+    if (isNewDay) {
       if (profile.last_active_date && isYesterday(profile.last_active_date)) {
         newStreak = profile.current_streak + 1;
-      } else if (profile.last_active_date !== today) {
+      } else {
         newStreak = 1;
       }
       newLongestStreak = Math.max(newLongestStreak, newStreak);
+
+      if (newStreak > 1 && source !== 'streak_bonus') {
+        streakBonusAwarded = Math.min(newStreak * XP_VALUES.streak_bonus, 250);
+        await XPTransaction.create(
+          { user_id: userId, amount: streakBonusAwarded, source: 'streak_bonus', reference_id: null },
+          { transaction: t }
+        );
+      }
     }
+
+    const totalAwarded = amount + streakBonusAwarded;
+    const finalTotalXP = profile.total_xp + totalAwarded;
+    const newTier = calculateTier(finalTotalXP);
+    const newFeatherLevel = calculateFeatherLevel(finalTotalXP, newTier);
 
     await profile.update(
       {
-        total_xp: newTotalXP,
+        total_xp: finalTotalXP,
         tier: newTier,
         feather_level: newFeatherLevel,
         current_streak: newStreak,
@@ -117,8 +129,8 @@ export async function awardXP(
     );
 
     return {
-      xp_awarded: amount,
-      total_xp: newTotalXP,
+      xp_awarded: totalAwarded,
+      total_xp: finalTotalXP,
       tier: newTier,
       feather_level: newFeatherLevel,
       tier_changed: newTier !== previousTier,
