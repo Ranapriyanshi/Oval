@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   View,
   Text,
@@ -53,7 +53,7 @@ const SIGNAL_LEVELS = [1, 2, 3, 4, 5];
 const STEPS: OnboardingStep[] = [
   {
     key: 'sports',
-    mascotMessage: "Hey there! Let's find your game!",
+    mascotMessage: "Hey there! What sports do you play? Select all that apply!",
     question: 'What sports do you play?',
     multiSelect: true,
     options: [
@@ -67,7 +67,7 @@ const STEPS: OnboardingStep[] = [
   },
   {
     key: 'level',
-    mascotMessage: "Nice picks! Now let's see your level.",
+    mascotMessage: "Nice picks! What's your skill level?",
     question: "What's your skill level?",
     multiSelect: false,
     options: [
@@ -80,7 +80,7 @@ const STEPS: OnboardingStep[] = [
   },
   {
     key: 'goal',
-    mascotMessage: "Awesome! Now let's find your starting point.",
+    mascotMessage: "Awesome! What are you looking for?",
     question: 'What are you looking for?',
     multiSelect: false,
     options: [
@@ -125,12 +125,10 @@ const SignalBars: React.FC<{ level: number; active: boolean; activeColor: string
             height: 6 + bar * 4,
             backgroundColor:
               bar <= level
-                ? active
-                  ? '#FFFFFF'
-                  : activeColor
+                ? activeColor
                 : active
-                  ? 'rgba(255,255,255,0.3)'
-                  : 'rgba(255,255,255,0.15)',
+                  ? 'rgba(140,7,221,0.15)'
+                  : 'rgba(0,0,0,0.08)',
           },
         ]}
       />
@@ -143,6 +141,34 @@ const signalStyles = StyleSheet.create({
   bar: { width: 5, borderRadius: 2 },
 });
 
+/* ─── Typewriter hook ─── */
+const useTypewriter = (text: string, speed = 35, active = true) => {
+  const [displayed, setDisplayed] = useState('');
+  const [done, setDone] = useState(false);
+
+  useEffect(() => {
+    if (!active) {
+      setDisplayed('');
+      setDone(false);
+      return;
+    }
+    setDisplayed('');
+    setDone(false);
+    let i = 0;
+    const interval = setInterval(() => {
+      i++;
+      setDisplayed(text.slice(0, i));
+      if (i >= text.length) {
+        clearInterval(interval);
+        setDone(true);
+      }
+    }, speed);
+    return () => clearInterval(interval);
+  }, [text, speed, active]);
+
+  return { displayed, done };
+};
+
 /* ═══════════════════════════════════════════════
    Main component
    ═══════════════════════════════════════════════ */
@@ -153,6 +179,7 @@ const OnboardingScreen: React.FC<OnboardingScreenProps> = ({ onDone }) => {
   const [phase, setPhase] = useState<Phase>('splash');
   const [stepIndex, setStepIndex] = useState(0);
   const [selections, setSelections] = useState<Record<string, string[]>>({});
+  const [bubbleReady, setBubbleReady] = useState(false);
 
   // Splash animations
   const splashOpacity = useRef(new Animated.Value(1)).current;
@@ -176,6 +203,7 @@ const OnboardingScreen: React.FC<OnboardingScreenProps> = ({ onDone }) => {
 
   const step = STEPS[stepIndex];
   const currentSelections = selections[step?.key] || [];
+  const { displayed: typedText } = useTypewriter(step?.mascotMessage || '', 30, bubbleReady);
 
   /* ─── Phase 1: Splash → Welcome ─── */
   useEffect(() => {
@@ -247,6 +275,7 @@ const OnboardingScreen: React.FC<OnboardingScreenProps> = ({ onDone }) => {
 
   /* ─── Quiz step entrance animations ─── */
   const animateStepIn = () => {
+    setBubbleReady(false);
     mascotSlide.setValue(-100);
     bubbleScale.setValue(0);
     optionsTranslateY.setValue(40);
@@ -265,6 +294,8 @@ const OnboardingScreen: React.FC<OnboardingScreenProps> = ({ onDone }) => {
         friction: 7,
         useNativeDriver: true,
       }),
+    ]).start(() => {
+      setBubbleReady(true);
       Animated.parallel([
         Animated.timing(optionsOpacity, {
           toValue: 1,
@@ -277,8 +308,8 @@ const OnboardingScreen: React.FC<OnboardingScreenProps> = ({ onDone }) => {
           friction: 8,
           useNativeDriver: true,
         }),
-      ]),
-    ]).start();
+      ]).start();
+    });
   };
 
   /* ─── Navigation helpers ─── */
@@ -485,25 +516,11 @@ const OnboardingScreen: React.FC<OnboardingScreenProps> = ({ onDone }) => {
               ]}
             >
               <Text style={[styles.speechText, { color: colors.textPrimary }]}>
-                {step.mascotMessage}
+                {typedText}
               </Text>
               <View style={[styles.speechTail, { borderRightColor: colors.surface }]} />
             </Animated.View>
           </Animated.View>
-
-          {/* Question title */}
-          {step.question && (
-            <Animated.View style={{ opacity: contentOpacity }}>
-              <Text style={[styles.questionTitle, { color: colors.textPrimary }]}>
-                {step.question}
-              </Text>
-              {step.multiSelect && (
-                <Text style={[styles.multiHint, { color: colors.textSecondary }]}>
-                  Select all that apply
-                </Text>
-              )}
-            </Animated.View>
-          )}
 
           {/* Option cards */}
           <Animated.View
@@ -526,8 +543,9 @@ const OnboardingScreen: React.FC<OnboardingScreenProps> = ({ onDone }) => {
                   style={[
                     styles.optionCard,
                     {
-                      backgroundColor: selected ? colors.primary : colors.surface,
+                      backgroundColor: selected ? colors.primaryLight : colors.surface,
                       borderColor: selected ? colors.primary : colors.border,
+                      borderWidth: selected ? 2.5 : 2,
                     },
                   ]}
                   onPress={() => toggleSelection(option.id)}
@@ -548,7 +566,7 @@ const OnboardingScreen: React.FC<OnboardingScreenProps> = ({ onDone }) => {
                       style={[
                         styles.optionLabel,
                         {
-                          color: selected ? '#FFFFFF' : colors.textPrimary,
+                          color: selected ? colors.primary : colors.textPrimary,
                           fontWeight: option.description ? fontWeight.bold : fontWeight.semibold,
                         },
                       ]}
@@ -559,7 +577,7 @@ const OnboardingScreen: React.FC<OnboardingScreenProps> = ({ onDone }) => {
                       <Text
                         style={[
                           styles.optionDescription,
-                          { color: selected ? 'rgba(255,255,255,0.8)' : colors.textSecondary },
+                          { color: selected ? colors.primary : colors.textSecondary },
                         ]}
                       >
                         {option.description}
@@ -713,6 +731,7 @@ const styles = StyleSheet.create({
     width: 72,
     height: 72,
     borderRadius: 36,
+    transform: [{ scaleX: -1 }],
   },
   speechBubble: {
     flex: 1,
@@ -743,19 +762,6 @@ const styles = StyleSheet.create({
     fontFamily: fontFamily.roundedSemibold,
     fontSize: fontSize.base,
     lineHeight: 20,
-  },
-
-  questionTitle: {
-    fontFamily: fontFamily.roundedBold,
-    fontSize: fontSize.xxl,
-    textAlign: 'center',
-    marginBottom: spacing.xs,
-  },
-  multiHint: {
-    fontFamily: fontFamily.roundedRegular,
-    fontSize: fontSize.sm,
-    textAlign: 'center',
-    marginBottom: spacing.md,
   },
 
   optionsContainer: {
