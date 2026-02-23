@@ -21,6 +21,7 @@ import {
   XP_SOURCE_ICONS,
   TIER_LABELS,
   OvaloTier,
+  BadgeItem,
 } from '../../services/ovalo';
 import OvaloCharacter from '../../components/Ovalo/OvaloCharacter';
 
@@ -66,17 +67,20 @@ const OvaloScreen = () => {
   const navigation = useNavigation<any>();
   const [profile, setProfile] = useState<OvaloProfileResponse | null>(null);
   const [history, setHistory] = useState<XPTransactionItem[]>([]);
+  const [badges, setBadges] = useState<BadgeItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
   const load = useCallback(async () => {
     try {
-      const [profileRes, historyRes] = await Promise.all([
+      const [profileRes, historyRes, badgesRes] = await Promise.all([
         ovaloApi.getProfile(),
         ovaloApi.getHistory({ limit: 10 }),
+        ovaloApi.getBadges(),
       ]);
       setProfile(profileRes);
       setHistory(historyRes.transactions);
+      setBadges(badgesRes.badges);
     } catch (e) {
       console.error('Load Ovalo error:', e);
     } finally {
@@ -133,6 +137,16 @@ const OvaloScreen = () => {
           />
           <Text style={styles.heroTierLabel}>{profile.tier_label}</Text>
           <Text style={styles.heroFeatherLevel}>Feather Level {profile.feather_level}</Text>
+          {profile.equipped_badge && (
+            <View style={styles.heroBadgeRow}>
+              <Text style={styles.heroBadgeEmoji}>
+                {badges.find((b) => b.key === profile.equipped_badge)?.emoji || '🏅'}
+              </Text>
+              <Text style={styles.heroBadgeText}>
+                {badges.find((b) => b.key === profile.equipped_badge)?.name || profile.equipped_badge}
+              </Text>
+            </View>
+          )}
         </View>
 
         <View style={styles.content}>
@@ -257,6 +271,38 @@ const OvaloScreen = () => {
             })}
           </ScrollView>
 
+          {/* Badges / Embellishments */}
+          <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>BADGES</Text>
+          <View style={[styles.badgesGrid, { backgroundColor: colors.surface }, shadow.sm]}>
+            {badges.map((b) => (
+              <TouchableOpacity
+                key={b.key}
+                style={[
+                  styles.badgeCard,
+                  { backgroundColor: colors.backgroundSecondary },
+                  !b.unlocked && styles.badgeLocked,
+                  b.equipped && { borderColor: colors.primary, borderWidth: 2 },
+                ]}
+                onPress={() => {
+                  if (!b.unlocked) return;
+                  if (b.equipped) {
+                    ovaloApi.unequipBadge().then(() => load());
+                  } else {
+                    ovaloApi.equipBadge(b.key).then(() => load());
+                  }
+                }}
+                activeOpacity={0.7}
+                disabled={!b.unlocked}
+              >
+                <Text style={styles.badgeEmoji}>{b.unlocked ? b.emoji : '🔒'}</Text>
+                <Text style={[styles.badgeName, { color: b.unlocked ? colors.textPrimary : colors.textTertiary }]} numberOfLines={1}>
+                  {b.unlocked ? b.name : '???'}
+                </Text>
+                {b.equipped && <Text style={[styles.badgeEquipped, { color: colors.primary }]}>Equipped</Text>}
+              </TouchableOpacity>
+            ))}
+          </View>
+
           {/* Recent XP Activity */}
           <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>RECENT XP</Text>
           {history.length === 0 ? (
@@ -350,6 +396,22 @@ const styles = StyleSheet.create({
     fontSize: fontSize.base,
     color: 'rgba(255,255,255,0.8)',
     marginTop: spacing.xs,
+  },
+  heroBadgeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: spacing.sm,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.xs,
+    borderRadius: borderRadius.pill,
+    gap: spacing.xs,
+  },
+  heroBadgeEmoji: { fontSize: 16 },
+  heroBadgeText: {
+    fontFamily: fontFamily.roundedSemibold,
+    fontSize: fontSize.sm,
+    color: '#FFFFFF',
   },
 
   content: {
@@ -536,6 +598,41 @@ const styles = StyleSheet.create({
     fontSize: fontSize.xs,
     marginTop: 2,
     textAlign: 'center',
+  },
+
+  badgesGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    padding: spacing.md,
+    borderRadius: borderRadius.md,
+    marginBottom: spacing.xxl,
+    gap: spacing.sm,
+  },
+  badgeCard: {
+    width: '30%',
+    minWidth: 90,
+    borderRadius: borderRadius.md,
+    padding: spacing.md,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: 'transparent',
+  },
+  badgeLocked: {
+    opacity: 0.5,
+  },
+  badgeEmoji: {
+    fontSize: 28,
+    marginBottom: spacing.xs,
+  },
+  badgeName: {
+    fontFamily: fontFamily.roundedSemibold,
+    fontSize: fontSize.xs,
+    textAlign: 'center',
+  },
+  badgeEquipped: {
+    fontFamily: fontFamily.roundedBold,
+    fontSize: fontSize.xs - 1,
+    marginTop: 2,
   },
 
   historyCard: {
