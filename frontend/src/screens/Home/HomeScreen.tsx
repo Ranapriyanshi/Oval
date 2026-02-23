@@ -17,6 +17,7 @@ import { spacing, borderRadius, fontSize, fontWeight, shadow, fontFamily } from 
 import { weatherApi, WeatherResponse } from '../../services/weather';
 import { ovaloApi, OvaloProfileResponse, TIER_LABELS } from '../../services/ovalo';
 import OvaloCharacter from '../../components/Ovalo/OvaloCharacter';
+import TierBadge from '../../components/Ovalo/TierBadge';
 import CoachingIcon from '../../assets/Black Kettlebell Display.png';
 import BookingIcon from '../../assets/Sealed Envelope Display.png';
 import MatchesIcon from '../../assets/Minimalist Yellow Trophy.png';
@@ -178,9 +179,12 @@ const HomeScreen = () => {
             )}
           </TouchableOpacity>
           <View style={styles.pageHeaderText}>
-            <Text style={[styles.pageHeaderGreeting, { color: colors.textPrimary }]}>
-              Hi, {firstName.toUpperCase()}
-            </Text>
+            <View style={styles.greetingRow}>
+              <Text style={[styles.pageHeaderGreeting, { color: colors.textPrimary }]}>
+                Hi, {firstName.toUpperCase()}
+              </Text>
+              {ovalo && <TierBadge tier={ovalo.tier} />}
+            </View>
           </View>
           <View style={styles.pageHeaderActions}>
             <TouchableOpacity
@@ -193,7 +197,7 @@ const HomeScreen = () => {
             <TouchableOpacity
               activeOpacity={0.8}
               style={styles.pageHeaderIconButton}
-              onPress={() => navigation.navigate('Chat')}
+              onPress={() => navigation.navigate('ChatTab')}
             >
               <Image source={EnvelopeIcon} style={styles.pageHeaderIconImage} resizeMode="contain" />
             </TouchableOpacity>
@@ -444,6 +448,10 @@ const styles = StyleSheet.create({
   pageHeaderText: {
     flex: 1,
     marginLeft: spacing.md,
+  },
+  greetingRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   pageHeaderGreeting: {
     fontFamily: fontFamily.roundedBold,
