@@ -1,11 +1,12 @@
 import express, { Response } from 'express';
-import { query, validationResult } from 'express-validator';
+import { query, param, validationResult } from 'express-validator';
 import { authenticate, AuthRequest } from '../middleware/auth';
-import { getProfile, getXPHistory, awardXP } from '../services/xpService';
+import { getProfile, getXPHistory } from '../services/xpService';
 import { TIER_LABELS } from '../models/OvaloProfile';
 import { XP_VALUES } from '../models/XPTransaction';
 import OvaloProfile from '../models/OvaloProfile';
 import User from '../models/User';
+import { BADGE_CATALOG, BADGE_KEYS, isBadgeUnlocked, type BadgeKey } from '../constants/badges';
 
 const router = express.Router();
 
@@ -89,6 +90,69 @@ router.get('/leaderboard', authenticate, async (req: AuthRequest, res: Response)
 
 router.get('/xp-values', authenticate, async (_req: AuthRequest, res: Response) => {
   res.json(XP_VALUES);
+});
+
+// Badges / embellishments
+router.get('/badges', authenticate, async (req: AuthRequest, res: Response) => {
+  try {
+    const profile = await getProfile(req.user!.id);
+    const badges = BADGE_KEYS.map((key) => {
+      const def = BADGE_CATALOG[key];
+      const unlocked = isBadgeUnlocked(key, profile.tier);
+      const equipped = profile.equipped_badge === key;
+      return {
+        key: def.key,
+        name: def.name,
+        description: def.description,
+        emoji: def.emoji,
+        unlocked,
+        equipped,
+      };
+    });
+    res.json({ badges, equipped_badge: profile.equipped_badge });
+  } catch (error: any) {
+    console.error('Get badges error:', error);
+    res.status(500).json({ message: 'Failed to get badges', error: error.message });
+  }
+});
+
+router.post(
+  '/badges/:key/equip',
+  authenticate,
+  [param('key').isIn([...BADGE_KEYS])],
+  async (req: AuthRequest, res: Response) => {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
+
+      const key = req.params.key as BadgeKey;
+      const profile = await OvaloProfile.findOne({ where: { user_id: req.user!.id } });
+      if (!profile) return res.status(404).json({ message: 'Ovalo profile not found' });
+
+      if (!isBadgeUnlocked(key, profile.tier)) {
+        return res.status(403).json({ message: 'Badge not unlocked yet' });
+      }
+
+      await profile.update({ equipped_badge: key });
+      res.json({ equipped_badge: key });
+    } catch (error: any) {
+      console.error('Equip badge error:', error);
+      res.status(500).json({ message: 'Failed to equip badge', error: error.message });
+    }
+  }
+);
+
+router.post('/badges/unequip', authenticate, async (req: AuthRequest, res: Response) => {
+  try {
+    const profile = await OvaloProfile.findOne({ where: { user_id: req.user!.id } });
+    if (!profile) return res.status(404).json({ message: 'Ovalo profile not found' });
+
+    await profile.update({ equipped_badge: null });
+    res.json({ equipped_badge: null });
+  } catch (error: any) {
+    console.error('Unequip badge error:', error);
+    res.status(500).json({ message: 'Failed to unequip badge', error: error.message });
+  }
 });
 
 export default router;
