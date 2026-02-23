@@ -26,6 +26,7 @@ export interface OvaloProfileResponse {
   last_active_date: string | null;
   feather_level: number;
   unlocked_embellishments: string[];
+  equipped_badge: string | null;
   next_tier: OvaloTier | null;
   xp_needed: number;
   progress_pct: number;
@@ -105,6 +106,28 @@ export interface OvaloLeaderboardEntry {
   streak: number;
 }
 
+export type BadgeKey =
+  | 'shuttlecock'
+  | 'cricket_stripe'
+  | 'football_badge'
+  | 'gold_crest'
+  | 'golden_wing'
+  | 'tennis_ace';
+
+export interface BadgeItem {
+  key: BadgeKey;
+  name: string;
+  description: string;
+  emoji: string;
+  unlocked: boolean;
+  equipped: boolean;
+}
+
+export interface BadgesResponse {
+  badges: BadgeItem[];
+  equipped_badge: string | null;
+}
+
 export interface XPAwardResult {
   xp_awarded: number;
   total_xp: number;
@@ -124,4 +147,13 @@ export const ovaloApi = {
 
   getLeaderboard: (params?: { limit?: number; offset?: number }) =>
     api.get<{ leaderboard: OvaloLeaderboardEntry[]; total: number }>('/ovalo/leaderboard', { params }).then((r) => r.data),
+
+  getBadges: () =>
+    api.get<BadgesResponse>('/ovalo/badges').then((r) => r.data),
+
+  equipBadge: (key: BadgeKey) =>
+    api.post<{ equipped_badge: string }>(`/ovalo/badges/${key}/equip`).then((r) => r.data),
+
+  unequipBadge: () =>
+    api.post<{ equipped_badge: null }>('/ovalo/badges/unequip').then((r) => r.data),
 };
