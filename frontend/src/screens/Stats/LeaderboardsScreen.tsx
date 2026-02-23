@@ -7,13 +7,18 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   RefreshControl,
+  Image,
 } from 'react-native';
 import { useTheme } from '../../context/ThemeContext';
-import { spacing, borderRadius, fontSize, fontWeight } from '../../theme';
+import { spacing, borderRadius, fontSize, fontWeight, fontFamily } from '../../theme';
 import { statsApi, LeaderboardEntry } from '../../services/stats';
+import { ovaloApi, OvaloLeaderboardEntry, TIER_LABELS } from '../../services/ovalo';
+import OvaloCharacter from '../../components/Ovalo/OvaloCharacter';
 import { SPORTS } from '../../utils/constants';
 
-type Tab = 'global' | 'sport';
+const CoinIcon = require('../../assets/gold-coin-icon-isolated-3d-render-illustration.png');
+
+type Tab = 'global' | 'sport' | 'ovalo';
 
 const LeaderboardsScreen = ({ route }: { route?: { params?: { sport?: string } } }) => {
   const { colors } = useTheme();
@@ -21,13 +26,18 @@ const LeaderboardsScreen = ({ route }: { route?: { params?: { sport?: string } }
   const [tab, setTab] = useState<Tab>(sportParam ? 'sport' : 'global');
   const [sport, setSport] = useState(sportParam ?? '');
   const [list, setList] = useState<LeaderboardEntry[]>([]);
+  const [ovaloList, setOvaloList] = useState<OvaloLeaderboardEntry[]>([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
   const load = async () => {
     try {
-      if (tab === 'sport' && sport) {
+      if (tab === 'ovalo') {
+        const res = await ovaloApi.getLeaderboard({ limit: 50 });
+        setOvaloList(res.leaderboard ?? []);
+        setTotal(res.total ?? 0);
+      } else if (tab === 'sport' && sport) {
         const res = await statsApi.getLeaderboardBySport(sport);
         setList(res.leaderboard ?? []);
         setTotal(res.total ?? 0);
@@ -39,6 +49,7 @@ const LeaderboardsScreen = ({ route }: { route?: { params?: { sport?: string } }
     } catch (e) {
       console.error(e);
       setList([]);
+      setOvaloList([]);
       setTotal(0);
     } finally {
       setLoading(false);
@@ -117,6 +128,14 @@ const LeaderboardsScreen = ({ route }: { route?: { params?: { sport?: string } }
             By sport
           </Text>
         </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.tab, tab === 'ovalo' && { borderBottomColor: colors.primary, borderBottomWidth: 2 }]}
+          onPress={() => setTab('ovalo')}
+        >
+          <Text style={[styles.tabText, { color: tab === 'ovalo' ? colors.primary : colors.textSecondary }]}>
+            Ovalo
+          </Text>
+        </TouchableOpacity>
       </View>
 
       {tab === 'sport' && (
@@ -151,7 +170,57 @@ const LeaderboardsScreen = ({ route }: { route?: { params?: { sport?: string } }
         </View>
       )}
 
-      {tab === 'sport' && !sport ? (
+      {tab === 'ovalo' ? (
+        loading && ovaloList.length === 0 ? (
+          <View style={styles.centered}>
+            <ActivityIndicator size="large" color={colors.primary} />
+          </View>
+        ) : (
+          <FlatList
+            data={ovaloList}
+            keyExtractor={(item) => item.user_id}
+            contentContainerStyle={styles.listContent}
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />
+            }
+            ListEmptyComponent={
+              <View style={styles.centered}>
+                <Text style={[styles.empty, { color: colors.textTertiary }]}>No Ovalo players yet</Text>
+              </View>
+            }
+            renderItem={({ item, index }) => {
+              const isAlt = index % 2 === 1;
+              const bg = isAlt ? colors.cardAltBackground : colors.cardBackground;
+              const border = isAlt ? colors.cardAltBorder : colors.cardBorder;
+              const textPri = isAlt ? colors.cardAltTextPrimary : colors.textPrimary;
+              const textSec = isAlt ? colors.cardAltTextSecondary : colors.textSecondary;
+              return (
+                <View style={[styles.row, { backgroundColor: bg, borderColor: border }]}>
+                  <View style={[styles.rankBadge, { backgroundColor: colors.primaryLight }]}>
+                    <Text style={[styles.rankText, { color: colors.primary }]}>{item.rank}</Text>
+                  </View>
+                  <OvaloCharacter tier={item.tier} featherLevel={item.feather_level} size={36} showGlow={false} />
+                  <View style={[styles.rowBody, { marginLeft: spacing.sm }]}>
+                    <Text style={[styles.rowName, { color: textPri }]} numberOfLines={1}>
+                      {item.name || 'Player'}
+                    </Text>
+                    <Text style={[styles.rowMeta, { color: textSec }]}>{item.tier_label}</Text>
+                  </View>
+                  <View style={styles.rowRight}>
+                    <View style={styles.ovaloXPRow}>
+                      <Image source={CoinIcon} style={styles.ovaloCoin} resizeMode="contain" />
+                      <Text style={[styles.karmaText, { color: textPri }]}>{item.total_xp.toLocaleString()}</Text>
+                    </View>
+                    {item.streak > 0 && (
+                      <Text style={[styles.statText, { color: textSec }]}>🔥 {item.streak}d</Text>
+                    )}
+                  </View>
+                </View>
+              );
+            }}
+          />
+        )
+      ) : tab === 'sport' && !sport ? (
         <View style={styles.centered}>
           <Text style={[styles.hint, { color: colors.textTertiary }]}>Select a sport above</Text>
         </View>
@@ -227,6 +296,8 @@ const styles = StyleSheet.create({
   centered: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: spacing.xl },
   hint: { fontSize: fontSize.base },
   empty: { fontSize: fontSize.base },
+  ovaloXPRow: { flexDirection: 'row', alignItems: 'center', gap: 4 },
+  ovaloCoin: { width: 16, height: 16 },
 });
 
 export default LeaderboardsScreen;
