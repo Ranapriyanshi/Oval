@@ -8,6 +8,7 @@ import { useFonts, Nunito_400Regular, Nunito_600SemiBold, Nunito_800ExtraBold } 
 import { AuthProvider } from './src/context/AuthContext';
 import { LocaleProvider } from './src/context/LocaleContext';
 import { ThemeProvider, useTheme } from './src/context/ThemeContext';
+import { XPProvider } from './src/context/XPContext';
 import AppNavigator from './src/navigation/AppNavigator';
 import i18n from './src/i18n';
 
@@ -58,7 +59,9 @@ export default function App() {
         <ThemeProvider>
           <LocaleProvider>
             <AuthProvider>
-              <AppInner />
+              <XPProvider>
+                <AppInner />
+              </XPProvider>
             </AuthProvider>
           </LocaleProvider>
         </ThemeProvider>

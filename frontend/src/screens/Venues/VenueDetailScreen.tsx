@@ -13,6 +13,7 @@ import { useRoute, useNavigation } from '@react-navigation/native';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import { venuesApi, VenueDetail, AvailabilitySlot } from '../../services/venues';
+import { useXP } from '../../context/XPContext';
 import { bookingsApi } from '../../services/bookings';
 import { formatCurrency } from '../../utils/formatting';
 import { spacing, borderRadius, fontSize, fontWeight, shadow } from '../../theme';
@@ -23,6 +24,7 @@ const VenueDetailScreen = () => {
   const navigation = useNavigation<any>();
   const { user } = useAuth();
   const { colors } = useTheme();
+  const { showXPFeedback } = useXP();
   const venueId = route.params?.venueId;
 
   const [venue, setVenue] = useState<VenueDetail | null>(null);
@@ -89,12 +91,13 @@ const VenueDetailScreen = () => {
     if (!selectedSlot?.available || !venue) return;
     setBookingLoading(true);
     try {
-      await bookingsApi.create({
+      const bookingRes = await bookingsApi.create({
         venue_id: venueId,
         sport_name: selectedSport,
         start_time: selectedSlot.start,
         end_time: selectedSlot.end,
       });
+      if (bookingRes?.data?.xp) showXPFeedback(bookingRes.data.xp);
       Alert.alert(t('venue.bookingSuccess'), '', [
         { text: 'OK', onPress: () => navigation.navigate('Main', { screen: 'Bookings' }) },
       ]);

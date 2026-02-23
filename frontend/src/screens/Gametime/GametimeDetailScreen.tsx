@@ -13,6 +13,7 @@ import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { useTheme } from '../../context/ThemeContext';
 import { spacing, borderRadius, fontSize, fontWeight, shadow } from '../../theme';
 import { gametimeApi, GametimeEvent } from '../../services/gametime';
+import { useXP } from '../../context/XPContext';
 
 const SPORT_EMOJIS: Record<string, string> = {
   tennis: '🎾', basketball: '🏀', soccer: '⚽', football: '🏈',
@@ -26,6 +27,7 @@ type RouteParams = { GametimeDetail: { eventId: string } };
 const GametimeDetailScreen = () => {
   const { t } = useTranslation();
   const { colors } = useTheme();
+  const { showXPFeedback } = useXP();
   const navigation = useNavigation<any>();
   const route = useRoute<RouteProp<RouteParams, 'GametimeDetail'>>();
   const { eventId } = route.params;
@@ -60,7 +62,8 @@ const GametimeDetailScreen = () => {
     if (!event) return;
     try {
       setActionLoading(true);
-      await gametimeApi.join(event.id);
+      const joinRes = await gametimeApi.join(event.id);
+      if (joinRes?.data?.xp) showXPFeedback(joinRes.data.xp);
       await loadEvent();
     } catch (error: any) {
       Alert.alert('Error', error.response?.data?.message || 'Failed to join');

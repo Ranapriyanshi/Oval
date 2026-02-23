@@ -13,6 +13,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useNavigation } from '@react-navigation/native';
 import { useTheme } from '../../context/ThemeContext';
+import { useXP } from '../../context/XPContext';
 import { spacing, borderRadius, fontSize, fontWeight } from '../../theme';
 import { gametimeApi } from '../../services/gametime';
 
@@ -22,6 +23,7 @@ const SKILL_LEVELS = ['any', 'beginner', 'intermediate', 'advanced'] as const;
 const GametimeCreateScreen = () => {
   const { t } = useTranslation();
   const { colors } = useTheme();
+  const { showXPFeedback } = useXP();
   const navigation = useNavigation<any>();
 
   const [title, setTitle] = useState('');
@@ -58,7 +60,7 @@ const GametimeCreateScreen = () => {
 
     try {
       setSubmitting(true);
-      await gametimeApi.create({
+      const createRes = await gametimeApi.create({
         title: title.trim(),
         sport_name: sportName.trim(),
         description: description.trim() || undefined,
@@ -73,6 +75,7 @@ const GametimeCreateScreen = () => {
         cost_per_person_cents: Math.round((parseFloat(costCents) || 0) * 100),
         notes: notes.trim() || undefined,
       });
+      if (createRes?.data?.xp) showXPFeedback(createRes.data.xp);
       Alert.alert(t('gametime.created'), t('gametime.createdMessage'), [
         { text: 'OK', onPress: () => navigation.goBack() },
       ]);

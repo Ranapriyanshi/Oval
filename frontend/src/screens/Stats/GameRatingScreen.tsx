@@ -13,12 +13,14 @@ import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import { spacing, borderRadius, fontSize, fontWeight } from '../../theme';
 import { gametimeApi, GametimeParticipant } from '../../services/gametime';
+import { useXP } from '../../context/XPContext';
 import { statsApi } from '../../services/stats';
 
 type RouteParams = { GameRating: { gameId: string } };
 
 const GameRatingScreen = () => {
   const { colors } = useTheme();
+  const { showXPFeedback } = useXP();
   const { user } = useAuth();
   const route = useRoute<{ params: { gameId: string } }>();
   const navigation = useNavigation<any>();
@@ -66,10 +68,15 @@ const GameRatingScreen = () => {
     if (!gameId) return;
     setSubmitting(true);
     try {
+      let lastXP = null;
       for (const p of participants) {
         const r = ratings[p.user_id];
-        if (r) await statsApi.ratePlayer(gameId, { rated_user_id: p.user_id, rating: r.rating, sportsmanship: r.sportsmanship });
+        if (r) {
+          const rateRes = await statsApi.ratePlayer(gameId, { rated_user_id: p.user_id, rating: r.rating, sportsmanship: r.sportsmanship });
+          if (rateRes?.xp) lastXP = rateRes.xp;
+        }
       }
+      if (lastXP) showXPFeedback(lastXP);
       Alert.alert('Thanks!', 'Your ratings have been saved.', [
         { text: 'OK', onPress: () => navigation.goBack() },
       ]);

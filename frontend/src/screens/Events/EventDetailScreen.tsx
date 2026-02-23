@@ -4,9 +4,11 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import { useTheme } from '../../context/ThemeContext';
 import { spacing, borderRadius, fontSize, fontWeight } from '../../theme';
 import { eventsApi, EventItem } from '../../services/events';
+import { useXP } from '../../context/XPContext';
 
 export default function EventDetailScreen() {
   const { colors } = useTheme();
+  const { showXPFeedback } = useXP();
   const navigation = useNavigation<any>();
   const route = useRoute<{ params: { eventId: string } }>();
   const eventId = route.params?.eventId;
@@ -25,7 +27,8 @@ export default function EventDetailScreen() {
     if (!event) return;
     setActionLoading(true);
     try {
-      await eventsApi.register(event.id);
+      const regRes = await eventsApi.register(event.id);
+      if (regRes?.xp) showXPFeedback(regRes.xp);
       await refresh();
     } catch (e: any) {
       Alert.alert('Error', e.response?.data?.message || 'Failed to register');

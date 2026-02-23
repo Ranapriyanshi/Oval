@@ -13,12 +13,14 @@ import { useRoute, useNavigation } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
 import coachingApi, { CoachItem } from '../../services/coaching';
 import { useTheme } from '../../context/ThemeContext';
+import { useXP } from '../../context/XPContext';
 import { spacing, borderRadius, fontSize, fontWeight, shadow } from '../../theme';
 
 const DAY_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
 const CoachProfileScreen = () => {
   const { colors } = useTheme();
+  const { showXPFeedback } = useXP();
   const { t } = useTranslation();
   const navigation = useNavigation<any>();
   const route = useRoute<any>();
@@ -61,13 +63,14 @@ const CoachProfileScreen = () => {
     }
     setBooking(true);
     try {
-      await coachingApi.bookSession(coachId, {
+      const sessionRes = await coachingApi.bookSession(coachId, {
         sport: bookSport,
         session_date: bookDate,
         start_time: bookTime,
         duration_minutes: parseInt(bookDuration) || 60,
         notes: bookNotes || undefined,
       });
+      if (sessionRes?.xp) showXPFeedback(sessionRes.xp);
       Alert.alert(
         t('coaching.booked', 'Session Booked!'),
         t('coaching.bookedMessage', 'Your coaching session has been requested. The coach will confirm shortly.'),
