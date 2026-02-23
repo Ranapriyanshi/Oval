@@ -162,7 +162,7 @@ const PlaypalProfileScreen = () => {
           </View>
           <View style={styles.nameWithBadge}>
             <Text style={[styles.name, { color: colors.textPrimary }]}>{profile.name}</Text>
-            {(profile as any).OvaloProfile && <TierBadge tier={(profile as any).OvaloProfile.tier} size="md" />}
+            {profile.OvaloProfile && <TierBadge tier={profile.OvaloProfile.tier} size="md" />}
           </View>
           {profile.city && (
             <Text style={[styles.location, { color: colors.textSecondary }]}>
@@ -174,16 +174,16 @@ const PlaypalProfileScreen = () => {
               <Text style={[styles.karmaText, { color: colors.textPrimary }]}>🏅 {profile.karma_points} karma</Text>
             </View>
           )}
-          {(profile as any).OvaloProfile && (
+          {profile.OvaloProfile && (
             <View style={[styles.ovaloCard, { backgroundColor: colors.primaryLight }]}>
-              <OvaloCharacter tier={(profile as any).OvaloProfile.tier} featherLevel={(profile as any).OvaloProfile.feather_level} size={48} showGlow={false} />
+              <OvaloCharacter tier={profile.OvaloProfile.tier} featherLevel={profile.OvaloProfile.feather_level} size={48} showGlow={false} />
               <View style={styles.ovaloCardInfo}>
                 <Text style={[styles.ovaloTierLabel, { color: colors.primary }]}>
-                  {TIER_LABELS[(profile as any).OvaloProfile.tier] || (profile as any).OvaloProfile.tier}
+                  {TIER_LABELS[profile.OvaloProfile.tier] || profile.OvaloProfile.tier}
                 </Text>
                 <Text style={[styles.ovaloXP, { color: colors.textSecondary }]}>
-                  {(profile as any).OvaloProfile.total_xp.toLocaleString()} XP
-                  {(profile as any).OvaloProfile.current_streak > 0 ? ` · 🔥 ${(profile as any).OvaloProfile.current_streak}d streak` : ''}
+                  {profile.OvaloProfile.total_xp.toLocaleString()} XP
+                  {profile.OvaloProfile.current_streak > 0 ? ` · 🔥 ${profile.OvaloProfile.current_streak}d streak` : ''}
                 </Text>
               </View>
             </View>

@@ -1,4 +1,5 @@
 import api from './api';
+import type { OvaloTier } from './ovalo';
 
 // --- Types ---
 
@@ -22,6 +23,13 @@ export interface PlaypalPhoto {
   sort_order: number;
 }
 
+export interface OvaloProfileSnap {
+  tier: OvaloTier;
+  feather_level: number;
+  total_xp: number;
+  current_streak: number;
+}
+
 export interface PlaypalUser {
   id: string;
   name: string;
@@ -35,6 +43,7 @@ export interface PlaypalUser {
   UserSportsSkills?: PlaypalSportsSkill[];
   UserAvailabilities?: PlaypalAvailability[];
   UserProfilePhotos?: PlaypalPhoto[];
+  OvaloProfile?: OvaloProfileSnap;
 }
 
 export interface DiscoverResponse {
