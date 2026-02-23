@@ -8,6 +8,7 @@ import {
   UserProfilePhoto,
   UserSwipe,
   UserMatch,
+  OvaloProfile,
 } from '../models';
 import { authenticate, AuthRequest } from '../middleware/auth';
 
@@ -353,6 +354,12 @@ router.get('/matches', authenticate, async (req: AuthRequest, res: Response) => 
               model: UserSportsSkill,
               as: 'UserSportsSkills',
             },
+            {
+              model: OvaloProfile,
+              as: 'OvaloProfile',
+              attributes: ['tier', 'feather_level', 'total_xp', 'current_streak'],
+              required: false,
+            },
           ],
         },
         {
@@ -369,6 +376,12 @@ router.get('/matches', authenticate, async (req: AuthRequest, res: Response) => 
             {
               model: UserSportsSkill,
               as: 'UserSportsSkills',
+            },
+            {
+              model: OvaloProfile,
+              as: 'OvaloProfile',
+              attributes: ['tier', 'feather_level', 'total_xp', 'current_streak'],
+              required: false,
             },
           ],
         },
@@ -456,6 +469,12 @@ router.get(
             model: UserProfilePhoto,
             as: 'UserProfilePhotos',
             order: [['sort_order', 'ASC'], ['is_primary', 'DESC']],
+          },
+          {
+            model: OvaloProfile,
+            as: 'OvaloProfile',
+            attributes: ['tier', 'feather_level', 'total_xp', 'current_streak'],
+            required: false,
           },
         ],
       });

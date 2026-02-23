@@ -11,8 +11,11 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { useTheme } from '../../context/ThemeContext';
-import { spacing, borderRadius, fontSize, fontWeight, shadow } from '../../theme';
+import { spacing, borderRadius, fontSize, fontWeight, fontFamily, shadow } from '../../theme';
 import { playpalsApi, PlaypalProfile } from '../../services/playpals';
+import OvaloCharacter from '../../components/Ovalo/OvaloCharacter';
+import TierBadge from '../../components/Ovalo/TierBadge';
+import { TIER_LABELS } from '../../services/ovalo';
 
 const SPORT_EMOJIS: Record<string, string> = {
   tennis: '🎾',
@@ -157,7 +160,10 @@ const PlaypalProfileScreen = () => {
           <View style={[styles.avatarLarge, { backgroundColor: colors.primaryLight }]}>
             <Text style={[styles.avatarLargeText, { color: colors.primary }]}>{initial}</Text>
           </View>
-          <Text style={[styles.name, { color: colors.textPrimary }]}>{profile.name}</Text>
+          <View style={styles.nameWithBadge}>
+            <Text style={[styles.name, { color: colors.textPrimary }]}>{profile.name}</Text>
+            {(profile as any).OvaloProfile && <TierBadge tier={(profile as any).OvaloProfile.tier} size="md" />}
+          </View>
           {profile.city && (
             <Text style={[styles.location, { color: colors.textSecondary }]}>
               📌 {profile.city}{profile.country ? `, ${profile.country}` : ''}
@@ -166,6 +172,20 @@ const PlaypalProfileScreen = () => {
           {profile.karma_points != null && profile.karma_points > 0 && (
             <View style={[styles.karmaBadge, { backgroundColor: colors.accent }]}>
               <Text style={[styles.karmaText, { color: colors.textPrimary }]}>🏅 {profile.karma_points} karma</Text>
+            </View>
+          )}
+          {(profile as any).OvaloProfile && (
+            <View style={[styles.ovaloCard, { backgroundColor: colors.primaryLight }]}>
+              <OvaloCharacter tier={(profile as any).OvaloProfile.tier} featherLevel={(profile as any).OvaloProfile.feather_level} size={48} showGlow={false} />
+              <View style={styles.ovaloCardInfo}>
+                <Text style={[styles.ovaloTierLabel, { color: colors.primary }]}>
+                  {TIER_LABELS[(profile as any).OvaloProfile.tier] || (profile as any).OvaloProfile.tier}
+                </Text>
+                <Text style={[styles.ovaloXP, { color: colors.textSecondary }]}>
+                  {(profile as any).OvaloProfile.total_xp.toLocaleString()} XP
+                  {(profile as any).OvaloProfile.current_streak > 0 ? ` · 🔥 ${(profile as any).OvaloProfile.current_streak}d streak` : ''}
+                </Text>
+              </View>
             </View>
           )}
         </View>
@@ -306,10 +326,25 @@ const styles = StyleSheet.create({
     fontSize: 40,
     fontWeight: fontWeight.bold,
   },
+  nameWithBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
   name: {
     fontSize: fontSize.title,
     fontWeight: fontWeight.bold,
   },
+  ovaloCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderRadius: borderRadius.md,
+    padding: spacing.md,
+    marginTop: spacing.md,
+    width: '100%',
+  },
+  ovaloCardInfo: { flex: 1, marginLeft: spacing.sm },
+  ovaloTierLabel: { fontFamily: fontFamily.roundedBold, fontSize: fontSize.base, fontWeight: fontWeight.bold },
+  ovaloXP: { fontSize: fontSize.sm, marginTop: 2 },
   location: {
     fontSize: fontSize.base,
     marginTop: spacing.xs,

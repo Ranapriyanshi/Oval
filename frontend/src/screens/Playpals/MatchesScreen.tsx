@@ -17,6 +17,8 @@ import { spacing, borderRadius, fontSize, fontWeight, shadow } from '../../theme
 import { playpalsApi, MatchItem } from '../../services/playpals';
 import chatApi from '../../services/chat';
 import { matchesEmptyIllustration } from '../../assets/illustrations';
+import OvaloCharacter from '../../components/Ovalo/OvaloCharacter';
+import TierBadge from '../../components/Ovalo/TierBadge';
 
 const SPORT_EMOJIS: Record<string, string> = {
   tennis: '🎾',
@@ -99,6 +101,7 @@ const MatchesScreen = () => {
     const initial = user.name?.charAt(0)?.toUpperCase() || '?';
     const skills = user.UserSportsSkills || [];
     const photo = user.UserProfilePhotos?.[0];
+    const ovaloProfile = user.OvaloProfile;
     const isAlt = index % 2 === 1;
     const bg = isAlt ? colors.cardAltBackground : colors.cardBackground;
     const border = isAlt ? colors.cardAltBorder : colors.cardBorder;
@@ -115,14 +118,24 @@ const MatchesScreen = () => {
         activeOpacity={0.7}
       >
         <View style={styles.matchCardInner}>
-          {/* Avatar */}
-          <View style={[styles.avatar, { backgroundColor: isAlt ? 'rgba(255,255,255,0.25)' : colors.primaryLight }]}>
-            <Text style={[styles.avatarText, { color: isAlt ? colors.textInverse : colors.primary }]}>{initial}</Text>
+          {/* Avatar with Ovalo */}
+          <View style={styles.avatarStack}>
+            <View style={[styles.avatar, { backgroundColor: isAlt ? 'rgba(255,255,255,0.25)' : colors.primaryLight }]}>
+              <Text style={[styles.avatarText, { color: isAlt ? colors.textInverse : colors.primary }]}>{initial}</Text>
+            </View>
+            {ovaloProfile && (
+              <View style={styles.miniOvalo}>
+                <OvaloCharacter tier={ovaloProfile.tier} featherLevel={ovaloProfile.feather_level} size={24} showGlow={false} />
+              </View>
+            )}
           </View>
 
           {/* Info */}
           <View style={styles.matchInfo}>
-            <Text style={[styles.matchName, { color: t1 }]}>{user.name}</Text>
+            <View style={styles.matchNameRow}>
+              <Text style={[styles.matchName, { color: t1 }]}>{user.name}</Text>
+              {ovaloProfile && <TierBadge tier={ovaloProfile.tier} />}
+            </View>
             {user.city && (
               <Text style={[styles.matchLocation, { color: t2 }]}>📌 {user.city}</Text>
             )}
@@ -311,6 +324,14 @@ const styles = StyleSheet.create({
     padding: spacing.lg,
     gap: spacing.lg,
   },
+  avatarStack: {
+    position: 'relative',
+  },
+  miniOvalo: {
+    position: 'absolute',
+    bottom: -4,
+    right: -8,
+  },
   avatar: {
     width: 56,
     height: 56,
@@ -324,6 +345,10 @@ const styles = StyleSheet.create({
   },
   matchInfo: {
     flex: 1,
+  },
+  matchNameRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   matchName: {
     fontSize: fontSize.lg,

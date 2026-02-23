@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -13,6 +13,9 @@ import { useAuth } from '../../context/AuthContext';
 import { useLocale } from '../../context/LocaleContext';
 import { useTheme } from '../../context/ThemeContext';
 import { spacing, borderRadius, fontSize, fontWeight, fontFamily } from '../../theme';
+import { ovaloApi, OvaloProfileResponse } from '../../services/ovalo';
+import OvaloCharacter from '../../components/Ovalo/OvaloCharacter';
+import TierBadge from '../../components/Ovalo/TierBadge';
 
 const ProfileScreen = () => {
   const { t } = useTranslation();
@@ -20,6 +23,11 @@ const ProfileScreen = () => {
   const { user, logout } = useAuth();
   const { country, timezone, setCountry } = useLocale();
   const { mode, isDark, colors, setMode, toggleTheme } = useTheme();
+  const [ovalo, setOvalo] = useState<OvaloProfileResponse | null>(null);
+
+  useEffect(() => {
+    ovaloApi.getProfile().then(setOvalo).catch(() => {});
+  }, []);
 
   return (
     <View style={[styles.container, { backgroundColor: colors.backgroundSecondary }]}>
@@ -41,8 +49,27 @@ const ProfileScreen = () => {
                 {user.name?.charAt(0)?.toUpperCase() || 'U'}
               </Text>
             </View>
-            <Text style={[styles.userName, { color: colors.textPrimary }]}>{user.name}</Text>
+            <View style={styles.nameRow}>
+              <Text style={[styles.userName, { color: colors.textPrimary }]}>{user.name}</Text>
+              {ovalo && <TierBadge tier={ovalo.tier} size="md" />}
+            </View>
             <Text style={[styles.userEmail, { color: colors.textSecondary }]}>{user.email}</Text>
+            {ovalo && (
+              <TouchableOpacity
+                style={[styles.ovaloProfileCard, { backgroundColor: colors.primaryLight }]}
+                activeOpacity={0.8}
+                onPress={() => navigation.navigate('OvaloProfile')}
+              >
+                <OvaloCharacter tier={ovalo.tier} featherLevel={ovalo.feather_level} size={44} showGlow={false} />
+                <View style={styles.ovaloProfileText}>
+                  <Text style={[styles.ovaloTierText, { color: colors.primary }]}>{ovalo.tier_label}</Text>
+                  <Text style={[styles.ovaloXPText, { color: colors.textSecondary }]}>
+                    {ovalo.total_xp.toLocaleString()} XP {ovalo.current_streak > 0 ? `· 🔥 ${ovalo.current_streak}d` : ''}
+                  </Text>
+                </View>
+                <Text style={[styles.ovaloChevron, { color: colors.textTertiary }]}>›</Text>
+              </TouchableOpacity>
+            )}
           </View>
         )}
 
@@ -233,8 +260,20 @@ const styles = StyleSheet.create({
     alignItems: 'center', justifyContent: 'center', marginBottom: spacing.md,
   },
   avatarLargeText: { fontSize: 32, fontWeight: fontWeight.bold },
+  nameRow: { flexDirection: 'row', alignItems: 'center' },
   userName: { fontSize: fontSize.xxl, fontWeight: fontWeight.bold },
   userEmail: { fontSize: fontSize.base, marginTop: spacing.xs },
+  ovaloProfileCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderRadius: borderRadius.md,
+    padding: spacing.md,
+    marginTop: spacing.md,
+  },
+  ovaloProfileText: { flex: 1, marginLeft: spacing.sm },
+  ovaloTierText: { fontFamily: fontFamily.roundedBold, fontSize: fontSize.base, fontWeight: fontWeight.bold },
+  ovaloXPText: { fontFamily: fontFamily.roundedRegular, fontSize: fontSize.sm, marginTop: 2 },
+  ovaloChevron: { fontSize: fontSize.xxl },
   card: {
     borderRadius: borderRadius.md, padding: spacing.lg,
     marginBottom: spacing.lg, borderWidth: 1,
