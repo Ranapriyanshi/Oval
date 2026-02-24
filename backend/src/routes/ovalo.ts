@@ -6,7 +6,13 @@ import { TIER_LABELS } from '../models/OvaloProfile';
 import { XP_VALUES } from '../models/XPTransaction';
 import OvaloProfile from '../models/OvaloProfile';
 import User from '../models/User';
-import { BADGE_CATALOG, BADGE_KEYS, isBadgeUnlocked, type BadgeKey } from '../constants/badges';
+import {
+  BADGE_CATALOG,
+  BADGE_KEYS,
+  isBadgeUnlocked,
+  isBadgeCurrentlyAvailable,
+  type BadgeKey,
+} from '../constants/badges';
 
 const router = express.Router();
 
@@ -100,11 +106,18 @@ router.get('/badges', authenticate, async (req: AuthRequest, res: Response) => {
       const def = BADGE_CATALOG[key];
       const unlocked = isBadgeUnlocked(key, profile.tier);
       const equipped = profile.equipped_badge === key;
+      const isSeasonal = !!def.season;
+      const isCurrentlyAvailable = isBadgeCurrentlyAvailable(def);
       return {
         key: def.key,
         name: def.name,
         description: def.description,
         emoji: def.emoji,
+        rarity: def.rarity ?? (isSeasonal ? 'seasonal' : 'core'),
+        season: def.season ?? null,
+        seasonLabel: def.seasonLabel ?? null,
+        isSeasonal,
+        isCurrentlyAvailable,
         unlocked,
         equipped,
       };
@@ -126,8 +139,13 @@ router.post(
       if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
 
       const key = req.params.key as BadgeKey;
+      const def = BADGE_CATALOG[key];
       const profile = await OvaloProfile.findOne({ where: { user_id: req.user!.id } });
       if (!profile) return res.status(404).json({ message: 'Ovalo profile not found' });
+
+      if (!isBadgeCurrentlyAvailable(def)) {
+        return res.status(403).json({ message: 'Badge is not currently available' });
+      }
 
       if (!isBadgeUnlocked(key, profile.tier)) {
         return res.status(403).json({ message: 'Badge not unlocked yet' });
