@@ -109,6 +109,28 @@ const OvaloScreen = () => {
     return `${days}d ago`;
   };
 
+  const coreBadges = badges.filter((b) => !b.isSeasonal);
+  const seasonalBadges = badges.filter((b) => b.isSeasonal);
+  const activeSeason = seasonalBadges.find((b) => b.isCurrentlyAvailable);
+  const currentSeasonLabel = activeSeason?.seasonLabel ?? null;
+
+  const handleBadgePress = (b: BadgeItem) => {
+    if (!b.unlocked) return;
+    if (b.isSeasonal && !b.isCurrentlyAvailable) return;
+
+    if (b.equipped) {
+      ovaloApi
+        .unequipBadge()
+        .then(() => load())
+        .catch((e) => console.error('Unequip badge error', e));
+    } else {
+      ovaloApi
+        .equipBadge(b.key)
+        .then(() => load())
+        .catch((e) => console.error('Equip badge error', e));
+    }
+  };
+
   if (loading || !profile) {
     return (
       <View style={[styles.container, { backgroundColor: colors.backgroundSecondary }]}>
@@ -273,35 +295,105 @@ const OvaloScreen = () => {
 
           {/* Badges / Embellishments */}
           <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>BADGES</Text>
-          <View style={[styles.badgesGrid, { backgroundColor: colors.surface }, shadow.sm]}>
-            {badges.map((b) => (
-              <TouchableOpacity
-                key={b.key}
-                style={[
-                  styles.badgeCard,
-                  { backgroundColor: colors.backgroundSecondary },
-                  !b.unlocked && styles.badgeLocked,
-                  b.equipped && { borderColor: colors.primary, borderWidth: 2 },
-                ]}
-                onPress={() => {
-                  if (!b.unlocked) return;
-                  if (b.equipped) {
-                    ovaloApi.unequipBadge().then(() => load());
-                  } else {
-                    ovaloApi.equipBadge(b.key).then(() => load());
-                  }
-                }}
-                activeOpacity={0.7}
-                disabled={!b.unlocked}
-              >
-                <Text style={styles.badgeEmoji}>{b.unlocked ? b.emoji : '🔒'}</Text>
-                <Text style={[styles.badgeName, { color: b.unlocked ? colors.textPrimary : colors.textTertiary }]} numberOfLines={1}>
-                  {b.unlocked ? b.name : '???'}
-                </Text>
-                {b.equipped && <Text style={[styles.badgeEquipped, { color: colors.primary }]}>Equipped</Text>}
-              </TouchableOpacity>
-            ))}
-          </View>
+          <Text style={[styles.badgesSubtitle, { color: colors.textSecondary }]}>
+            Seasonal badges are only available for a limited time.
+          </Text>
+          {currentSeasonLabel && (
+            <Text style={[styles.badgesSeasonNow, { color: colors.primary }]}>
+              Now live: {currentSeasonLabel}
+            </Text>
+          )}
+
+          {seasonalBadges.length > 0 && (
+            <>
+              <Text style={[styles.badgesGroupTitle, { color: colors.textPrimary }]}>Seasonal</Text>
+              <View style={[styles.badgesGrid, { backgroundColor: colors.surface }, shadow.sm]}>
+                {seasonalBadges.map((b) => {
+                  const isExpired = b.isSeasonal && !b.isCurrentlyAvailable;
+                  const disabled = !b.unlocked || isExpired;
+                  return (
+                    <TouchableOpacity
+                      key={b.key}
+                      style={[
+                        styles.badgeCard,
+                        { backgroundColor: colors.backgroundSecondary },
+                        !b.unlocked && styles.badgeLocked,
+                        isExpired && styles.badgeExpired,
+                        b.equipped && { borderColor: colors.primary, borderWidth: 2 },
+                      ]}
+                      onPress={() => handleBadgePress(b)}
+                      activeOpacity={0.7}
+                      disabled={disabled}
+                    >
+                      <Text style={styles.badgeEmoji}>
+                        {b.unlocked ? (isExpired ? '⏳' : b.emoji) : '🔒'}
+                      </Text>
+                      <Text
+                        style={[
+                          styles.badgeName,
+                          { color: disabled ? colors.textTertiary : colors.textPrimary },
+                        ]}
+                        numberOfLines={1}
+                      >
+                        {b.unlocked ? b.name : '???'}
+                      </Text>
+                      <Text style={[styles.badgeSeasonLabel, { color: colors.textSecondary }]} numberOfLines={1}>
+                        {b.seasonLabel || (b.isSeasonal ? 'Seasonal' : '')}
+                      </Text>
+                      {isExpired && (
+                        <Text style={[styles.badgeStatus, { color: colors.textTertiary }]}>Expired</Text>
+                      )}
+                      {b.equipped && !isExpired && (
+                        <Text style={[styles.badgeEquipped, { color: colors.primary }]}>Equipped</Text>
+                      )}
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+            </>
+          )}
+
+          {coreBadges.length > 0 && (
+            <>
+              <Text style={[styles.badgesGroupTitle, { color: colors.textPrimary }]}>Core</Text>
+              <View style={[styles.badgesGrid, { backgroundColor: colors.surface }, shadow.sm]}>
+                {coreBadges.map((b) => {
+                  const disabled = !b.unlocked;
+                  return (
+                    <TouchableOpacity
+                      key={b.key}
+                      style={[
+                        styles.badgeCard,
+                        { backgroundColor: colors.backgroundSecondary },
+                        !b.unlocked && styles.badgeLocked,
+                        b.equipped && { borderColor: colors.primary, borderWidth: 2 },
+                      ]}
+                      onPress={() => handleBadgePress(b)}
+                      activeOpacity={0.7}
+                      disabled={disabled}
+                    >
+                      <Text style={styles.badgeEmoji}>{b.unlocked ? b.emoji : '🔒'}</Text>
+                      <Text
+                        style={[
+                          styles.badgeName,
+                          { color: disabled ? colors.textTertiary : colors.textPrimary },
+                        ]}
+                        numberOfLines={1}
+                      >
+                        {b.unlocked ? b.name : '???'}
+                      </Text>
+                      <Text style={[styles.badgeSeasonLabel, { color: colors.textSecondary }]} numberOfLines={1}>
+                        Core badge
+                      </Text>
+                      {b.equipped && (
+                        <Text style={[styles.badgeEquipped, { color: colors.primary }]}>Equipped</Text>
+                      )}
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+            </>
+          )}
 
           {/* Recent XP Activity */}
           <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>RECENT XP</Text>
@@ -600,6 +692,23 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
 
+  badgesSubtitle: {
+    fontFamily: fontFamily.roundedRegular,
+    fontSize: fontSize.sm,
+    marginBottom: spacing.xs,
+  },
+  badgesSeasonNow: {
+    fontFamily: fontFamily.roundedSemibold,
+    fontSize: fontSize.sm,
+    marginBottom: spacing.sm,
+  },
+  badgesGroupTitle: {
+    fontFamily: fontFamily.roundedSemibold,
+    fontSize: fontSize.sm,
+    marginBottom: spacing.xs,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
   badgesGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -620,6 +729,9 @@ const styles = StyleSheet.create({
   badgeLocked: {
     opacity: 0.5,
   },
+  badgeExpired: {
+    opacity: 0.6,
+  },
   badgeEmoji: {
     fontSize: 28,
     marginBottom: spacing.xs,
@@ -629,8 +741,19 @@ const styles = StyleSheet.create({
     fontSize: fontSize.xs,
     textAlign: 'center',
   },
+  badgeSeasonLabel: {
+    fontFamily: fontFamily.roundedRegular,
+    fontSize: fontSize.xs - 1,
+    textAlign: 'center',
+    marginTop: 2,
+  },
   badgeEquipped: {
     fontFamily: fontFamily.roundedBold,
+    fontSize: fontSize.xs - 1,
+    marginTop: 2,
+  },
+  badgeStatus: {
+    fontFamily: fontFamily.roundedSemibold,
     fontSize: fontSize.xs - 1,
     marginTop: 2,
   },
