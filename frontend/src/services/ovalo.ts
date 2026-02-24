@@ -112,13 +112,20 @@ export type BadgeKey =
   | 'football_badge'
   | 'gold_crest'
   | 'golden_wing'
-  | 'tennis_ace';
+  | 'tennis_ace'
+  | 'summer_flare'
+  | 'monsoon_feather';
 
 export interface BadgeItem {
   key: BadgeKey;
   name: string;
   description: string;
   emoji: string;
+  rarity: 'core' | 'seasonal' | 'legendary';
+  season: string | null;
+  seasonLabel: string | null;
+  isSeasonal: boolean;
+  isCurrentlyAvailable: boolean;
   unlocked: boolean;
   equipped: boolean;
 }
